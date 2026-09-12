@@ -724,7 +724,7 @@ function SavedPlaceButton({
     <div className="relative group">
       <button
         type="button"
-        onClick={() => (place ? onSelect() : onStartEdit())}
+        onClick={(e) => { e.stopPropagation(); place ? onSelect() : onStartEdit(); }}
         className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 transition-colors duration-100 text-left"
       >
         <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 flex-shrink-0">
