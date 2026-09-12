@@ -76,8 +76,8 @@ describe("Fare policy (calculateFare)", () => {
     });
 
     expect(fare.fareBreakdown.distanceFare).toBe(130 * 12);
-    // 100 base + 1560 distance + 300 bata (130 km <= 400 slab)
-    expect(fare.estimatedFare).toBe(1960);
+    // 100 base + 1560 distance + 400 bata (130 km <= 400 slab, one-way standard)
+    expect(fare.estimatedFare).toBe(2060);
   });
 
   it("one-way minimum scales with days", async () => {
@@ -89,9 +89,9 @@ describe("Fare policy (calculateFare)", () => {
       days: 3,
     });
 
-    // max(100, 3*130) = 390 km; running 390 <= 400 so standard bata
+    // max(100, 3*130) = 390 km; running 390 <= 400 so standard bata (400/day one-way)
     expect(fare.fareBreakdown.distanceFare).toBe(390 * 12);
-    expect(fare.fareBreakdown.driverAllowance).toBe(300 * 3);
+    expect(fare.fareBreakdown.driverAllowance).toBe(400 * 3);
   });
 
   it("round trip to Bengaluru bills the 300 km/day minimum", async () => {
@@ -358,8 +358,8 @@ describe("Package-inclusive base fare (baseKm)", () => {
     expect(fare.fareBreakdown.baseKm).toBe(50);
     expect(fare.fareBreakdown.chargeableDistance).toBe(270);
     expect(fare.fareBreakdown.distanceFare).toBe(270 * 15);
-    // 1000 base + 4050 distance + 300 bata
-    expect(fare.estimatedFare).toBe(5350);
+    // 1000 base + 4050 distance + 400 bata (one-way standard)
+    expect(fare.estimatedFare).toBe(5450);
   });
 
   it("round trip 320km each way subtracts baseKm once from total 640km", async () => {

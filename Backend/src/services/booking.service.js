@@ -47,6 +47,12 @@ export const createBooking = async (
     vehicleType,
     paymentMethod = "Cash",
     customerNotes = "",
+    // Guest snapshot — when present (guest flow) these are stored atomically
+    // so the admin email sees the guest's real contact, not the placeholder
+    // `guest-<phone>@guest.letsgocab.local` account email.
+    guestName = null,
+    guestEmail = null,
+    guestPhone = null,
   } = bookingData;
 
   /* ===========================
@@ -129,6 +135,12 @@ export const createBooking = async (
       paymentMethod,
 
       customerNotes,
+
+      // Snapshot guest contact when provided (guest flow). Logged-in flow
+      // leaves these null — `getBookingEmailFields` falls back to User.
+      ...(guestName ? { guestName: String(guestName).trim() } : {}),
+      ...(guestEmail ? { guestEmail: String(guestEmail).trim().toLowerCase() } : {}),
+      ...(guestPhone ? { guestPhone: String(guestPhone).trim() } : {}),
 
       bookingStatus: "Pending",
 
@@ -339,7 +351,13 @@ export const createGuestBooking = async (guestData) => {
   }
 
   /* ===========================
-     STANDARD PIPELINE (same as logged-in flow)
+      STANDARD PIPELINE (same as logged-in flow)
+      Guest snapshot is stored atomically with the booking so the admin
+      email (sent inside createBooking) sees the real guest contact
+      (guestEmail/phone) rather than the placeholder account email. This
+      fixes production where most guest bookings appeared to send with
+      `guest-...@guest.letsgocab.local` instead of the guest's actual
+      email — perceived as "email not sent".
   =========================== */
 
   const result = await createBooking(customer._id, {
@@ -351,32 +369,13 @@ export const createGuestBooking = async (guestData) => {
     vehicleType,
     paymentMethod: "Cash",
     customerNotes,
+    guestName: guestName.trim(),
+    guestEmail: cleanEmail,
+    guestPhone,
   });
-
-  // Snapshot exactly what the guest typed (survives email reuse,
-  // name changes and placeholder account emails).
-  const stamped = await Booking.findByIdAndUpdate(
-    result.booking._id,
-    {
-      guestName: guestName.trim(),
-      guestEmail: cleanEmail,
-      guestPhone,
-    },
-    { new: true }
-  )
-    .populate("customer", "name phone profileImage")
-    .populate("vehicleType")
-    .populate({
-      path: "driver",
-      populate: [
-        { path: "user", select: "name phone profileImage" },
-        { path: "vehicleType" },
-      ],
-    });
 
   return {
     ...result,
-    booking: stamped || result.booking,
     duplicate: false,
     isGuest: true,
   };

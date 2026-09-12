@@ -32,6 +32,7 @@ import {
   assignDriver,
   cancelBooking,
   completeBooking,
+  resendBookingEmail,
   getAllReviews,
   hideReview,
   unhideReview,
@@ -96,6 +97,7 @@ router.get("/bookings/:id", validateParams(idParamSchema), getBookingById);
 router.patch("/bookings/:id/assign-driver", validateParams(idParamSchema), validate(assignDriverSchema), assignDriver);
 router.patch("/bookings/:id/cancel", validateParams(idParamSchema), validate(cancelBookingSchema), cancelBooking);
 router.patch("/bookings/:id/complete", validateParams(idParamSchema), completeBooking);
+router.post("/bookings/:id/resend-email", validateParams(idParamSchema), resendBookingEmail);
 
 // Withdrawals
 router.get("/withdrawals", getWithdrawalRequests);

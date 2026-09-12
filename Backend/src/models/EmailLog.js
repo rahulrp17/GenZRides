@@ -1,16 +1,18 @@
 import mongoose from "mongoose";
 
 // Idempotency ledger for admin booking alert emails.
-// One document per booking (unique index) so retries / duplicate
-// submissions can never send the same alert twice.
+// Only one `sent` record per booking — `failed`/`skipped` never block a
+// retry. A partial unique index enforces the sent deduplication at the DB
+// level while allowing transient failures to be retried (critical for prod
+// where SMTP can flap). Without this, a single SMTP timeout would create a
+// `failed` log with `unique:true` that permanently blocks that booking's
+// retry (duplicate-key 11000 on the next `sent` attempt).
 const emailLogSchema = new mongoose.Schema(
   {
     booking: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Booking",
       required: true,
-      unique: true,
-      index: true,
     },
 
     to: {
@@ -34,6 +36,12 @@ const emailLogSchema = new mongoose.Schema(
   {
     timestamps: true,
   }
+);
+
+// One `sent` per booking; `failed`/`skipped` never block retries.
+emailLogSchema.index(
+  { booking: 1 },
+  { unique: true, partialFilterExpression: { status: "sent" } }
 );
 
 export default mongoose.model("EmailLog", emailLogSchema);

@@ -204,14 +204,14 @@ const ManageVehicles = () => {
         )}
         {/* Status badge */}
         <div className="absolute top-3 left-3">
-          <span className={`px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide backdrop-blur-md ${v.isActive ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-400/30' : 'bg-red-500/25 text-red-300 border border-red-400/30'}`}>
+          <span className={`px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide backdrop-blur-md ${v.isActive ? 'bg-emerald-800 text-emerald-300 border border-emerald-400/30' : 'bg-red-500/25 text-red-300 border border-red-400/30'}`}>
             {v.isActive ? 'ACTIVE' : 'INACTIVE'}
           </span>
         </div>
         {/* AC badge */}
         {v.isAC && (
           <div className="absolute top-3 right-3">
-            <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-500/20 text-blue-300 border border-blue-400/25 backdrop-blur-md flex items-center gap-1">
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-500/20 text-blue-900 border border-blue-400/25 backdrop-blur-md flex items-center gap-1">
               <Snowflake size={11} /> AC
             </span>
           </div>

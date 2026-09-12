@@ -787,6 +787,32 @@ export const completeBooking = async (req, res) => {
 };
 
 /**
+ * RESEND BOOKING EMAIL TO ADMIN (retry after SMTP/config fix)
+ * Idempotent: if already `sent` it returns duplicate, otherwise attempts
+ * to deliver. Uses the same env-only recipient logic as the creation hook.
+ */
+export const resendBookingEmail = async (req, res) => {
+  try {
+    const { resendAdminBookingEmail } = await import("../services/email.service.js");
+    const result = await resendAdminBookingEmail(req.params.id);
+    const status = result.sent ? 200 : result.skipped === "duplicate" ? 200 : result.skipped === "booking-not-found" ? 404 : 502;
+    res.status(status).json({
+      success: result.sent,
+      ...result,
+      message: result.sent
+        ? "Booking email resent to admin."
+        : result.skipped === "duplicate"
+          ? "Email already sent for this booking."
+          : result.skipped === "booking-not-found"
+            ? "Booking not found."
+            : `Email not sent: ${result.skipped}`,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
  * GET ALL REVIEWS
  */
 export const getAllReviews = async (

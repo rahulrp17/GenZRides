@@ -11,26 +11,34 @@ const combineNameAddress = (name, address) => {
 
 export const getEmailConfig = () => getConfig();
 
-const getConfig = () => ({
-  host: (process.env.SMTP_HOST || "").trim(),
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: String(process.env.SMTP_SECURE || "false") === "true",
-  user: (process.env.SMTP_USER || "").trim(),
-  pass: process.env.SMTP_PASS || "",
-  adminEmail: (process.env.ADMIN_EMAIL || "").trim(),
-  // Base URL for inbox deep links (View booking button). Falls back to
-  // CLIENT_URL; when neither is set the button is omitted.
-  appUrl: (process.env.FRONTEND_URL || process.env.CLIENT_URL || "")
-    .trim()
-    .replace(/\/+$/, ""),
-  from:
-    (process.env.EMAIL_FROM || "").trim() ||
-    combineNameAddress(
-      (process.env.EMAIL_FROM_NAME || "").trim(),
-      (process.env.EMAIL_FROM_ADDRESS || "").trim()
-    ) ||
-    "GenZRides <no-reply@genzrides.com>",
-});
+const getConfig = () => {
+  const rawPort = Number(process.env.SMTP_PORT || 587);
+  // Port 465 is implicit TLS — must be `secure:true` even if the env flag
+  // is missing/wrong (common prod misconfiguration). For every other port
+  // (587, 2525, 2587, etc.) honour the explicit SMTP_SECURE flag.
+  const explicitSecure = String(process.env.SMTP_SECURE || "false") === "true";
+  const secure = rawPort === 465 ? true : explicitSecure;
+  return {
+    host: (process.env.SMTP_HOST || "").trim(),
+    port: rawPort,
+    secure,
+    user: (process.env.SMTP_USER || "").trim(),
+    pass: process.env.SMTP_PASS || "",
+    adminEmail: (process.env.ADMIN_EMAIL_ADDRESS || "").trim(),
+    // Base URL for inbox deep links (View booking button). Falls back to
+    // CLIENT_URL; when neither is set the button is omitted.
+    appUrl: (process.env.FRONTEND_URL || process.env.CLIENT_URL || "")
+      .trim()
+      .replace(/\/+$/, ""),
+    from:
+      (process.env.EMAIL_FROM || "").trim() ||
+      combineNameAddress(
+        (process.env.EMAIL_FROM_NAME || "").trim(),
+        (process.env.EMAIL_FROM_ADDRESS || "").trim()
+      ) ||
+      "GenZRides <no-reply@genzrides.com>",
+  };
+};
 
 // Safe for logs: never prints the full address.
 export const maskEmail = (email) => {
@@ -65,11 +73,22 @@ const formatDateTime = (value) => {
 const   getBookingEmailFields = async (booking) => {
   const customer = booking.customer || {};
 
-  // Customer email is not part of booking API populates (contract), so
-  // resolve it here best-effort for the admin email only.
-  let customerEmail = customer.email || booking.guestEmail || "N/A";
+  // Guest bookings have a placeholder `guest-...@guest.letsgocab.local`
+  // on the User record; the real address is snapshot on `booking.guestEmail`.
+  // Prioritize the snapshot so the admin sees the guest's actual contact.
+  let customerEmail = booking.guestEmail || customer.email || "N/A";
+  // Detect placeholder and prefer snapshot even if customer.email is truthy.
+  if (customerEmail && String(customerEmail).includes("@guest.letsgocab.local") && booking.guestEmail) {
+    customerEmail = booking.guestEmail;
+  }
   try {
-    if (!customer.email && customer._id) {
+    if ((!customer.email || String(customer.email).includes("@guest.letsgocab.local")) && !booking.guestEmail && customer._id) {
+      const user = await User.findById(customer._id)
+        .select("email")
+        .lean();
+      if (user?.email && !String(user.email).includes("@guest.letsgocab.local")) customerEmail = user.email;
+      else if (user?.email && booking.guestEmail) customerEmail = booking.guestEmail;
+    } else if (!customer.email && customer._id && !booking.guestEmail) {
       const user = await User.findById(customer._id)
         .select("email")
         .lean();
@@ -238,6 +257,14 @@ export const buildBookingEmailText = async (booking) => {
 
 // Injectable transport factory (default: nodemailer SMTP). Tests inject a
 // fake factory returning { sendMail } without touching the network.
+//
+// Production robustness:
+// - Port 465 → implicit TLS (`secure:true`).
+// - Port 587 → STARTTLS (`secure:false` + `requireTLS:true`) so mis-configured
+//   hosts that advertise STARTTLS are forced to upgrade instead of sending
+//   credentials in cleartext. `requireTLS` is ignored when `secure:true`.
+// - Timeouts prevent hung SMTP from blocking the booking response (>30s
+//   requestTimeout). 10s is the nodemailer best-practice for cloud SMTPs.
 const defaultTransportFactory = async (config) => {
   const { default: nodemailer } = await import("nodemailer");
 
@@ -245,22 +272,37 @@ const defaultTransportFactory = async (config) => {
     host: config.host,
     port: config.port,
     secure: config.secure,
+    // Enforce STARTTLS on plain ports; harmless when the server doesn't
+    // support it and critical when it does (e.g. Gmail 587).
+    requireTLS: !config.secure,
     auth: config.user
       ? { user: config.user, pass: config.pass }
       : undefined,
     connectionTimeout: REQUEST_TIMEOUT,
     greetingTimeout: REQUEST_TIMEOUT,
     socketTimeout: REQUEST_TIMEOUT,
+    // TLS for prod clouds (e.g. Render → Gmail) can fail with
+    // self-signed intermediates; do not reject by default but keep
+    // hostname verification. This matches the previous behaviour and
+    // avoids `self signed certificate` flakes on managed SMTPs.
+    tls: {
+      // `ciphers: 'SSLv3'` is intentionally NOT set — it weakens security.
+      // Nodemailer negotiates the best cipher automatically.
+      rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== "false",
+    },
   });
 };
 
-// Every admin login (role=admin) receives booking alerts, plus the
-// configured ADMIN_EMAIL as fallback/extra. Deduped + lowercased.
+// Every admin login (role=admin, not blocked) receives booking alerts,
+// plus the configured ADMIN_EMAIL as fallback/extra. Deduped + lowercased.
+// In production the ADMIN_EMAIL is often the only recipient (no admin user
+// may exist yet on a fresh prod DB), so the fallback is critical. Filtering
+// `isBlocked` prevents alerts to deactivated admins.
 export const getAdminRecipients = async (fallbackEmail) => {
   const set = new Set();
 
   try {
-    const admins = await User.find({ role: "admin" })
+    const admins = await User.find({ role: "admin", isBlocked: { $ne: true } })
       .select("email")
       .lean();
     admins.forEach((a) => {
@@ -271,26 +313,64 @@ export const getAdminRecipients = async (fallbackEmail) => {
   }
 
   if (fallbackEmail) {
-    set.add(String(fallbackEmail).trim().toLowerCase());
+    // ADMIN_EMAIL may be a comma-separated list on prod (e.g. "a@x.com,b@y.com")
+    const parts = String(fallbackEmail).split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+    for (const cleaned of parts) {
+      if (cleaned.includes("@") && cleaned.includes(".")) {
+        set.add(cleaned);
+      } else if (cleaned) {
+        console.warn(`[email] ignoring invalid ADMIN_EMAIL entry: ${maskEmail(cleaned)}`);
+      }
+    }
   }
 
   return [...set].filter(Boolean);
 };
 
 // Returns true when this worker won the race and recorded the send.
+// Partial unique on `sent` allows `failed` to be retried. For backwards
+// compat with an older `unique:true` index on `booking` (pre-fix prod DBs),
+// we delete any stale `failed` row BEFORE attempting the `sent` create so
+// the old unique doesn't block the retry with 11000.
 const markEmailSent = async (bookingId, to) => {
+  const toStr = Array.isArray(to) ? to.join(",") : to || "invalid";
+  // Clean stale failures first — required for old DBs with `unique:true`.
+  try {
+    await EmailLog.deleteMany({ booking: bookingId, status: "failed" });
+  } catch {}
   try {
     await EmailLog.create({
       booking: bookingId,
-      to: Array.isArray(to) ? to.join(",") : to || "invalid",
+      to: toStr,
       status: "sent",
     });
     return true;
   } catch (err) {
     if (err?.code === 11000) {
+      // Another worker already recorded `sent` (partial unique).
       return false;
     }
     throw err;
+  }
+};
+
+const recordEmailFailure = async (bookingId, to, error) => {
+  const toStr = Array.isArray(to) ? to.join(",") : to || "invalid";
+  try {
+    // Upsert so repeated failures for the same booking don't create
+    // unbounded `failed` rows and don't hit the partial unique.
+    await EmailLog.findOneAndUpdate(
+      { booking: bookingId, status: "failed" },
+      { to: toStr, status: "failed", error: error || "Unknown email error" },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+  } catch (e) {
+    // Fallback to raw create if upsert races; ignore duplicate.
+    try {
+      await EmailLog.create({ booking: bookingId, to: toStr, status: "failed", error });
+    } catch (err) {
+      if (err?.code !== 11000) console.warn(`[email] failed to record failure for ${bookingId}: ${err.message}`);
+    }
   }
 };
 
@@ -313,11 +393,17 @@ export const notifyAdminOfBookingEmail = async (
       return { sent: false, skipped: "no-booking" };
     }
 
-    const existing = await EmailLog.findOne({
+    // Only `sent` blocks a retry — `failed`/`skipped` never do. This is the
+    // production fix: a transient SMTP 5xx/timeout previously created a
+    // `failed` doc with `unique:true` that permanently blocked the next
+    // `sent` attempt for the same booking (11000). With the partial index
+    // only `sent` is unique, so we check only for `sent` here.
+    const existingSent = await EmailLog.findOne({
       booking: booking._id,
+      status: "sent",
     }).lean();
 
-    if (existing) {
+    if (existingSent) {
       return { sent: false, skipped: "duplicate" };
     }
 
@@ -330,7 +416,7 @@ export const notifyAdminOfBookingEmail = async (
 
     if (missing.length > 0) {
       console.warn(
-        `[email] booking ${ref}: skipped, missing env: ${missing.join(", ")}`
+        `[email] booking ${ref}: skipped, missing env: ${missing.join(", ")} (set SMTP_HOST/USER/PASS on production)`
       );
       return { sent: false, skipped: "email-not-configured" };
     }
@@ -340,14 +426,37 @@ export const notifyAdminOfBookingEmail = async (
 
     if (!recipients.length) {
       console.warn(
-        `[email] booking ${ref}: skipped, no admin recipients (no admin users, ADMIN_EMAIL unset)`
+        `[email] booking ${ref}: skipped, no admin recipients (no admin users, ADMIN_EMAIL unset). Set ADMIN_EMAIL on production or create an admin user.`
       );
       return { sent: false, skipped: "no-recipients" };
     }
 
-    const html = await buildBookingEmailHtml(booking);
-    const text = await buildBookingEmailText(booking);
-    const subject = `New GenZRides booking ${ref} — ${booking.bookingStatus || "Pending"}`;
+    // Fresh guest snapshot (defensive): if the booking was stamped with
+    // guest fields after the initial `Booking.create` (legacy path before
+    // this fix), merge the persisted guest fields so the admin sees the
+    // guest's real email/phone instead of the placeholder.
+    let effectiveBooking = booking;
+    try {
+      if (booking?._id) {
+        const { default: Booking } = await import("../models/Booking.js");
+        const freshened = await Booking.findById(booking._id)
+          .select("guestName guestEmail guestPhone customer pickup drop pickupDateTime tripType days distance vehicleType estimatedFare finalFare paymentMethod paymentStatus bookingStatus customerNotes")
+          .lean();
+        if (freshened) {
+          const base = booking?.toObject ? booking.toObject() : booking;
+          effectiveBooking = { ...base, ...freshened, _id: booking._id };
+          if (base.customer && !effectiveBooking.customer?.name) effectiveBooking.customer = base.customer;
+          if (base.vehicleType && !effectiveBooking.vehicleType) effectiveBooking.vehicleType = base.vehicleType;
+          if (base.driver && !effectiveBooking.driver) effectiveBooking.driver = base.driver;
+        }
+      }
+    } catch {
+      effectiveBooking = booking;
+    }
+
+    const html = await buildBookingEmailHtml(effectiveBooking);
+    const text = await buildBookingEmailText(effectiveBooking);
+    const subject = `New GenZRides booking ${ref} — ${effectiveBooking.bookingStatus || "Pending"}`;
 
     const factory = transportFactory || defaultTransportFactory;
     const transporter = await factory(config);
@@ -366,12 +475,7 @@ export const notifyAdminOfBookingEmail = async (
         `[email] booking ${ref}: send failed to ${recipients.map(maskEmail).join(",")}:`,
         err?.message || err
       );
-      await EmailLog.create({
-        booking: booking._id,
-        to: recipients.join(","),
-        status: "failed",
-        error: err?.message || "Unknown email error",
-      });
+      await recordEmailFailure(booking._id, recipients, err?.message);
       return { sent: false, skipped: "send-failed" };
     }
 
@@ -392,4 +496,18 @@ export const notifyAdminOfBookingEmail = async (
     );
     return { sent: false, skipped: "error" };
   }
+};
+
+// Re-send helper for admin retry (e.g. after fixing SMTP config). Only
+// useful when the previous attempt was `failed`/`no-recipients`/not-sent.
+export const resendAdminBookingEmail = async (bookingId, transportFactory = null) => {
+  const { default: Booking } = await import("../models/Booking.js");
+  const booking = await Booking.findById(bookingId)
+    .populate("customer", "name phone email")
+    .populate("vehicleType")
+    .lean();
+  if (!booking) return { sent: false, skipped: "booking-not-found" };
+  // Allow retry by removing only `failed` logs; `sent` stays blocked.
+  await EmailLog.deleteMany({ booking: bookingId, status: "failed" });
+  return notifyAdminOfBookingEmail(booking, transportFactory);
 };

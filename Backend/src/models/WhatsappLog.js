@@ -1,16 +1,14 @@
 import mongoose from "mongoose";
 
 // Idempotency ledger for admin WhatsApp booking alerts.
-// One document per booking (unique index) so retries / duplicate
-// submissions can never send the same alert twice.
+// Same partial-unique policy as EmailLog — only `sent` is unique so
+// transient Meta API failures can be retried.
 const whatsappLogSchema = new mongoose.Schema(
   {
     booking: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Booking",
       required: true,
-      unique: true,
-      index: true,
     },
 
     to: {
@@ -34,6 +32,11 @@ const whatsappLogSchema = new mongoose.Schema(
   {
     timestamps: true,
   }
+);
+
+whatsappLogSchema.index(
+  { booking: 1 },
+  { unique: true, partialFilterExpression: { status: "sent" } }
 );
 
 export default mongoose.model("WhatsappLog", whatsappLogSchema);

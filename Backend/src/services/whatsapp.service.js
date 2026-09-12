@@ -195,7 +195,11 @@ export const buildBookingTemplateParams = async (booking) => {
 };
 
 // Returns true when this worker won the race and recorded the send.
+// See email.service.js — delete stale `failed` first for old `unique:true` DBs.
 const markAlertSent = async (bookingId, to) => {
+  try {
+    await WhatsappLog.deleteMany({ booking: bookingId, status: "failed" });
+  } catch {}
   try {
     await WhatsappLog.create({
       booking: bookingId,
@@ -208,6 +212,22 @@ const markAlertSent = async (bookingId, to) => {
       return false;
     }
     throw err;
+  }
+};
+
+const recordWhatsappFailure = async (bookingId, to, error) => {
+  try {
+    await WhatsappLog.findOneAndUpdate(
+      { booking: bookingId, status: "failed" },
+      { to: to || "invalid", status: "failed", error: error || "Unknown WhatsApp error" },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+  } catch {
+    try {
+      await WhatsappLog.create({ booking: bookingId, to: to || "invalid", status: "failed", error });
+    } catch (err) {
+      if (err?.code !== 11000) console.warn(`[whatsapp] failed to record failure for ${bookingId}: ${err.message}`);
+    }
   }
 };
 
@@ -224,10 +244,11 @@ export const notifyAdminOfBooking = async (booking, sender = null) => {
   try {
     if (!booking?._id) return { sent: false, skipped: "no-booking" };
 
-    const existing = await WhatsappLog.findOne({
+    const existingSent = await WhatsappLog.findOne({
       booking: booking._id,
+      status: "sent",
     }).lean();
-    if (existing) {
+    if (existingSent) {
       return { sent: false, skipped: "duplicate" };
     }
 
@@ -250,12 +271,7 @@ export const notifyAdminOfBooking = async (booking, sender = null) => {
         `[whatsapp] booking ${ref}: invalid admin number format (${maskPhone(to)}). ` +
           `Set WHATSAPP_BUSINESS_NUMBER to full international digits, e.g. 91934830199.`
       );
-      await WhatsappLog.create({
-        booking: booking._id,
-        to: to || "invalid",
-        status: "failed",
-        error: "Invalid admin WhatsApp number format",
-      });
+      await recordWhatsappFailure(booking._id, to || "invalid", "Invalid admin WhatsApp number format");
       return { sent: false, skipped: "send-failed" };
     }
 
@@ -299,12 +315,7 @@ export const notifyAdminOfBooking = async (booking, sender = null) => {
         `[whatsapp] booking ${ref}: Meta API error`,
         JSON.stringify(safe)
       );
-      await WhatsappLog.create({
-        booking: booking._id,
-        to: to || "invalid",
-        status: "failed",
-        error: safe.message,
-      });
+      await recordWhatsappFailure(booking._id, to || "invalid", safe.message);
       return { sent: false, skipped: "send-failed", detail: safe };
     }
 

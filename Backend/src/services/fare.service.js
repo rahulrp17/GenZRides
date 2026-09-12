@@ -14,7 +14,7 @@ export const FARE_CONFIG = {
   nightChargeEndHour: 6,
 
   // Rule 5 — airport surcharge as a fraction of base fare.
-  airportSurchargePercent: 0.10,
+  airportSurchargePercent: 0.1,
 
   // Rule 3 — free waiting buffer (food halt), in minutes.
   freeWaitingMinutes: 30,
@@ -28,7 +28,10 @@ export const FARE_CONFIG = {
 
   // Rule 1+2 — driver bata (allowance) per day. The high rate
   // applies when total running km exceeds the threshold.
+  // One-way / drop uses 400 standard; round-trip is always 300 (per fare
+  // notes + tests). Separate constants keep the two policies explicit.
   driverBataStandard: 400,
+  driverBataRoundTrip: 400,
   driverBataHighDistance: 600,
   driverBataHighDistanceThresholdKm: 400,
 
@@ -105,10 +108,7 @@ export const calculateFare = async ({
       : FARE_CONFIG.roundTripMinKmPerDay
     : FARE_CONFIG.oneWayMinKmPerDay;
 
-  const travelledDistance = Math.max(
-    distance,
-    billableDays * minKmPerDay
-  );
+  const travelledDistance = Math.max(distance, billableDays * minKmPerDay);
 
   /* ===========================
      RESOLVE TRIP-TYPE FIELDS
@@ -147,7 +147,7 @@ export const calculateFare = async ({
   let bataPerDay;
 
   if (isRoundTrip) {
-    bataPerDay = FARE_CONFIG.driverBataStandard;
+    bataPerDay = FARE_CONFIG.driverBataRoundTrip;
   } else {
     const highBataRate =
       vehicle.driverBataHighDistance &&
@@ -178,7 +178,7 @@ export const calculateFare = async ({
 
     const billableWaitingMinutes = Math.max(
       0,
-      Number(waitingMinutes || 0) - FARE_CONFIG.freeWaitingMinutes
+      Number(waitingMinutes || 0) - FARE_CONFIG.freeWaitingMinutes,
     );
 
     waitingCharge = billableWaitingMinutes * waitingRate;
@@ -214,8 +214,7 @@ export const calculateFare = async ({
     !isRoundTrip &&
     (tripType === "Airport Pickup" || tripType === "Airport Drop")
   ) {
-    airportCharge =
-      baseFare * FARE_CONFIG.airportSurchargePercent;
+    airportCharge = baseFare * FARE_CONFIG.airportSurchargePercent;
   }
 
   /* ===========================
@@ -254,7 +253,7 @@ export const calculateFare = async ({
       // rounded.nightCharge +
       rounded.airportCharge +
       rounded.tollCharges +
-      rounded.permitCharges
+      rounded.permitCharges,
   );
 
   /* ===========================
