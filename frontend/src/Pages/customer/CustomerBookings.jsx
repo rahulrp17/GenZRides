@@ -31,7 +31,7 @@ const CustomerBookings = () => {
   const { copied, copyBooking } = useCopyBooking();
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isFetching, isError, error } = useQuery({
     queryKey: ['myBookings', page, statusFilter],
     queryFn: async () => {
       const params = { page, limit: 10 };
@@ -39,6 +39,8 @@ const CustomerBookings = () => {
       const { data } = await bookingAPI.getMyBookings(params);
       return data;
     },
+    staleTime: 30000,
+    placeholderData: (prev) => prev,
   });
 
   const cancelMutation = useMutation({
@@ -108,7 +110,7 @@ const CustomerBookings = () => {
         </div>
       </div>
 
-      {isLoading ? (
+      {(isLoading || (isFetching && !data)) ? (
         <TableSkeleton rows={5} cols={6} />
       ) : bookings.length === 0 ? (
         <EmptyState

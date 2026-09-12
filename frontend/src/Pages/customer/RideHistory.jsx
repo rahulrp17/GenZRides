@@ -18,7 +18,7 @@ const RideHistory = () => {
   const [cancelId, setCancelId] = useState(null);
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isFetching, isError, error } = useQuery({
     queryKey: ['myBookings', page, statusFilter],
     queryFn: async () => {
       const params = { page, limit: 10 };
@@ -26,6 +26,8 @@ const RideHistory = () => {
       const { data } = await historyAPI.getAll(params);
       return data;
     },
+    staleTime: 30000,
+    placeholderData: (prev) => prev,
   });
 
   const cancelMutation = useMutation({
@@ -89,7 +91,7 @@ const RideHistory = () => {
         </div>
       </div>
 
-      {isLoading ? (
+      {(isLoading || (isFetching && !data)) ? (
         <TableSkeleton rows={5} cols={5} />
       ) : bookings.length === 0 ? (
         <EmptyState
