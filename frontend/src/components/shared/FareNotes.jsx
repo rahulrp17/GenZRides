@@ -10,17 +10,17 @@ const NOTES = [
   {
     icon: Wallet,
     title: "Driver bata",
-    text: "₹300/day from day one. One-way/drop: ₹600/day when total running exceeds 400 km. Round trip: ₹300/day always.",
+    text: "₹400/day from day one. One-way/drop: ₹600/day when total running exceeds 400 km. Round trip: ₹300/day always.",
   },
   {
     icon: Timer,
     title: "Waiting charge",
-    text: "One-way only. After the driver arrives at pickup and waits over 30 min: ₹2/min (first 30 min free).",
+    text: "One-way only. After the driver arrives at pickup and waits over 30 min: ₹2.5/min (first 30 min free).",
   },
   {
     icon: Receipt,
     title: "Toll + permit",
-    text: "One-way only. Toll fee and interstate permit fee apply when applicable, at actuals.",
+    text: " Toll fee and interstate permit fee apply when applicable, at actuals.",
   },
   {
     icon: XCircle,

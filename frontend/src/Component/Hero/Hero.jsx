@@ -63,7 +63,7 @@ const Hero = () => {
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-16 lg:items-center">
 
         {/* LEFT — headline — full viewport on mobile */}
-        <div className="min-h-[100dvh] flex flex-col justify-center pt-20 pb-8 lg:min-h-0 lg:pt-32 lg:pb-24">
+        <div className=" flex flex-col justify-center pt-20 pb-8 lg:min-h-0 lg:pt-32 lg:pb-24">
           <Motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
