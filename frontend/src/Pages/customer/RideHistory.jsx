@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { Clock, MapPin, Star, X, Eye, Download, Filter } from 'lucide-react';
 import { historyAPI, bookingAPI, invoiceAPI } from '../../services/endpoints';
+import { useSocket } from '../../Context/SocketContext';
 import { TableSkeleton } from '../../components/shared/Skeleton';
 import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
@@ -18,6 +19,7 @@ const RideHistory = () => {
   const [cancelId, setCancelId] = useState(null);
   const queryClient = useQueryClient();
 
+  const { socket } = useSocket();
   const { data, isLoading, isFetching, isError, error } = useQuery({
     queryKey: ['myBookings', page, statusFilter],
     queryFn: async () => {
@@ -26,9 +28,28 @@ const RideHistory = () => {
       const { data } = await historyAPI.getAll(params);
       return data;
     },
-    staleTime: 30000,
+    staleTime: 10000,
     placeholderData: (prev) => prev,
+    refetchInterval: 15000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
   });
+
+  useEffect(() => {
+    if (!socket) return;
+    const onUpdate = () => queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+    socket.on('booking-updated', onUpdate);
+    socket.on('ride-status-updated', onUpdate);
+    socket.on('notification', onUpdate);
+    const onVis = () => { if (document.visibilityState === 'visible') queryClient.invalidateQueries({ queryKey: ['myBookings'] }); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      socket.off('booking-updated', onUpdate);
+      socket.off('ride-status-updated', onUpdate);
+      socket.off('notification', onUpdate);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [socket, queryClient]);
 
   const cancelMutation = useMutation({
     mutationFn: ({ id, reason }) => bookingAPI.cancel(id, { cancelReason: reason }),
