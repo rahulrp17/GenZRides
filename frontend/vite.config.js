@@ -25,7 +25,7 @@ export default defineConfig({
           if (id.includes('react-icons') || id.includes('lucide-react')) return 'vendor-icons';
           if (id.includes('@tanstack/react-query') || id.includes('axios') || id.includes('socket.io-client')) return 'vendor-data';
           if (id.includes('react-router-dom')) return 'vendor-router';
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/') || id.includes('node_modules/scheduler/')) return 'vendor-react';
+          // Keep React in main vendor to avoid createContext order bug (vendor-BiyTdn7a before vendor-react)
           return 'vendor';
         },
         assetFileNames: 'assets/[name]-[hash][extname]',
