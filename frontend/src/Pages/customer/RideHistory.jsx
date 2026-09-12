@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { Clock, MapPin, Star, X, Eye, Download, Filter } from 'lucide-react';
+import { Clock, MapPin, Star, X, Eye, Download, Filter, RefreshCw } from 'lucide-react';
 import { historyAPI, bookingAPI, invoiceAPI } from '../../services/endpoints';
 import { useSocket } from '../../Context/SocketContext';
 import { TableSkeleton } from '../../components/shared/Skeleton';
@@ -21,27 +21,35 @@ const RideHistory = () => {
 
   const { socket } = useSocket();
   const { data, isLoading, isFetching, isError, error } = useQuery({
-    queryKey: ['myBookings', page, statusFilter],
+    queryKey: ['rideHistory', page, statusFilter],
     queryFn: async () => {
       const params = { page, limit: 10 };
       if (statusFilter) params.status = statusFilter;
       const { data } = await historyAPI.getAll(params);
       return data;
     },
-    staleTime: 10000,
+    staleTime: 0,
+    gcTime: 5 * 60 * 1000,
     placeholderData: (prev) => prev,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
     refetchInterval: 15000,
     refetchIntervalInBackground: true,
-    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
     if (!socket) return;
-    const onUpdate = () => queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+    const onUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ['rideHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+    };
     socket.on('booking-updated', onUpdate);
     socket.on('ride-status-updated', onUpdate);
     socket.on('notification', onUpdate);
-    const onVis = () => { if (document.visibilityState === 'visible') queryClient.invalidateQueries({ queryKey: ['myBookings'] }); };
+    const onVis = () => { if (document.visibilityState === 'visible') {
+      queryClient.invalidateQueries({ queryKey: ['rideHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+    }};
     document.addEventListener('visibilitychange', onVis);
     return () => {
       socket.off('booking-updated', onUpdate);
@@ -55,6 +63,7 @@ const RideHistory = () => {
     mutationFn: ({ id, reason }) => bookingAPI.cancel(id, { cancelReason: reason }),
     onSuccess: () => {
       toast.success('Booking cancelled');
+      queryClient.invalidateQueries({ queryKey: ['rideHistory'] });
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
       setCancelId(null);
     },
@@ -79,7 +88,7 @@ const RideHistory = () => {
   const bookings = data?.data || [];
   const pagination = data?.pagination || {};
 
-  if (isError) return <ErrorState message={error?.message || 'Failed to load ride history'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['myBookings'] })} />;
+  if (isError) return <ErrorState message={error?.message || 'Failed to load ride history'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['rideHistory'] })} />;
 
   const statusColors = {
     Pending: 'bg-amber-500/10 text-amber-400',
@@ -97,6 +106,14 @@ const RideHistory = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="font-display text-2xl font-bold text-white tracking-tight">Ride History</h1>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['rideHistory'] })}
+            disabled={isFetching}
+            title="Refresh"
+            className="p-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition disabled:opacity-50"
+          >
+            <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
+          </button>
           <Filter size={16} className="text-gray-500" />
           <select
             value={statusFilter}

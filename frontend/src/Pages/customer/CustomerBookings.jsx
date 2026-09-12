@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { Calendar, MapPin, Clock, Car, Eye, X, Download, Filter, Copy, Check } from 'lucide-react';
+import { Calendar, MapPin, Clock, Car, Eye, X, Download, Filter, Copy, Check, RefreshCw } from 'lucide-react';
 import { bookingAPI, invoiceAPI } from '../../services/endpoints';
 import { useSocket } from '../../Context/SocketContext';
 import { useCopyBooking } from '../../utils/bookingText';
@@ -41,20 +41,28 @@ const CustomerBookings = () => {
       const { data } = await bookingAPI.getMyBookings(params);
       return data;
     },
-    staleTime: 10000,
+    staleTime: 0,
+    gcTime: 5 * 60 * 1000,
     placeholderData: (prev) => prev,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
     refetchInterval: 15000,
     refetchIntervalInBackground: true,
-    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
     if (!socket) return;
-    const onUpdate = () => queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+    const onUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['rideHistory'] });
+    };
     socket.on('booking-updated', onUpdate);
     socket.on('ride-status-updated', onUpdate);
     socket.on('notification', onUpdate);
-    const onVis = () => { if (document.visibilityState === 'visible') queryClient.invalidateQueries({ queryKey: ['myBookings'] }); };
+    const onVis = () => { if (document.visibilityState === 'visible') {
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['rideHistory'] });
+    }};
     document.addEventListener('visibilitychange', onVis);
     return () => {
       socket.off('booking-updated', onUpdate);
@@ -69,6 +77,7 @@ const CustomerBookings = () => {
     onSuccess: () => {
       toast.success('Booking cancelled');
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['rideHistory'] });
       setCancelId(null);
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to cancel'),
@@ -112,6 +121,14 @@ const CustomerBookings = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="font-display text-2xl font-bold text-white tracking-tight">My Bookings</h1>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['myBookings'] })}
+            disabled={isFetching}
+            title="Refresh"
+            className="p-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition disabled:opacity-50"
+          >
+            <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
+          </button>
           <Filter size={16} className="text-gray-400" />
           <select
             value={statusFilter}
