@@ -125,13 +125,19 @@ export default function LocationPicker({
     }
   }, [dropAddress, activeField]);
 
-  // Focus input when field becomes active
+  // Focus input when field becomes active + ensure dropdown visible above keyboard
   useEffect(() => {
     if (activeField === "pickup" && pickupInputRef.current) {
-      setTimeout(() => pickupInputRef.current?.focus(), 50);
+      setTimeout(() => {
+        pickupInputRef.current?.focus();
+        dropdownRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 80);
     }
     if (activeField === "drop" && dropInputRef.current) {
-      setTimeout(() => dropInputRef.current?.focus(), 50);
+      setTimeout(() => {
+        dropInputRef.current?.focus();
+        dropdownRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 80);
     }
   }, [activeField]);
 
@@ -381,7 +387,7 @@ export default function LocationPicker({
   const inputValue = isPickupActive ? pickupInputValue : dropInputValue;
 
   return (
-    <div className="w-full max-w-full min-w-0" ref={dropdownRef}>
+    <div className="w-full max-w-full min-w-0 relative" ref={dropdownRef}>
       {/* Location Inputs Card */}
       <div className="bg-white/5 rounded-2xl shadow-sm border border-white/10 overflow-hidden max-w-full">
         <div className="p-4 pb-3">
@@ -488,7 +494,7 @@ export default function LocationPicker({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="fixed lg:absolute left-4 right-4 lg:left-0 lg:right-0 bottom-4 lg:bottom-auto lg:top-full lg:mt-2 w-auto lg:w-full max-w-full bg-gray-900 lg:bg-white/5 rounded-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[50dvh] sm:max-h-[60vh] overflow-y-auto overscroll-contain z-50"
+            className="absolute left-0 right-0 top-full mt-2 w-full max-w-full bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[45dvh] sm:max-h-[50vh] overflow-y-auto overscroll-contain z-50"
           >
             {/* Search Results (when typing) */}
             {inputValue && inputValue.length >= 2 && (
