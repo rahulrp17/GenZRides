@@ -48,7 +48,7 @@ const About = () => {
             <h2 className="text-4xl font-bold text-indigo-700">WELCOME TO</h2>
           </AnimatedOnScroll>
           <AnimatedOnScroll delay={0.2} direction="right">
-            <h1 className="text-3xl font-extrabold text-gray-800 mt-2">Let'sGoCab</h1>
+            <h1 className="text-3xl font-extrabold text-gray-800 mt-2">GenZRides</h1>
           </AnimatedOnScroll>
           
           <div className="mt-6">
@@ -60,14 +60,14 @@ const About = () => {
 
                 <hr className="border-t-2 border-gray-300 mb-4" />
                 <p className="text-gray-700 text-lg leading-relaxed mb-4">
-                  Let’sGoCab offers a seamless cab booking experience across cities and towns.
+                  GenZRides offers a seamless cab booking experience across cities and towns.
                   With our reliable drivers, real-time tracking, and comfortable rides,
                   we’re redefining local and long-distance travel.
                 </p>
 
                 <AnimatedOnScroll delay={0.3} direction="right">
                   <p className="text-indigo-700 italic font-semibold text-md mb-4 ml-4">
-                    "Your journey, our priority — Let’s Go Anywhere with Let'sGoCab."
+                    "Your journey, our priority — Let’s Go Anywhere with GenZRides."
                   </p>
                 </AnimatedOnScroll>
 

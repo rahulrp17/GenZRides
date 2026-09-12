@@ -25,9 +25,9 @@ const ScrollProgress = () => {
           z-[9999]
           rounded-r-full
           bg-gradient-to-r
-          from-[#165ff0]
-          via-[#4b62fc]
-          to-[#2c64e7]
+          from-[#3af016]
+          via-[#83fc4b]
+          to-[#58e72c]
           shadow-[0_0_25px_rgba(22,163,74,0.55)]
         "
       />

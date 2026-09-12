@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import { Car } from "lucide-react";
 
 export default function Loader() {
@@ -6,7 +6,7 @@ export default function Loader() {
     <div className="fixed inset-0 bg-gradient-to-br from-slate-950 via-black to-slate-900 flex flex-col items-center justify-center z-[9999] overflow-hidden">
 
       {/* Moving Cab */}
-      <motion.div
+      <Motion.div
         animate={{
           x: [-150, 150, -150],
         }}
@@ -18,10 +18,10 @@ export default function Loader() {
         className="mb-8"
       >
         <Car size={70} className="text-green-500" />
-      </motion.div>
+      </Motion.div>
 
       {/* Logo Text */}
-      <motion.h1
+      <Motion.h1
         initial={{ opacity: 0, y: 30 }}
         animate={{
           opacity: 1,
@@ -32,11 +32,11 @@ export default function Loader() {
         }}
         className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-green-400 via-white to-green-400 bg-clip-text text-transparent"
       >
-        Let's Go Cab
-      </motion.h1>
+        GenZRides
+      </Motion.h1>
 
       {/* Tagline */}
-      <motion.p
+      <Motion.p
         initial={{ opacity: 0 }}
         animate={{
           opacity: 1,
@@ -47,11 +47,11 @@ export default function Loader() {
         className="text-gray-400 mt-4 text-lg italic"
       >
         Reliable • Affordable • Everywhere
-      </motion.p>
+      </Motion.p>
 
       {/* Loading Bar */}
       <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden mt-8">
-        <motion.div
+        <Motion.div
           className="h-full bg-green-500"
           initial={{ width: 0 }}
           animate={{ width: "100%" }}
@@ -63,7 +63,7 @@ export default function Loader() {
       </div>
 
       {/* Loading Text */}
-      <motion.p
+      <Motion.p
         animate={{
           opacity: [0.3, 1, 0.3],
         }}
@@ -74,7 +74,7 @@ export default function Loader() {
         className="text-green-400 mt-4"
       >
         Finding your ride...
-      </motion.p>
+      </Motion.p>
     </div>
   );
 }

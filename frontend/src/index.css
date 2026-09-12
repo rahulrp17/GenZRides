@@ -1,15 +1,110 @@
 @import "tailwindcss";
 
+:root {
+  --font-display: 'Plus Jakarta Sans', 'Poppins', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-body: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', 'Roboto', sans-serif;
+}
+
+html {
+  overflow-x: clip;
+}
+
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #E5E5E5;
-    font-family: 'Poppins', sans-serif;
+    background-color: #020617;
+    color: #f8fafc;
+    font-family: var(--font-body);
     padding: 0;
     box-sizing: border-box;
-    
+    overflow-x: clip;
+    text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+}
+
+/* Editorial serif for landing hero / marquee headings */
+.font-editorial {
+    font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    letter-spacing: -0.01em;
+}
+
+/* Slow cinematic drift for ambient landing blobs */
+@keyframes landing-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -30px) scale(1.08); }
+}
+.landing-drift {
+  animation: landing-drift 12s ease-in-out infinite;
+}
+.landing-drift-slow {
+  animation: landing-drift 18s ease-in-out infinite reverse;
+}
+
+#root {
+  min-width: 0;
+  max-width: 100vw;
+  overflow-x: clip;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+}
+
+/* Slim dark scrollbars for dropdowns / panels */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Swiper carousels (home routes + testimonials): emerald pagination */
+.routes-swiper .swiper-pagination-bullet,
+.testimonials-swiper .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.25);
+  opacity: 1;
+  transition: all 0.3s;
+}
+.routes-swiper .swiper-pagination-bullet-active,
+.testimonials-swiper .swiper-pagination-bullet-active {
+  background: #10b981;
+  width: 26px;
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+}
+
+/* Premium ride-timeline effects */
+@keyframes ride-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+@keyframes ride-dash-flow {
+  to { stroke-dashoffset: -24; }
+}
+@keyframes ride-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.45), 0 0 24px rgba(52, 211, 153, 0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0), 0 0 34px rgba(52, 211, 153, 0.55); }
+}
+.ride-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: ride-shimmer 2.2s ease-in-out infinite;
+}
+.ride-glow {
+  animation: ride-glow-pulse 2s ease-in-out infinite;
 }

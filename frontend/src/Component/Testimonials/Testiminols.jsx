@@ -9,7 +9,7 @@ const testimonials = [
   {
     name: "Amit Sharma",
     role: "Frequent Traveler",
-    quote: "Let’sGoCab is my go-to service! Always on time and super clean rides.",
+    quote: "GenZRides is my go-to service! Always on time and super clean rides.",
     gender: "male",
   },
   {

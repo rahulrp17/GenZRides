@@ -1,0 +1,801 @@
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { LoadScript } from "@react-google-maps/api";
+import { motion as Motion, AnimatePresence } from "framer-motion";
+import { useSocket } from "../../Context/SocketContext";
+import { toast } from "react-hot-toast";
+import {
+  MapPin,
+  Calendar,
+  CreditCard,
+  StickyNote,
+  Send,
+  Map,
+  ArrowLeft,
+  Loader2,
+  Navigation,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
+import {
+  bookingAPI,
+  fareAPI,
+  vehicleAPI,
+  mapsAPI,
+} from "../../services/endpoints";
+import RideMap from "../../components/customer/RideMap";
+import LocationPicker from "../../components/customer/LocationPicker";
+import VehicleSelector from "../../components/customer/VehicleSelector";
+import ErrorState from "../../components/shared/ErrorState";
+import { useRef as useStateRef } from "react";
+
+const GOOGLE_MAPS_KEY =
+  import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+
+const getMinDateTime = () => {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() + 30);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const h = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${y}-${m}-${day}T${h}:${min}`;
+};
+
+const BookRide = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient;
+  const { socket, emit, on } = useSocket();
+
+  const [pickupCoords, setPickupCoords] = useState(null);
+  const [pickupAddress, setPickupAddress] = useState("");
+  const [dropCoords, setDropCoords] = useState(null);
+  const [dropAddress, setDropAddress] = useState("");
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [fareEstimate, setFareEstimate] = useState(null);
+  const [estimating, setEstimating] = useState(false);
+  const [selectingPin, setSelectingPin] = useState(null);
+  const [showMobileMap, setShowMobileMap] = useState(false);
+  const [tripType, setTripType] = useState("One Way");
+  const [paymentMethod, setPaymentMethod] = useState("Cash");
+  const [days, setDays] = useState(1);
+  const [notes, setNotes] = useState("");
+  const [pickupDateTime, setPickupDateTime] = useState(getMinDateTime());
+  const [locationError, setLocationError] = useState(null);
+  const [bookingFlow, setBookingFlow] = useState("idle"); // idle → booking → drivers-en-route → driver-accepted → ride-in-progress → completed
+  const [bookingData, setBookingData] = useState(null);
+  const [driverResponseTime, setDriverResponseTime] = useState(null);
+  const [currentRide, setCurrentRide] = useState(null);
+
+  const estimateTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (estimateTimerRef.current)
+      clearTimeout(estimateTimerRef.current);
+    estimateTimerRef.current = setTimeout(
+      () => estimateFare(selectedVehicle),
+      300
+    );
+    return () => {
+      if (estimateTimerRef.current)
+        clearTimeout(estimateTimerRef.current);
+    };
+  }, [
+    pickupCoords,
+    dropCoords,
+    selectedVehicle,
+    tripType,
+    days,
+    pickupDateTime,
+    estimateFare,
+  ]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    // Listen for booking updates from driver acceptance
+    const handleBookingUpdated = (data) => {
+      setBookingData(data.booking);
+      setBookingFlow("driver-accepted");
+      setDriverResponseTime(Date.now());
+
+      toast.success(
+        `Driver ${data.driverName} accepted your ride!`
+      );
+    };
+
+    // Listen for ride status updates
+    const handleRideStatusUpdated = (data) => {
+      setCurrentRide(data.ride);
+      setBookingFlow("ride-in-progress");
+    };
+
+    // Listen for no more drivers available
+    const handleNoDrivers = () => {
+      setBookingFlow("no-drivers");
+      toast.error("No drivers available. Please try again.");
+    };
+
+    // Listen for booking errors
+    const handleError = (error) => {
+      setBookingFlow("error");
+      toast.error(error.message || "An error occurred");
+    };
+
+    socket.on("booking-updated", handleBookingUpdated);
+    socket.on("ride-status-updated", handleRideStatusUpdated);
+    socket.on("no-drivers-available", handleNoDrivers);
+    socket.on("error", handleError);
+
+    return () => {
+      socket.off("booking-updated", handleBookingUpdated);
+      socket.off("ride-status-updated", handleRideStatusUpdated);
+      socket.off("no-drivers-available", handleNoDrivers);
+      socket.off("error", handleError);
+    };
+  }, [socket]);
+
+  const { data: vehicles, isError: vehiclesError, error: vehiclesErr } =
+    useQuery({
+      queryKey: ["vehicles"],
+      queryFn: async () => {
+        const { data } = await vehicleAPI.getAll();
+        return data;
+      },
+    });
+
+  const bookMutation = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        pickup: {
+          address: pickupAddress,
+          latitude: pickupCoords.lat,
+          longitude: pickupCoords.lng,
+        },
+        drop: {
+          address: dropAddress,
+          latitude: dropCoords.lat,
+          longitude: dropCoords.lng,
+        },
+        pickupDateTime: new Date(pickupDateTime).toISOString(),
+        tripType,
+        vehicleType: selectedVehicle,
+        days: tripType === "Round Trip" ? days : 1,
+        paymentMethod,
+        customerNotes: notes || "",
+      };
+      const { data } = await bookingAPI.create(payload);
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Booking created! Looking for drivers...");
+      setBookingFlow("drivers-en-route");
+      setBookingData(null);
+      setDriverResponseTime(null);
+      setCurrentRide(null);
+      // Dont navigate immediately - let Socket.IO handlers drive the flow
+      // navigate("/customer/history"); // Removed - flow continues via Socket.IO
+    },
+    onError: (err) => {
+      toast.error(
+        err.response?.data?.message || "Booking failed. Please try again."
+      );
+    },
+  });
+
+  const estimateFare = useCallback(
+    async (vehicleId) => {
+      if (!pickupCoords || !dropCoords || !vehicleId) return;
+      setEstimating(true);
+      setFareEstimate(null);
+      try {
+        const { data } = await fareAPI.estimate({
+          pickup: {
+            latitude: pickupCoords.lat,
+            longitude: pickupCoords.lng,
+          },
+          drop: {
+            latitude: dropCoords.lat,
+            longitude: dropCoords.lng,
+          },
+          vehicleType: vehicleId,
+          tripType,
+          days: tripType === "Round Trip" ? days : 1,
+        pickupDateTime: pickupDateTime,
+        });
+        if (data.success) setFareEstimate(data.data);
+      } catch (err) {
+        toast.error(
+          err.response?.data?.message || "Failed to estimate fare"
+        );
+      } finally {
+        setEstimating(false);
+      }
+    },
+    [pickupCoords, dropCoords, tripType, days, pickupDateTime]
+  );
+
+  useEffect(() => {
+    if (pickupCoords && dropCoords && selectedVehicle) {
+      if (estimateTimerRef.current)
+        clearTimeout(estimateTimerRef.current);
+      estimateTimerRef.current = setTimeout(
+        () => estimateFare(selectedVehicle),
+        300
+      );
+    }
+    return () => {
+      if (estimateTimerRef.current)
+        clearTimeout(estimateTimerRef.current);
+    };
+  }, [
+    pickupCoords,
+    dropCoords,
+    selectedVehicle,
+    tripType,
+    days,
+    pickupDateTime,
+    estimateFare,
+  ]);
+
+  const reverseGeocode = useCallback(async (coords) => {
+    try {
+      const { data } = await mapsAPI.reverseGeocode({
+        latitude: coords.lat,
+        longitude: coords.lng,
+      });
+      if (data.success && data.data) return data.data;
+    } catch {
+      /* ignore */
+    }
+    return `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`;
+  }, []);
+
+  const handlePickupSelect = useCallback((place) => {
+    if (place.lat && place.lng) {
+      setPickupCoords({ lat: place.lat, lng: place.lng });
+    }
+    setPickupAddress(place.formatted_address || place.name || "");
+    setFareEstimate(null);
+  }, []);
+
+  const handleDropSelect = useCallback((place) => {
+    if (place.lat && place.lng) {
+      setDropCoords({ lat: place.lat, lng: place.lng });
+    }
+    setDropAddress(place.formatted_address || place.name || "");
+    setFareEstimate(null);
+  }, []);
+
+  const handleSelectCurrentLocation = useCallback(() => {
+    setLocationError(null);
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser.");
+      toast.error("Geolocation not supported");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const coords = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
+        const address = await reverseGeocode(coords);
+        setPickupCoords(coords);
+        setPickupAddress(address);
+        setFareEstimate(null);
+        toast.success("Current location set as pickup");
+      },
+      (err) => {
+        const msg =
+          err.code === 1
+            ? "Location permission denied. Please enable it in browser settings."
+            : err.code === 2
+            ? "Unable to determine your location."
+            : "Location request timed out. Please try again.";
+        setLocationError(msg);
+        toast.error(msg);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, [reverseGeocode]);
+
+  const handleSetOnMap = useCallback((which) => {
+    setSelectingPin(which);
+    setShowMobileMap(true);
+  }, []);
+
+  const handlePinSelect = useCallback(
+    async (coords) => {
+      const address = await reverseGeocode(coords);
+      if (selectingPin === "pickup") {
+        setPickupCoords(coords);
+        setPickupAddress(address);
+        setFareEstimate(null);
+      } else if (selectingPin === "drop") {
+        setDropCoords(coords);
+        setDropAddress(address);
+        setFareEstimate(null);
+      }
+      setSelectingPin(null);
+      setShowMobileMap(false);
+      toast.success(
+        `${selectingPin === "pickup" ? "Pickup" : "Drop"} location set`
+      );
+    },
+    [selectingPin, reverseGeocode]
+  );
+
+  const handleCancelMapSelect = useCallback(() => {
+    setSelectingPin(null);
+    setShowMobileMap(false);
+  }, []);
+
+  const handleVehicleSelect = useCallback((vehicleId) => {
+    setSelectedVehicle(vehicleId);
+    setFareEstimate(null);
+  }, []);
+
+  const canBook =
+    pickupCoords &&
+    dropCoords &&
+    selectedVehicle &&
+    pickupDateTime &&
+    !bookMutation.isPending;
+
+  if (vehiclesError) {
+    return (
+      <ErrorState
+        message={vehiclesErr?.message || "Failed to load vehicles"}
+        onRetry={() =>
+          queryClient.invalidateQueries({ queryKey: ["vehicles"] })
+        }
+      />
+    );
+  }
+
+  if (!GOOGLE_MAPS_KEY || GOOGLE_MAPS_KEY === "YOUR_GOOGLE_MAPS_API_KEY") {
+    return (
+      <Motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="max-w-2xl mx-auto p-4"
+      >
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 text-center">
+          <Map className="mx-auto mb-4 text-indigo-500" size={48} />
+          <h2 className="text-xl font-bold text-slate-900 mb-2">
+            Google Maps Required
+          </h2>
+          <p className="text-slate-500">
+            Set{" "}
+            <code className="bg-slate-100 px-2 py-1 rounded text-sm">
+              VITE_GOOGLE_MAPS_API_KEY
+            </code>{" "}
+            in your .env file to enable location features.
+          </p>
+        </div>
+      </Motion.div>
+    );
+  }
+
+const formPanel = (
+    bookingFlow === "idle"
+      ? (
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="px-4 pt-4 pb-2 flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 rounded-xl hover:bg-slate-100 transition"
+            >
+              <ArrowLeft size={20} className="text-slate-600" />
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-slate-900">
+                Book a Ride
+              </h1>
+              <p className="text-xs text-slate-500">
+                Where are you going?
+              </p>
+            </div>
+          </div>
+
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-4">
+            {/* Location Picker */}
+            <LocationPicker
+              pickupAddress={pickupAddress}
+              dropAddress={dropAddress}
+              onPickupSelect={handlePickupSelect}
+              onDropSelect={handleDropSelect}
+              onSelectCurrentLocation={handleSelectCurrentLocation}
+              onSetOnMap={handleSetOnMap}
+            />
+
+            {/* Location Error */}
+            {locationError && (
+              <Motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"
+              >
+                <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
+                <span>{locationError}</span>
+                <button
+                  onClick={() => setLocationError(null)}
+                  className="ml-auto text-red-400 hover:text-red-600"
+                >
+                  <span className="sr-only">Dismiss</span>&times;
+                </button>
+              </Motion.div>
+            )}
+
+            {/* Trip Options */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-3">
+              <h3 className="text-sm font-semibold text-slate-700">
+                Trip Options
+              </h3>
+
+              {/* Trip Type */}
+              <div>
+                <label className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-1.5">
+                  <Navigation size={14} /> Trip Type
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {["One Way", "Round Trip"].map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setTripType(t)}
+                      className={`py-2 px-3 rounded-xl text-sm font-medium transition-all ${
+                        tripType === t
+                          ? "bg-indigo-100 text-indigo-700 border border-indigo-300"
+                          : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {["Airport Pickup", "Airport Drop"].map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setTripType(t)}
+                      className={`py-2 px-3 rounded-xl text-sm font-medium transition-all ${
+                        tripType === t
+                          ? "bg-indigo-100 text-indigo-700 border border-indigo-300"
+                          : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Date & Time */}
+              <div>
+                <label className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-1.5">
+                  <Calendar size={14} /> Pickup Date & Time
+                </label>
+                <input
+                  type="datetime-local"
+                  value={pickupDateTime}
+                  min={getMinDateTime()}
+                  onChange={(e) => setPickupDateTime(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition touch-manipulation"
+                />
+              </div>
+
+              {/* Round Trip Days */}
+              {tripType === "Round Trip" && (
+                <Motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                >
+                  <label className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-1.5">
+                    <Clock size={14} /> Number of Days
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="30"
+                    value={days}
+                    onChange={(e) =>
+                      setDays(Math.max(1, parseInt(e.target.value) || 1))
+                    }
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition touch-manipulation"
+                  />
+                </Motion.div>
+              )}
+
+              {/* Payment Method */}
+              <div>
+                <label className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-1.5">
+                  <CreditCard size={14} /> Payment
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {["Cash", "Online"].map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setPaymentMethod(m)}
+                      className={`py-2 px-3 rounded-xl text-sm font-medium transition-all ${
+                        paymentMethod === m
+                          ? "bg-indigo-100 text-indigo-700 border border-indigo-300"
+                          : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      {m === "Cash" ? "\uD83D\uDCB5" : "\uD83D\uDCB3"} {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-1.5">
+                  <StickyNote size={14} /> Notes (optional)
+                </label>
+                <textarea
+                  rows={2}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Any special instructions..."
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition resize-none touch-manipulation"
+                />
+              </div>
+            </div>
+
+            {/* Vehicle Selection */}
+            <VehicleSelector
+              vehicles={vehicles?.vehicles || []}
+              selectedVehicle={selectedVehicle}
+              onSelect={handleVehicleSelect}
+              fareEstimate={fareEstimate}
+              estimating={estimating}
+              pickupSet={!!pickupCoords}
+              dropSet={!!dropCoords}
+            />
+
+            {/* Distance & Duration Summary */}
+            {fareEstimate && (
+              <Motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-center gap-4 py-2 text-sm text-slate-500"
+              >
+                <span>{fareEstimate.distance?.toFixed(1)} km</span>
+                <span className="w-1 h-1 rounded-full bg-slate-300" />
+                <span>{Math.ceil(fareEstimate.duration)} min</span>
+              </Motion.div>
+            )}
+
+            {/* Book Button (sticky bottom) */}
+            <div className="px-4 pb-4 pt-2 border-t border-slate-100 bg-white">
+              <button
+                type="button"
+                disabled={!canBook}
+                onClick={() => bookMutation.mutate()}
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+              >
+                {bookMutation.isPending ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" /> Booking...
+                  </>
+                ) : fareEstimate ? (
+                  <>
+                    <Send size={18} /> Book Ride — ₹
+                    {fareEstimate.estimatedFare}
+                  </>
+                ) : (
+                  <>
+                    <Send size={18} /> Book Ride
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+      : bookingFlow === "drivers-en-route"
+      ? (
+        <div className="flex flex-col items-center py-20">
+          <Motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-4">
+              <Loader2 size={32} className="animate-spin text-indigo-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900">Looking for Drivers</h2>
+            <p className="text-slate-500 mt-2">
+              Your ride request is being sent to nearby drivers.
+            </p>
+            <p className="text-slate-400 mt-4">
+              Drivers typically respond within 15 seconds.
+            </p>
+            {driverResponseTime && (
+              <p className="text-sm text-slate-500 mt-2">
+                {driverResponseTime > 0 ? (
+                  `Time elapsed: ${Math.floor(
+                    (Date.now() - driverResponseTime) / 1000
+                  )}s`
+                ) : "Waiting for driver...")
+              </p>
+            )}
+          </Motion.div>
+
+          {/* Auto-advance timeout after 15 seconds */}
+          {driverResponseTime && Date.now() - driverResponseTime > 15000 && setBookingFlow("no-drivers")}
+        </div>
+      )
+      : bookingFlow === "no-drivers"
+      ? (
+        <Motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md mx-auto p-6 bg-red-50 border border-red-200 rounded-xl text-center"
+        >
+          <AlertCircle size={48} className="mx-auto mb-4 text-red-400" />
+          <h3 className="text-xl font-bold text-slate-900">No Drivers Available</h3>
+          <p className="text-slate-500 mt-2">
+            Unfortunately, no drivers are available at the moment. Please try again shortly.
+          </p>
+          <button
+            onClick={() => setBookingFlow("idle")}
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+          >
+            <RefreshCw size={16} /> Try Again
+          </button>
+        </Motion.div>
+      )
+      : bookingFlow === "driver-accepted"
+      ? (
+        <Motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md mx-auto p-6 bg-emerald-50 border border-emerald-200 rounded-xl"
+        >
+          <CheckCircle size={48} className="mx-auto text-emerald-400 mb-4" />
+          <h3 className="text-xl font-bold text-slate-900">Driver Accepted!</h3>
+          <p className="text-slate-500 mb-4">
+            Your driver has accepted the ride. The ride will begin shortly.
+          </p>
+          <button
+            onClick={() => setBookingFlow("ride-in-progress")}
+            className="mt-4 inline-flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition"
+          >
+            <Play size={16} /> View Ride
+          </button>
+        </Motion.div>
+      )
+      : bookingFlow === "ride-in-progress"
+      ? (
+        {/* Render Current Ride UI for customer */}
+        <CurrentRideCustomer
+          bookingData={bookingData}
+          onNavigateToHistory={() => navigate("/customer/history")}
+        />
+      )
+      : bookingFlow === "completed"
+      ? (
+        <Motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md mx-auto p-6 bg-emerald-50 border border-emerald-200 rounded-xl"
+        >
+          <CheckCircle size={48} className="mx-auto text-emerald-400 mb-4" />
+          <h3 className="text-xl font-bold text-slate-900">Ride Completed!</h3>
+          <p className="text-slate-500 mb-4">
+            Your ride has been completed. Invoice has been generated.
+          </p>
+          <button
+            onClick={() => navigate("/customer/invoices")}
+            className="mt-4 inline-flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition"
+          >
+            <Download size={16} /> View Invoices
+          </button>
+        </Motion.div>
+      )
+      : (
+        <ErrorState
+          message="An unexpected error occurred in the booking flow."
+          onRetry={() => setBookingFlow("idle")}
+        />
+      );
+
+  const mapPanel = (
+    <RideMap
+      pickupCoords={pickupCoords}
+      dropCoords={dropCoords}
+      onPinSelect={handlePinSelect}
+      selectingPin={selectingPin}
+      className="w-full h-full min-h-[400px]"
+    />
+  );
+
+  return (
+    <LoadScript googleMapsApiKey={GOOGLE_MAPS_KEY} libraries={["places"]}>
+      {/* Mobile Map Overlay */}
+      <AnimatePresence>
+        {showMobileMap && (
+          <Motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-white lg:hidden"
+          >
+            <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm p-3 flex items-center gap-3 shadow-sm">
+              <button
+                onClick={handleCancelMapSelect}
+                className="p-2 rounded-xl hover:bg-slate-100 transition"
+              >
+                <ArrowLeft size={20} className="text-slate-600" />
+              </button>
+              <p className="text-sm font-medium text-slate-700">
+                {selectingPin === "pickup"
+                  ? "Set pickup location"
+                  : selectingPin === "drop"
+                  ? "Set drop-off location"
+                  : "Select location on map"}
+              </p>
+              {selectingPin && (
+                <button
+                  onClick={handleCancelMapSelect}
+                  className="ml-auto text-sm text-slate-500 font-medium"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+            <div className="h-full pt-14">
+              <RideMap
+                pickupCoords={pickupCoords}
+                dropCoords={dropCoords}
+                onPinSelect={handlePinSelect}
+                selectingPin={selectingPin}
+                className="w-full h-full rounded-none"
+              />
+            </div>
+          </Motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Layout */}
+      <Motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="h-[100dvh] sm:h-[calc(100dvh-64px)] flex flex-col lg:flex-row overflow-hidden"
+      >
+        {/* Form Panel */}
+        <div className="w-full lg:w-[480px] xl:w-[520px] flex-shrink-0 bg-slate-50 lg:bg-white border-r border-slate-200 flex flex-col min-h-0">
+          {formPanel}
+        </div>
+
+        {/* Map Panel (desktop) */}
+        <div className="hidden lg:block flex-1 relative">
+          {mapPanel}
+        </div>
+
+        {/* Mobile Map Toggle */}
+        {!showMobileMap && (
+          <button
+            type="button"
+            onClick={() => setShowMobileMap(true)}
+            className="lg:hidden fixed bottom-24 right-4 z-40 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-all active:scale-95"
+          >
+            <Map size={22} />
+          </button>
+        )}
+      </Motion.div>
+    </LoadScript>
+  );
+};
+
+export default BookRide;

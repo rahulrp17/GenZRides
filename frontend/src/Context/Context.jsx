@@ -1,6 +1,5 @@
-// src/context/AppContext.js
-import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
+import React, { createContext, useState } from "react";
+import { authAPI } from "../services/endpoints";
 
 const AppContext = createContext();
 
@@ -9,25 +8,29 @@ export const AppProvider = ({ children }) => {
   const [CustomerData, setCustomerData] = useState(null);
   const [isAccountCreated, setIsAccountCreated] = useState(false);
 
-  // 🔧 Replace with your actual backend URL
-  const backendUrl = "http://localhost:8080";
+  const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
   const getCustomerData = async () => {
     try {
-      const res = await axios.get(`${backendUrl}/api/Customer/auth/CustomerData`, {
-        withCredentials: true,
-      });
-      setCustomerData(res.data);
+      const { data } = await authAPI.getProfile();
+      if (data.success) {
+        setCustomerData(data.data);
+        setIsLoggedIn(true);
+      } else {
+        setCustomerData(null);
+        setIsLoggedIn(false);
+      }
     } catch (err) {
       console.error("User fetch failed:", err);
       setCustomerData(null);
+      setIsLoggedIn(false);
     }
   };
 
-  useEffect(() => {
-    // Optionally check login status on app load
-    getCustomerData();
-  }, []);
+  // NOTE: no mount-time profile fetch here on purpose — AuthContext
+  // already hydrates the user on startup. Fetching here too would fire
+  // a duplicate GET /auth/profile on every app load. Callers that need
+  // a refresh can use getCustomerData() explicitly.
 
   return (
     <AppContext.Provider

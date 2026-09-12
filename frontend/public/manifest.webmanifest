@@ -1,0 +1,13 @@
+{
+  "name": "GenZRides - Premium Rides",
+  "short_name": "GenZRides",
+  "description": "Chauffeured city rides, airport transfers and outstation escapes",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    { "src": "/logo5.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/logo5.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

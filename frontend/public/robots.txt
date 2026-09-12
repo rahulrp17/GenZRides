@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Private app areas — authenticated dashboards and flows stay out of search
+Disallow: /customer/
+Disallow: /driver/
+Disallow: /admin/
+Disallow: /booking/
+Allow: /booking$
+Disallow: /login
+Disallow: /signup
+
+Sitemap: https://www.genzrides.com/sitemap.xml
+Host: https://www.genzrides.com

@@ -76,7 +76,7 @@ const WhyChooseUs = () => {
     <section className="bg-gray-50 py-20 px-6 md:px-20 overflow-hidden" id="why-us">
       <AnimatedCard direction="up">
         <h2 className="text-4xl font-bold text-center text-indigo-700 mb-10">
-          Why Choose <span className="text-black">Let’sGoCab</span>
+          Why Choose <span className="text-black">GenZRides</span>
         </h2>
       </AnimatedCard>
 
