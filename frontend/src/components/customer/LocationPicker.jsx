@@ -433,6 +433,61 @@ export default function LocationPicker({
                     <X size={14} className="text-gray-400" />
                   </button>
                 )}
+                {isPickupActive && (
+                  <AnimatePresence>
+                    <Motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                      transition={{ duration: 0.14 }}
+                      className="absolute left-0 right-0 top-full mt-2 bg-gray-900 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[45dvh] sm:max-h-[50vh] overflow-y-auto overscroll-contain z-50"
+                    >
+                      {pickupInputValue && pickupInputValue.length >= 2 ? (
+                        <div className="py-1">
+                          {searching ? (
+                            <div className="flex items-center justify-center py-6"><Loader2 size={20} className="text-indigo-500 animate-spin" /></div>
+                          ) : predictions.length === 0 ? (
+                            <div className="px-4 py-6 text-center"><p className="text-sm text-gray-400">No results found.</p></div>
+                          ) : (
+                            predictions.map((p) => (
+                              <button key={p.placeId} type="button" onClick={() => handleSelectPrediction(p)} className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 text-left">
+                                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0"><MapPin size={16} className="text-gray-400" /></div>
+                                <p className="text-sm font-medium text-white truncate">{p.text}</p>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      ) : (
+                        <div className="py-1">
+                          <button type="button" onClick={handleCurrentLocation} disabled={locationLoading} className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 text-left">
+                            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">{locationLoading ? <Loader2 size={18} className="text-blue-600 animate-spin" /> : <Navigation size={18} className="text-blue-600" />}</div>
+                            <p className="text-sm font-medium text-white">Use current location</p>
+                          </button>
+                          <button type="button" onClick={handleSetOnMap} className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 text-left">
+                            <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0"><Crosshair size={18} className="text-emerald-600" /></div>
+                            <p className="text-sm font-medium text-white">Set pickup on map</p>
+                          </button>
+                          <div className="border-t border-white/10 py-1">
+                            <div className="px-4 py-2"><h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Saved places</h3></div>
+                            <SavedPlaceButton type="home" icon={<Home size={18} className="text-gray-600" />} place={savedPlaces.home} onSelect={() => handleSelectSavedPlace("home")} onEdit={() => handleEditSavedPlace("home")} onRemove={() => handleRemoveSavedPlace("home")} onSave={handleSaveSavedPlace} isEditing={activeSavedPlaceEdit === "home"} onStartEdit={() => setActiveSavedPlaceEdit("home")} onCancelEdit={() => setActiveSavedPlaceEdit(null)} />
+                            <SavedPlaceButton type="work" icon={<Building2 size={18} className="text-gray-600" />} place={savedPlaces.work} onSelect={() => handleSelectSavedPlace("work")} onEdit={() => handleEditSavedPlace("work")} onRemove={() => handleRemoveSavedPlace("work")} onSave={handleSaveSavedPlace} isEditing={activeSavedPlaceEdit === "work"} onStartEdit={() => setActiveSavedPlaceEdit("work")} onCancelEdit={() => setActiveSavedPlaceEdit(null)} />
+                          </div>
+                          {recentSearches.length > 0 && (
+                            <div className="border-t border-white/10 py-1">
+                              <div className="px-4 py-2 flex items-center justify-between"><h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Recent searches</h3><button type="button" onClick={handleClearRecent} className="text-xs text-gray-400 hover:text-gray-600">Clear all</button></div>
+                              {recentSearches.map((s,i)=>(
+                                <button key={(s.place_id||s.formatted_address)+i} type="button" onClick={()=>handleSelectRecent(s)} className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 text-left">
+                                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0"><Clock size={16} className="text-gray-400" /></div>
+                                  <div className="flex-1 min-w-0"><p className="text-sm font-medium text-white truncate">{s.name||s.formatted_address}</p><p className="text-xs text-gray-400 truncate">{s.formatted_address}</p></div>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </Motion.div>
+                  </AnimatePresence>
+                )}
               </div>
 
               {/* Drop Input - IS the search field */}
@@ -468,6 +523,61 @@ export default function LocationPicker({
                     <X size={14} className="text-gray-400" />
                   </button>
                 )}
+                {isDropActive && (
+                  <AnimatePresence>
+                    <Motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                      transition={{ duration: 0.14 }}
+                      className="absolute left-0 right-0 top-full mt-2 bg-gray-900 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[45dvh] sm:max-h-[50vh] overflow-y-auto overscroll-contain z-50"
+                    >
+                      {dropInputValue && dropInputValue.length >= 2 ? (
+                        <div className="py-1">
+                          {searching ? (
+                            <div className="flex items-center justify-center py-6"><Loader2 size={20} className="text-indigo-500 animate-spin" /></div>
+                          ) : predictions.length === 0 ? (
+                            <div className="px-4 py-6 text-center"><p className="text-sm text-gray-400">No results found.</p></div>
+                          ) : (
+                            predictions.map((p) => (
+                              <button key={p.placeId} type="button" onClick={() => handleSelectPrediction(p)} className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 text-left">
+                                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0"><MapPin size={16} className="text-gray-400" /></div>
+                                <p className="text-sm font-medium text-white truncate">{p.text}</p>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      ) : (
+                        <div className="py-1">
+                          <button type="button" onClick={handleSelectAirport} className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 text-left">
+                            <div className="w-10 h-10 rounded-full bg-sky-500/10 flex items-center justify-center shrink-0"><Plane size={18} className="text-sky-600" /></div>
+                            <div className="flex-1 min-w-0"><p className="text-sm font-medium text-white">Chennai International Airport</p><p className="text-xs text-gray-400">MAA - Chennai</p></div>
+                          </button>
+                          <button type="button" onClick={handleSetOnMap} className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 text-left">
+                            <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0"><Crosshair size={18} className="text-emerald-600" /></div>
+                            <p className="text-sm font-medium text-white">Set drop-off on map</p>
+                          </button>
+                          <div className="border-t border-white/10 py-1">
+                            <div className="px-4 py-2"><h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Saved places</h3></div>
+                            <SavedPlaceButton type="home" icon={<Home size={18} className="text-gray-600" />} place={savedPlaces.home} onSelect={() => handleSelectSavedPlace("home")} onEdit={() => handleEditSavedPlace("home")} onRemove={() => handleRemoveSavedPlace("home")} onSave={handleSaveSavedPlace} isEditing={activeSavedPlaceEdit === "home"} onStartEdit={() => setActiveSavedPlaceEdit("home")} onCancelEdit={() => setActiveSavedPlaceEdit(null)} />
+                            <SavedPlaceButton type="work" icon={<Building2 size={18} className="text-gray-600" />} place={savedPlaces.work} onSelect={() => handleSelectSavedPlace("work")} onEdit={() => handleEditSavedPlace("work")} onRemove={() => handleRemoveSavedPlace("work")} onSave={handleSaveSavedPlace} isEditing={activeSavedPlaceEdit === "work"} onStartEdit={() => setActiveSavedPlaceEdit("work")} onCancelEdit={() => setActiveSavedPlaceEdit(null)} />
+                          </div>
+                          {recentSearches.length > 0 && (
+                            <div className="border-t border-white/10 py-1">
+                              <div className="px-4 py-2 flex items-center justify-between"><h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Recent searches</h3><button type="button" onClick={handleClearRecent} className="text-xs text-gray-400 hover:text-gray-600">Clear all</button></div>
+                              {recentSearches.map((s,i)=>(
+                                <button key={(s.place_id||s.formatted_address)+i} type="button" onClick={()=>handleSelectRecent(s)} className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 text-left">
+                                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0"><Clock size={16} className="text-gray-400" /></div>
+                                  <div className="flex-1 min-w-0"><p className="text-sm font-medium text-white truncate">{s.name||s.formatted_address}</p><p className="text-xs text-gray-400 truncate">{s.formatted_address}</p></div>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </Motion.div>
+                  </AnimatePresence>
+                )}
               </div>
             </div>
 
@@ -486,201 +596,7 @@ export default function LocationPicker({
         </div>
       </div>
 
-      {/* Dropdown Panel */}
-      <AnimatePresence>
-        {showDropdown && (
-          <Motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute left-0 right-0 top-full mt-2 w-full max-w-full bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[45dvh] sm:max-h-[50vh] overflow-y-auto overscroll-contain z-50"
-          >
-            {/* Search Results (when typing) */}
-            {inputValue && inputValue.length >= 2 && (
-              <div className="py-1">
-                {searching && (
-                  <div className="flex items-center justify-center py-6">
-                    <Loader2
-                      size={20}
-                      className="text-indigo-500 animate-spin"
-                    />
-                  </div>
-                )}
 
-                {!searching && predictions.length === 0 && (
-                  <div className="px-4 py-6 text-center">
-                    <p className="text-sm text-gray-400">
-                      No results found. Try a different search.
-                    </p>
-                  </div>
-                )}
-
-                {!searching &&
-                  predictions.map((prediction) => (
-                    <button
-                      key={prediction.placeId}
-                      type="button"
-                      title={prediction.text}
-                      onClick={() => handleSelectPrediction(prediction)}
-                      className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 transition-colors duration-100 text-left"
-                    >
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 flex-shrink-0">
-                        <MapPin size={16} className="text-gray-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
-                          {prediction.text}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-              </div>
-            )}
-
-            {/* Quick Actions (always visible when dropdown is open) */}
-            {!inputValue || inputValue.length < 2 ? (
-              <div className="py-1">
-                {/* Use Current Location - pickup only */}
-                {isPickupActive && (
-                  <button
-                    type="button"
-                    onClick={handleCurrentLocation}
-                    disabled={locationLoading}
-                    className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 transition-colors duration-100 text-left"
-                  >
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500/10 flex-shrink-0">
-                      {locationLoading ? (
-                        <Loader2
-                          size={18}
-                          className="text-blue-600 animate-spin"
-                        />
-                      ) : (
-                        <Navigation size={18} className="text-blue-600" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white">
-                        Use current location
-                      </p>
-                    </div>
-                  </button>
-                )}
-
-                {/* Chennai Airport - drop only */}
-                {isDropActive && (
-                  <button
-                    type="button"
-                    onClick={handleSelectAirport}
-                    className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 transition-colors duration-100 text-left"
-                  >
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-sky-500/10 flex-shrink-0">
-                      <Plane size={18} className="text-sky-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white">
-                        Chennai International Airport
-                      </p>
-                      <p className="text-xs text-gray-400">MAA - Chennai</p>
-                    </div>
-                  </button>
-                )}
-
-                {/* Set on Map */}
-                <button
-                  type="button"
-                  onClick={handleSetOnMap}
-                  className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 transition-colors duration-100 text-left"
-                >
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/10 flex-shrink-0">
-                    <Crosshair size={18} className="text-emerald-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white">
-                      Set {isPickupActive ? "pickup" : "drop-off"} on map
-                    </p>
-                  </div>
-                </button>
-              </div>
-            ) : null}
-
-            {/* Saved Places */}
-            <div className="border-t border-white/10 py-1">
-              <div className="px-4 py-2">
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Saved places
-                </h3>
-              </div>
-
-              <SavedPlaceButton
-                type="home"
-                icon={<Home size={18} className="text-gray-600" />}
-                place={savedPlaces.home}
-                onSelect={() => handleSelectSavedPlace("home")}
-                onEdit={() => handleEditSavedPlace("home")}
-                onRemove={() => handleRemoveSavedPlace("home")}
-                onSave={handleSaveSavedPlace}
-                isEditing={activeSavedPlaceEdit === "home"}
-                onStartEdit={() => setActiveSavedPlaceEdit("home")}
-                onCancelEdit={() => setActiveSavedPlaceEdit(null)}
-              />
-
-              <SavedPlaceButton
-                type="work"
-                icon={<Building2 size={18} className="text-gray-600" />}
-                place={savedPlaces.work}
-                onSelect={() => handleSelectSavedPlace("work")}
-                onEdit={() => handleEditSavedPlace("work")}
-                onRemove={() => handleRemoveSavedPlace("work")}
-                onSave={handleSaveSavedPlace}
-                isEditing={activeSavedPlaceEdit === "work"}
-                onStartEdit={() => setActiveSavedPlaceEdit("work")}
-                onCancelEdit={() => setActiveSavedPlaceEdit(null)}
-              />
-            </div>
-
-            {/* Recent Searches (when no search active) */}
-            {(!inputValue || inputValue.length < 2) &&
-              recentSearches.length > 0 && (
-<div className="border-t border-white/10 py-1">
-                  <div className="px-4 py-2 flex items-center justify-between">
-                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                      Recent searches
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={handleClearRecent}
-                      className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      Clear all
-                    </button>
-                  </div>
-
-                  {recentSearches.map((search, index) => (
-                    <button
-                      key={`${search.place_id || search.formatted_address}-${index}`}
-                      type="button"
-                      onClick={() => handleSelectRecent(search)}
-                      className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 transition-colors duration-100 text-left"
-                    >
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 flex-shrink-0">
-                        <Clock size={16} className="text-gray-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
-                          {search.name || search.formatted_address}
-                        </p>
-                        <p className="text-xs text-gray-400 truncate">
-                          {search.formatted_address}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-          </Motion.div>
-        )}
-      </AnimatePresence>
 
     </div>
   );
