@@ -37,6 +37,7 @@ const Navbar = () => {
   const profileRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const transportRef = useRef(null);
+  const menuButtonRef = useRef(null);
 
   // Close profile dropdown on outside click
   useEffect(() => {
@@ -54,11 +55,16 @@ const Navbar = () => {
     };
   }, [profileOpen]);
 
-  // Close mobile menu on outside click
+  // Close mobile menu on outside click (exclude toggle button)
   useEffect(() => {
     if (!isOpen) return;
     const handle = (e) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(e.target) &&
+        menuButtonRef.current &&
+        !menuButtonRef.current.contains(e.target)
+      ) {
         setIsOpen(false);
       }
     };
@@ -91,6 +97,7 @@ const Navbar = () => {
         setProfileOpen(false);
         setIsOpen(false);
         setTransportOpen(false);
+        setMobileTransportOpen(false);
       }
     };
     document.addEventListener("keydown", handle);
@@ -382,8 +389,9 @@ const Navbar = () => {
               </button>
             )}
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 text-gray-200 hover:text-white transition"
+              ref={menuButtonRef}
+              onClick={() => setIsOpen((v) => !v)}
+              className="p-2 text-gray-200 hover:text-white transition cursor-pointer"
               aria-label="Toggle menu"
             >
               {isOpen ? <X size={28} /> : <Menu size={28} />}
