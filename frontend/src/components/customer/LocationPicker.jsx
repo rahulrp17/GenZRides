@@ -389,7 +389,7 @@ export default function LocationPicker({
   return (
     <div className="w-full max-w-full min-w-0 relative" ref={dropdownRef}>
       {/* Location Inputs Card */}
-      <div className="bg-white/5 rounded-2xl shadow-sm border border-white/10 overflow-hidden max-w-full">
+      <div className="bg-white/5 rounded-2xl shadow-sm border border-white/10 max-w-full overflow-visible">
         <div className="p-4 pb-3">
           <div className="relative flex items-start gap-3 min-w-0">
             {/* Dot indicators */}
