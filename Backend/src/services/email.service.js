@@ -323,28 +323,43 @@ const sendViaHttpApi = async (config, { from, to, subject, text, html }) => {
       console.warn(`[email] Resend: from ${resendFrom} uses gmail.com (not verifiable) → falling back to onboarding@resend.dev. Set RESEND_FROM or EMAIL_FROM to your verified domain or onboarding@resend.dev.`);
       resendFrom = "GenZRides <onboarding@resend.dev>";
     }
-    // If still unverified genzrides.com and no explicit RESEND_FROM, warn but try
-    // — Resend will return 403 with clear message if domain not verified.
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ from: resendFrom, to: toArr, subject, text, html }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      const msg = data?.message || `Resend ${res.status}`;
-      // Add actionable hint for the common domain-verification 403
-      if (/domain.*not verified/i.test(msg) || /verify.*domain/i.test(msg)) {
-        throw new Error(`${msg} — fix: set EMAIL_FROM or RESEND_FROM to onboarding@resend.dev for testing, or verify your domain at https://resend.com/domains`);
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ from: resendFrom, to: toArr, subject, text, html }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = data?.message || `Resend ${res.status}`;
+        if (/domain.*not verified/i.test(msg) || /verify.*domain/i.test(msg) || /only send testing emails to your own/i.test(msg)) {
+          const hint = `${msg} — Resend onboarding only sends to ${process.env.RESEND_OWNER_EMAIL || "your account email"}. Fix: verify domain at https://resend.com/domains and set RESEND_FROM to it, or set BREVO_API_KEY to send via Brevo (allows any recipient).`;
+          // If Brevo is also configured, don't throw yet — fall through to Brevo
+          if (process.env.BREVO_API_KEY) {
+            console.warn(`[email] Resend failed (${msg}) → trying Brevo fallback`);
+          } else {
+            throw new Error(hint);
+          }
+        } else {
+          throw new Error(msg);
+        }
+      } else {
+        return { messageId: data?.id || null };
       }
-      throw new Error(msg);
+    } catch (e) {
+      // If Brevo is configured, let it try; otherwise rethrow
+      if (process.env.BREVO_API_KEY) {
+        console.warn(`[email] Resend error: ${e.message} → trying Brevo`);
+      } else {
+        throw e;
+      }
     }
-    return { messageId: data?.id || null };
   }
   // Brevo (Sendinblue) — https://api.brevo.com/v3/smtp/email
+  // Works with any recipient (no onboarding restriction) once sender is verified at https://app.brevo.com/settings/senders
   if (process.env.BREVO_API_KEY) {
     const res = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
