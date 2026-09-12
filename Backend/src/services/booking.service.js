@@ -191,20 +191,15 @@ export const createBooking = async (
       .populate("vehicleType");
 
   /* ===========================
-     ADMIN WHATSAPP ALERT (guest + logged-in)
-     Best-effort: failures never break booking creation,
-     duplicates are suppressed per booking.
+      ADMIN WHATSAPP ALERT (guest + logged-in)
+      Best-effort: failures never break booking creation,
+      duplicates are suppressed per booking.
+      Fire-and-forget so Confirm → Waiting is instant (email/WhatsApp
+      may take 1-10s via Brevo/Resend/SMTP; must not block response).
   =========================== */
 
-  await notifyAdminOfBooking(populatedBooking);
-
-  /* ===========================
-     ADMIN BOOKING EMAIL (guest + logged-in)
-     Same guarantees as the WhatsApp alert: env-only config,
-     per-booking dedup, never breaks booking creation.
-  =========================== */
-
-  await notifyAdminOfBookingEmail(populatedBooking);
+  notifyAdminOfBooking(populatedBooking).catch(() => {});
+  notifyAdminOfBookingEmail(populatedBooking).catch(() => {});
 
   // VERBOSE: Auto-dispatch to matching vehicle-type drivers only
   // Sedan→Sedan, SUV→SUV, Innova→Innova (via dispatch.service findNearbyDrivers vehicleType filter)
