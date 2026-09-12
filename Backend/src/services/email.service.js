@@ -310,17 +310,38 @@ const defaultTransportFactory = async (config) => {
 const sendViaHttpApi = async (config, { from, to, subject, text, html }) => {
   const toArr = Array.isArray(to) ? to : [to];
   // Resend (https://resend.com) — simplest HTTPS email API
+  // IMPORTANT: Resend requires the `from` domain to be verified at
+  // https://resend.com/domains. For quick testing use the onboarding
+  // sender `onboarding@resend.dev` (works without verification). Set
+  // RESEND_FROM or EMAIL_FROM to that value, or verify your domain.
   if (process.env.RESEND_API_KEY) {
+    // Allow explicit override: RESEND_FROM wins, else EMAIL_FROM/config.from,
+    // but auto-fallback to onboarding@resend.dev if from uses gmail.com
+    // (never verifiable in Resend) to avoid "gmail.com domain is not verified".
+    let resendFrom = (process.env.RESEND_FROM || from || "").trim();
+    if (/gmail\.com/i.test(resendFrom)) {
+      console.warn(`[email] Resend: from ${resendFrom} uses gmail.com (not verifiable) → falling back to onboarding@resend.dev. Set RESEND_FROM or EMAIL_FROM to your verified domain or onboarding@resend.dev.`);
+      resendFrom = "GenZRides <onboarding@resend.dev>";
+    }
+    // If still unverified genzrides.com and no explicit RESEND_FROM, warn but try
+    // — Resend will return 403 with clear message if domain not verified.
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from, to: toArr, subject, text, html }),
+      body: JSON.stringify({ from: resendFrom, to: toArr, subject, text, html }),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data?.message || `Resend ${res.status}`);
+    if (!res.ok) {
+      const msg = data?.message || `Resend ${res.status}`;
+      // Add actionable hint for the common domain-verification 403
+      if (/domain.*not verified/i.test(msg) || /verify.*domain/i.test(msg)) {
+        throw new Error(`${msg} — fix: set EMAIL_FROM or RESEND_FROM to onboarding@resend.dev for testing, or verify your domain at https://resend.com/domains`);
+      }
+      throw new Error(msg);
+    }
     return { messageId: data?.id || null };
   }
   // Brevo (Sendinblue) — https://api.brevo.com/v3/smtp/email
