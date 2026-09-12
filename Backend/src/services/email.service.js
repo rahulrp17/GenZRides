@@ -537,10 +537,13 @@ export const notifyAdminOfBookingEmail = async (
         });
       } catch (err) {
         const msg = err?.message || String(err);
-        const isNetUnreach = /ENETUNREACH|EHOSTUNREACH|ETIMEDOUT|ECONNREFUSED/i.test(msg) || err?.code === "ENETUNREACH";
+        const code = String(err?.code || "");
+        const isNetUnreach =
+          /ENETUNREACH|EHOSTUNREACH|ETIMEDOUT|ECONNREFUSED|Connection timeout|Timeout/i.test(msg) ||
+          /ENETUNREACH|EHOSTUNREACH|ETIMEDOUT|ECONNREFUSED/i.test(code);
         if (isNetUnreach) {
           console.error(
-            `[email] booking ${ref}: SMTP ${err.code || "ENETUNREACH"} to ${config.host}:${config.port} — host blocks outbound SMTP (common on Render/Vercel free). Fix: set RESEND_API_KEY (or BREVO_API_KEY) to send via HTTPS 443, or use SMTP_PORT=2525/2587 via a relay like SendGrid/Mailgun, or force IPv4 with SMTP_FAMILY=4 (now default). Original: ${msg}`
+            `[email] booking ${ref}: SMTP ${code || "TIMEOUT"} to ${config.host}:${config.port} — host blocks outbound SMTP (common on Render/Vercel free). Fix: set RESEND_API_KEY (or BREVO_API_KEY) to send via HTTPS 443 (recommended), or use SMTP_PORT=2525/2587 via a relay like SendGrid/Mailgun. Current family:4 already set. Original: ${msg}`
           );
         } else {
           console.error(
