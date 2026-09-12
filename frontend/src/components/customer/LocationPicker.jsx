@@ -105,16 +105,23 @@ export default function LocationPicker({
     setRecentSearches(loadRecentSearches());
   }, []);
 
-  // Sync input values with external address props
+  // Sync input values with external address props — only when the external address actually changes, not on every focus blur.
+  const prevPickupRef = useRef(pickupAddress);
+  const prevDropRef = useRef(dropAddress);
   useEffect(() => {
-    if (!activeField || activeField !== "pickup") {
-      setPickupInputValue(pickupAddress || "");
+    if (prevPickupRef.current !== pickupAddress) {
+      prevPickupRef.current = pickupAddress;
+      if (!activeField || activeField !== "pickup") {
+        setPickupInputValue(pickupAddress || "");
+      }
     }
   }, [pickupAddress, activeField]);
-
   useEffect(() => {
-    if (!activeField || activeField !== "drop") {
-      setDropInputValue(dropAddress || "");
+    if (prevDropRef.current !== dropAddress) {
+      prevDropRef.current = dropAddress;
+      if (!activeField || activeField !== "drop") {
+        setDropInputValue(dropAddress || "");
+      }
     }
   }, [dropAddress, activeField]);
 
@@ -128,7 +135,7 @@ export default function LocationPicker({
     }
   }, [activeField]);
 
-  // Close dropdown on outside click
+  // Close dropdown on outside click — use click (not touchstart) so scrolling the page doesn't close it on mobile
   useEffect(() => {
     const handleOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -136,11 +143,11 @@ export default function LocationPicker({
       }
     };
     if (activeField) {
-      document.addEventListener("mousedown", handleOutside);
-      document.addEventListener("touchstart", handleOutside, { passive: true });
+      // delay adding click listener so the opening click doesn't immediately close
+      const t = setTimeout(() => document.addEventListener("click", handleOutside), 0);
       return () => {
-        document.removeEventListener("mousedown", handleOutside);
-        document.removeEventListener("touchstart", handleOutside);
+        clearTimeout(t);
+        document.removeEventListener("click", handleOutside);
       };
     }
   }, [activeField]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -153,15 +160,16 @@ export default function LocationPicker({
 
   const handlePickupFocus = useCallback(() => {
     setActiveField("pickup");
-    setPickupInputValue("");
+    // keep typed text if user already typed, otherwise show current address for editing
+    setPickupInputValue((prev) => (prev && activeField === "pickup" ? prev : pickupAddress || ""));
     setPredictions([]);
-  }, []);
+  }, [pickupAddress, activeField]);
 
   const handleDropFocus = useCallback(() => {
     setActiveField("drop");
-    setDropInputValue("");
+    setDropInputValue((prev) => (prev && activeField === "drop" ? prev : dropAddress || ""));
     setPredictions([]);
-  }, []);
+  }, [dropAddress, activeField]);
 
   const handlePickupChange = useCallback((value) => {
     setPickupInputValue(value);
@@ -480,7 +488,7 @@ export default function LocationPicker({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="mt-2 w-full max-w-full bg-white/5 rounded-2xl shadow-lg border border-white/10 overflow-hidden max-h-[45dvh] sm:max-h-[60vh] overflow-y-auto overscroll-contain"
+            className="fixed lg:absolute left-4 right-4 lg:left-0 lg:right-0 bottom-4 lg:bottom-auto lg:top-full lg:mt-2 w-auto lg:w-full max-w-full bg-gray-900 lg:bg-white/5 rounded-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[50dvh] sm:max-h-[60vh] overflow-y-auto overscroll-contain z-50"
           >
             {/* Search Results (when typing) */}
             {inputValue && inputValue.length >= 2 && (

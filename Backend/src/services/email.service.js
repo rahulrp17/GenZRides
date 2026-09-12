@@ -143,8 +143,8 @@ export const buildBookingEmailHtml = async (booking) => {
 
   const row = (label, value, highlight = false) => `
     <tr>
-      <td class="stack-column" style="padding:12px 16px;font-size:11px;color:#64748b;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;width:36%;vertical-align:top;background-color:#f8fafc;border-bottom:1px solid #f1f5f9;">${label}</td>
-      <td class="stack-column" style="padding:12px 16px;font-size:14px;color:${highlight ? "#059669" : "#0f172a"};font-weight:${highlight ? "700" : "500"};vertical-align:top;word-break:break-word;border-bottom:1px solid #f1f5f9;">${value}</td>
+      <td class="stack-column label-col" style="padding:12px 16px;font-size:11px;color:#64748b;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;width:36%;vertical-align:top;background-color:#f8fafc;border-bottom:1px solid #f1f5f9;">${label}</td>
+      <td class="stack-column value-col" style="padding:12px 16px;font-size:14px;color:${highlight ? "#059669" : "#0f172a"};font-weight:${highlight ? "700" : "500"};vertical-align:top;word-break:break-word;border-bottom:1px solid #f1f5f9;">${value}</td>
     </tr>`;
 
   return `<!doctype html>
@@ -152,8 +152,10 @@ export const buildBookingEmailHtml = async (booking) => {
   <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
     @media only screen and (max-width: 600px) {
-      .container { padding: 16px 8px !important; }
-      .stack-column { display:block !important; width:100% !important; padding:8px 16px !important; }
+      .container { padding: 12px 6px !important; }
+      .stack-column { padding:10px 10px !important; }
+      .label-col { width:32% !important; font-size:10px !important; }
+      .value-col { font-size:13px !important; }
       .header { padding:20px 16px !important; }
       .cta { padding:12px 20px !important; font-size:13px !important; }
     }

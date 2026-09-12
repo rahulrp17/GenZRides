@@ -30,22 +30,42 @@ const memSet = (key, val, ttlSec) => {
 
 export const getRedisClient = () => {
   if (!redisClient) {
-    const opts = {
-      host: process.env.REDIS_HOST || "127.0.0.1",
-      port: parseInt(process.env.REDIS_PORT || "6379", 10),
-      maxRetriesPerRequest: 3,
-      enableOfflineQueue: false,
-      retryStrategy(times) {
-        if (times > 3) return null;
-        return Math.min(times * 200, 2000);
-      },
-    };
+    // Upstash REST URL (https://...) is NOT for ioredis — use Dashboard → Connect → Node (rediss://)
+    // Support REDIS_URL directly if provided (e.g. rediss://default:pass@host:6379)
+    if (process.env.REDIS_URL && process.env.REDIS_URL.startsWith("redis")) {
+      redisClient = new Redis(process.env.REDIS_URL);
+    } else {
+      let rawHost = process.env.REDIS_HOST || "127.0.0.1";
+      if (rawHost.startsWith("https://")) {
+        console.error("REDIS_HOST is https:// (REST URL) — use Upstash Dashboard → Connect → Node → Host (e.g. charmed-duck-146690.upstash.io) without https://, or set REDIS_URL=rediss://...");
+        rawHost = rawHost.replace(/^https:\/\//, "").replace(/\/$/, "");
+      }
+      const opts = {
+        host: rawHost,
+        port: parseInt(process.env.REDIS_PORT || "6379", 10),
+        maxRetriesPerRequest: 3,
+        enableOfflineQueue: false,
+        retryStrategy(times) {
+          if (times > 3) return null;
+          return Math.min(times * 200, 2000);
+        },
+      };
 
-    if (process.env.REDIS_PASSWORD) {
-      opts.password = process.env.REDIS_PASSWORD;
+      if (process.env.REDIS_PASSWORD) {
+        opts.password = process.env.REDIS_PASSWORD;
+      }
+
+      // Upstash requires TLS
+      if (
+        String(process.env.REDIS_HOST || "").includes("upstash.io") ||
+        String(process.env.REDIS_TLS || "").toLowerCase() === "true" ||
+        String(process.env.REDIS_URL || "").startsWith("rediss")
+      ) {
+        opts.tls = {};
+      }
+
+      redisClient = new Redis(opts);
     }
-
-    redisClient = new Redis(opts);
 
     redisClient.on("error", (err) => {
       if (!_errorLogged) {
