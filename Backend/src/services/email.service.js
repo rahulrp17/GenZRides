@@ -24,7 +24,7 @@ const getConfig = () => {
     secure,
     user: (process.env.SMTP_USER || "").trim(),
     pass: process.env.SMTP_PASS || "",
-    adminEmail: (process.env.ADMIN_EMAIL_ADDRESS || "").trim(),
+    adminEmail: (process.env.ADMIN_EMAIL || "").trim(),
     // Base URL for inbox deep links (View booking button). Falls back to
     // CLIENT_URL; when neither is set the button is omitted.
     appUrl: (process.env.FRONTEND_URL || process.env.CLIENT_URL || "")
@@ -268,6 +268,13 @@ export const buildBookingEmailText = async (booking) => {
 const defaultTransportFactory = async (config) => {
   const { default: nodemailer } = await import("nodemailer");
 
+  // ENETUNREACH on 2607:f8b0:...:587 (Render/Railway) = host's VPC has no
+  // IPv6 egress or outbound SMTP 587 is blocked. Force IPv4 and allow
+  // override via SMTP_FAMILY=4|6. `family:4` makes nodemailer resolve only
+  // A records (e.g. smtp.gmail.com → 142.250.x.x) and avoids :: → ENETUNREACH.
+  const familyEnv = String(process.env.SMTP_FAMILY || "").trim();
+  const family = familyEnv === "6" ? 6 : familyEnv === "4" ? 4 : 4; // default 4 for prod
+
   return nodemailer.createTransport({
     host: config.host,
     port: config.port,
@@ -275,6 +282,7 @@ const defaultTransportFactory = async (config) => {
     // Enforce STARTTLS on plain ports; harmless when the server doesn't
     // support it and critical when it does (e.g. Gmail 587).
     requireTLS: !config.secure,
+    family,
     auth: config.user
       ? { user: config.user, pass: config.pass }
       : undefined,
@@ -289,8 +297,48 @@ const defaultTransportFactory = async (config) => {
       // `ciphers: 'SSLv3'` is intentionally NOT set — it weakens security.
       // Nodemailer negotiates the best cipher automatically.
       rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== "false",
+      // Prefer IPv4 SNI — some Gmail IPv6 frontends require it.
+      servername: config.host,
     },
   });
+};
+
+// HTTP API fallback for hosts that block outbound SMTP (Render free,
+// Vercel, etc.). If RESEND_API_KEY / BREVO_API_KEY / SENDGRID_API_KEY is
+// set, uses HTTPS (443) which is never blocked. Returns {messageId} or
+// throws like nodemailer.
+const sendViaHttpApi = async (config, { from, to, subject, text, html }) => {
+  const toArr = Array.isArray(to) ? to : [to];
+  // Resend (https://resend.com) — simplest HTTPS email API
+  if (process.env.RESEND_API_KEY) {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ from, to: toArr, subject, text, html }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.message || `Resend ${res.status}`);
+    return { messageId: data?.id || null };
+  }
+  // Brevo (Sendinblue) — https://api.brevo.com/v3/smtp/email
+  if (process.env.BREVO_API_KEY) {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: { "api-key": process.env.BREVO_API_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sender: { email: from.match(/<(.+)>/)?.[1] || from, name: from.match(/(.+)<.+/ )?.[1]?.trim() || "GenZRides" },
+        to: toArr.map((e) => ({ email: String(e).trim() })),
+        subject, textContent: text, htmlContent: html,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.message || `Brevo ${res.status}`);
+    return { messageId: data?.messageId || null };
+  }
+  return null; // no API key → fall through to SMTP
 };
 
 // Every admin login (role=admin, not blocked) receives booking alerts,
@@ -458,25 +506,51 @@ export const notifyAdminOfBookingEmail = async (
     const text = await buildBookingEmailText(effectiveBooking);
     const subject = `New GenZRides booking ${ref} — ${effectiveBooking.bookingStatus || "Pending"}`;
 
-    const factory = transportFactory || defaultTransportFactory;
-    const transporter = await factory(config);
-
-    let info;
+    // Prefer HTTPS API when configured — Render/Railway block 587, but 443 always works
+    let info = null;
+    let apiUsed = null;
     try {
-      info = await transporter.sendMail({
+      const apiInfo = await sendViaHttpApi(config, {
         from: config.from,
         to: recipients.length === 1 ? recipients[0] : recipients,
-        subject,
-        text,
-        html,
+        subject, text, html,
       });
-    } catch (err) {
-      console.error(
-        `[email] booking ${ref}: send failed to ${recipients.map(maskEmail).join(",")}:`,
-        err?.message || err
-      );
-      await recordEmailFailure(booking._id, recipients, err?.message);
-      return { sent: false, skipped: "send-failed" };
+      if (apiInfo) {
+        info = apiInfo;
+        apiUsed = process.env.RESEND_API_KEY ? "resend" : "brevo";
+      }
+    } catch (apiErr) {
+      console.error(`[email] booking ${ref}: HTTP API send failed:`, apiErr?.message || apiErr);
+      // fall through to SMTP attempt
+    }
+
+    if (!info) {
+      const factory = transportFactory || defaultTransportFactory;
+      const transporter = await factory(config);
+      try {
+        info = await transporter.sendMail({
+          from: config.from,
+          to: recipients.length === 1 ? recipients[0] : recipients,
+          subject,
+          text,
+          html,
+        });
+      } catch (err) {
+        const msg = err?.message || String(err);
+        const isNetUnreach = /ENETUNREACH|EHOSTUNREACH|ETIMEDOUT|ECONNREFUSED/i.test(msg) || err?.code === "ENETUNREACH";
+        if (isNetUnreach) {
+          console.error(
+            `[email] booking ${ref}: SMTP ${err.code || "ENETUNREACH"} to ${config.host}:${config.port} — host blocks outbound SMTP (common on Render/Vercel free). Fix: set RESEND_API_KEY (or BREVO_API_KEY) to send via HTTPS 443, or use SMTP_PORT=2525/2587 via a relay like SendGrid/Mailgun, or force IPv4 with SMTP_FAMILY=4 (now default). Original: ${msg}`
+          );
+        } else {
+          console.error(
+            `[email] booking ${ref}: send failed to ${recipients.map(maskEmail).join(",")}:`,
+            msg
+          );
+        }
+        await recordEmailFailure(booking._id, recipients, msg);
+        return { sent: false, skipped: "send-failed" };
+      }
     }
 
     const logged = await markEmailSent(booking._id, recipients);
@@ -486,7 +560,7 @@ export const notifyAdminOfBookingEmail = async (
     }
 
     console.log(
-      `[email] booking ${ref}: sent to ${recipients.map(maskEmail).join(",")} (id=${info?.messageId || "n/a"})`
+      `[email] booking ${ref}: sent via ${apiUsed || `smtp:${config.host}:${config.port}`} to ${recipients.map(maskEmail).join(",")} (id=${info?.messageId || "n/a"})`
     );
     return { sent: true, messageId: info?.messageId || null };
   } catch (err) {
