@@ -162,6 +162,7 @@ export default function LocationPicker({
     setActiveField(null);
     setPredictions([]);
     setSearching(false);
+    setActiveSavedPlaceEdit(null);
   }, []);
 
   const handlePickupFocus = useCallback(() => {
@@ -383,8 +384,6 @@ export default function LocationPicker({
   const isPickupActive = activeField === "pickup";
   const isDropActive = activeField === "drop";
   const showDropdown = activeField !== null;
-
-  const inputValue = isPickupActive ? pickupInputValue : dropInputValue;
 
   return (
     <div className="w-full max-w-full min-w-0 relative" ref={dropdownRef}>
