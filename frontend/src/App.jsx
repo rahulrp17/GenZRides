@@ -39,6 +39,7 @@ const AdminBookingRequests = lazy(() => import("./Pages/admin/AdminBookingReques
 const ManageWithdrawals = lazy(() => import("./Pages/admin/ManageWithdrawals"));
 const ManageReviews = lazy(() => import("./Pages/admin/ManageReviews"));
 const AdminNotifications = lazy(() => import("./Pages/admin/AdminNotifications"));
+const AdminProfile = lazy(() => import("./Pages/admin/AdminProfile"));
 
 const CustomerLayout = lazy(() => import("./layouts/CustomerLayout"));
 const CustomerDashboard = lazy(() => import("./Pages/customer/CustomerDashboard"));
@@ -154,6 +155,7 @@ function App() {
           <Route path="withdrawals" element={<ManageWithdrawals />} />
           <Route path="reviews" element={<ManageReviews />} />
           <Route path="notifications" element={<AdminNotifications />} />
+          <Route path="profile" element={<AdminProfile />} />
         </Route>
 
         {/* Customer dashboard */}

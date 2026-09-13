@@ -5,7 +5,7 @@ import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { MapPin, Navigation, Car, Clock, Phone, User, CheckCircle, X, Download, Star } from 'lucide-react';
-import { bookingAPI, invoiceAPI } from '../../services/endpoints';
+import { bookingAPI, invoiceAPI, reviewAPI } from '../../services/endpoints';
 import { useSocket } from '../../Context/SocketContext';
 import { CardSkeleton } from '../../components/shared/Skeleton';
 import ErrorState from '../../components/shared/ErrorState';
@@ -77,6 +77,25 @@ function decodePolyline(encoded) {
   return points;
 }
 
+const StarRating = ({ rating, onRate, size = 24, interactive = true }) => (
+  <div className="flex gap-1">
+    {[1, 2, 3, 4, 5].map((star) => (
+      <button
+        key={star}
+        type="button"
+        disabled={!interactive}
+        onClick={() => interactive && onRate?.(star)}
+        className={`transition ${interactive ? 'hover:scale-110 cursor-pointer' : 'cursor-default'}`}
+      >
+        <Star
+          size={size}
+          className={star <= rating ? 'text-amber-400 fill-amber-400' : 'text-gray-500'}
+        />
+      </button>
+    ))}
+  </div>
+);
+
 const CurrentRideCustomer = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -89,6 +108,11 @@ const CurrentRideCustomer = () => {
   const hasInteractedRef = useRef(false);
   const initialFitDoneRef = useRef(false);
 
+  // Review state
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
   const cancelMutation = useMutation({
     mutationFn: ({ id, reason }) => bookingAPI.cancel(id, { cancelReason: reason }),
     onSuccess: (res) => {
@@ -99,6 +123,24 @@ const CurrentRideCustomer = () => {
       setCancelDialogOpen(false);
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to cancel booking'),
+  });
+
+  const reviewMutation = useMutation({
+    mutationFn: ({ bookingId, rating, review }) => reviewAPI.create(bookingId, { rating, review: review || undefined }),
+    onSuccess: () => {
+      toast.success('Review submitted!');
+      setReviewSubmitted(true);
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+    },
+    onError: (err) => {
+      const msg = err.response?.data?.message || 'Failed to submit review';
+      if (msg.toLowerCase().includes('already')) {
+        setReviewSubmitted(true);
+        toast.success('Review already submitted');
+      } else {
+        toast.error(msg);
+      }
+    },
   });
 
   const { isLoaded, loadError } = useJsApiLoader({
@@ -114,20 +156,28 @@ const CurrentRideCustomer = () => {
     refetchInterval: (query) => {
       const bookings = query.state.data?.bookings || [];
       const active = bookings.find((b) => !['Completed', 'Cancelled'].includes(b.bookingStatus));
-      if (!active) return 3000;
-      const terminal = ['Completed', 'Cancelled'].includes(active.bookingStatus);
-      return terminal ? false : 8000;
+      if (!active) return false;
+      return 8000;
     },
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: true,
   });
 
   const bookings = data?.bookings || [];
+
+  // Find the most recent booking: active first, then most recent completed
   const activeBooking = bookings.find(
     (b) => !['Completed', 'Cancelled'].includes(b.bookingStatus)
   ) || null;
 
-  const booking = liveStatus || activeBooking;
+  const recentCompleted = !activeBooking
+    ? bookings.find((b) => b.bookingStatus === 'Completed')
+    : null;
+
+  const booking = liveStatus || activeBooking || recentCompleted;
+  const isCompleted = booking?.bookingStatus === 'Completed';
+  const isCancelled = booking?.bookingStatus === 'Cancelled';
+
   // Live elapsed time from backend timestamps (refresh-safe).
   const rideTime = useRideTime(booking);
   const pickupCoordsEarly = booking?.pickup?.latitude && booking?.pickup?.longitude
@@ -138,6 +188,20 @@ const CurrentRideCustomer = () => {
     : null;
   const [livePath, setLivePath] = useState(null);
   const lastFetchRef = useRef(0);
+
+  // Check if review already exists for this completed booking
+  useEffect(() => {
+    if (!isCompleted || !booking?._id) return;
+    if (booking.rating) {
+      setReviewSubmitted(true);
+      setReviewRating(booking.rating);
+      setReviewText(booking.review || '');
+    } else {
+      setReviewSubmitted(false);
+      setReviewRating(0);
+      setReviewText('');
+    }
+  }, [booking?._id, booking?.rating, booking?.review, isCompleted]);
 
   // Live route: Accepted/On The Way -> driver -> pickup ; Started/Reached -> pickup -> drop (car moving)
   useEffect(() => {
@@ -206,7 +270,6 @@ const CurrentRideCustomer = () => {
     const handleDriverLocation = (data) => {
       setDriverLocation({ lat: data.latitude, lng: data.longitude });
       setDriverEta(data.eta);
-      // Do NOT auto-center if user dragged; let them explore
     };
 
     const handleRideStatusUpdated = (data) => {
@@ -217,7 +280,6 @@ const CurrentRideCustomer = () => {
     socket.on('booking-updated', handleBookingUpdated);
     socket.on('driver-location-updated', handleDriverLocation);
     socket.on('ride-status-updated', handleRideStatusUpdated);
-    // Also listen for generic notification that may carry booking id
     const handleNotification = (n) => {
       if (n?.booking && String(n.booking) === String(booking._id)) {
         queryClient.invalidateQueries({ queryKey: ['myBookings'] });
@@ -242,7 +304,7 @@ const CurrentRideCustomer = () => {
     };
   }, [socket, booking?._id, queryClient]);
 
-  // Reset live status when booking changes
+  // Reset live status when active booking changes
   useEffect(() => {
     if (activeBooking) {
       setLiveStatus(activeBooking);
@@ -250,6 +312,12 @@ const CurrentRideCustomer = () => {
       setDriverEta(null);
     }
   }, [activeBooking?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSubmitReview = () => {
+    if (!reviewRating) return toast.error('Please select a rating');
+    if (!booking?._id) return toast.error('Booking not found');
+    reviewMutation.mutate({ bookingId: booking._id, rating: reviewRating, review: reviewText });
+  };
 
   if (isError) {
     return <ErrorState message={error?.message || 'Failed to load ride'} />;
@@ -291,18 +359,15 @@ const CurrentRideCustomer = () => {
     : null;
 
   const currentStatusIndex = STATUS_FLOW.findIndex((s) => s.key === booking.bookingStatus);
-  const isCompleted = booking.bookingStatus === 'Completed';
-  const isCancelled = booking.bookingStatus === 'Cancelled';
 
   const defaultCenter = { lat: 13.0827, lng: 80.2707 };
-  // If user has dragged, don't force center at all — keep map where they left it until Recenter
   const mapCenterProp = hasInteractedRef.current ? undefined : (pickupCoords || defaultCenter);
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 min-w-0 w-full max-w-full overflow-x-clip">
       <div>
         <h1 className="font-display text-2xl font-bold text-white tracking-tight">Current Ride</h1>
-        <p className="text-sm text-slate-200/80 mt-1">Track your ride in real-time</p>
+        <p className="text-sm text-slate-200/80 mt-1">{isCompleted ? 'Your completed ride' : 'Track your ride in real-time'}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 min-w-0">
@@ -346,9 +411,8 @@ const CurrentRideCustomer = () => {
             )}
           </div>
 
-          {/* Cancel — visible only until the driver arrives.
-              Hidden from Arrived onward (Started/Reached/Completed). */}
-          {['Pending', 'Accepted', 'On The Way'].includes(booking.bookingStatus) && (
+          {/* Cancel — visible only until the driver arrives. */}
+          {!isCompleted && !isCancelled && ['Pending', 'Accepted', 'On The Way'].includes(booking.bookingStatus) && (
             <button
               onClick={() => setCancelDialogOpen(true)}
               className="w-full flex items-center justify-center gap-2 py-3 bg-red-500/10 text-red-300 border border-red-500/30 rounded-2xl font-semibold hover:bg-red-500/20 transition-all"
@@ -362,7 +426,7 @@ const CurrentRideCustomer = () => {
             <RideTimeline booking={booking} currentStatusIndex={currentStatusIndex} />
           )}
 
-          {/* Cancellation banner with actor + reason */}
+          {/* Cancellation banner */}
           {isCancelled && (
             <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-5">
               <h3 className="font-semibold text-red-300">
@@ -509,7 +573,7 @@ const CurrentRideCustomer = () => {
                     )}
                     </GoogleMap>
                 )}
-                {/* Recenter button - restores auto-fit without forcing on every driver move */}
+                {/* Recenter button */}
                 <button
                   onClick={() => {
                     hasInteractedRef.current = false;
@@ -545,7 +609,7 @@ const CurrentRideCustomer = () => {
                   <p className="text-sm text-gray-400">{booking.driver.user?.phone || 'N/A'}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{booking.driver.vehicleType?.name || 'Vehicle'}</p>
                 </div>
-                {booking.driver.user?.phone && (
+                {!isCompleted && !isCancelled && booking.driver.user?.phone && (
                   <a
                     href={`tel:${booking.driver.user.phone}`}
                     className="w-11 h-11 rounded-full bg-emerald-500/20 flex items-center justify-center hover:bg-emerald-500/30 transition shrink-0"
@@ -557,16 +621,17 @@ const CurrentRideCustomer = () => {
             </div>
           )}
 
-          {/* Completed Ride Details */}
+          {/* Completed Ride Details + Inline Review */}
           {isCompleted && (
-            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-5">
-              <div className="flex items-center gap-3 mb-4">
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center gap-3">
                 <CheckCircle size={24} className="text-emerald-400" />
                 <div>
                   <h3 className="font-semibold text-emerald-300">Ride Completed</h3>
                   <p className="text-sm text-emerald-400">Thank you for riding with us!</p>
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-white/5 rounded-xl p-3">
                   <p className="text-xs text-gray-400">Final Fare</p>
@@ -576,8 +641,60 @@ const CurrentRideCustomer = () => {
                   <p className="text-xs text-gray-400">Payment Status</p>
                   <p className="text-sm font-semibold">{booking.paymentStatus}</p>
                 </div>
+                {booking.driver?.user?.name && (
+                  <div className="bg-white/5 rounded-xl p-3">
+                    <p className="text-xs text-gray-400">Driver</p>
+                    <p className="text-sm font-semibold text-white">{booking.driver.user.name}</p>
+                  </div>
+                )}
+                {booking.completedAt && (
+                  <div className="bg-white/5 rounded-xl p-3">
+                    <p className="text-xs text-gray-400">Completed At</p>
+                    <p className="text-sm font-semibold text-white">
+                      {new Date(booking.completedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                )}
               </div>
-              <div className="flex flex-col sm:flex-row gap-2 mt-4">
+
+              {/* Inline Review Section */}
+              {!reviewSubmitted ? (
+                <div className="bg-white/5 rounded-xl p-4 space-y-3">
+                  <h4 className="text-sm font-semibold text-white">Rate Your Ride</h4>
+                  <StarRating rating={reviewRating} onRate={setReviewRating} size={28} />
+                  <textarea
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value.slice(0, 500))}
+                    placeholder="Tell us about your experience (optional)"
+                    rows={3}
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/40 resize-none"
+                  />
+                  <button
+                    onClick={handleSubmitReview}
+                    disabled={!reviewRating || reviewMutation.isPending}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold text-sm hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all disabled:opacity-50"
+                  >
+                    {reviewMutation.isPending ? (
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <Star size={16} />
+                    )}
+                    {reviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </div>
+              ) : (
+                <div className="bg-white/5 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle size={16} className="text-emerald-400" />
+                    <span className="text-sm font-semibold text-emerald-400">Review submitted</span>
+                  </div>
+                  <StarRating rating={reviewRating} onRate={() => {}} interactive={false} size={20} />
+                  {reviewText && <p className="text-xs text-gray-400 mt-2">{reviewText}</p>}
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-2">
                 <button
                   onClick={async () => {
                     try {
@@ -601,10 +718,10 @@ const CurrentRideCustomer = () => {
                   <Download size={16} /> Download Invoice
                 </button>
                 <button
-                  onClick={() => navigate('/customer/reviews', { state: { bookingId: booking._id } })}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xl hover:bg-amber-500/30 transition font-semibold text-sm"
+                  onClick={() => navigate('/customer/book')}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-white/10 text-white border border-white/10 rounded-xl hover:bg-white/15 transition font-semibold text-sm"
                 >
-                  <Star size={16} /> Rate Your Ride
+                  <Car size={16} /> Book Again
                 </button>
               </div>
             </div>

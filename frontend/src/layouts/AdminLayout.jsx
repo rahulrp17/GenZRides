@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, Navigate, useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import {  Home,  Users,  Car,  Calendar,  Wallet,  Star,  Bell,  LogOut,  Menu,  ChevronDown,  Settings,  LayoutPanelLeft,} from "lucide-react";
+import {  Home,  Users,  Car,  Calendar,  Wallet,  Star,  Bell,  LogOut,  Menu,  ChevronDown,  Settings,  LayoutPanelLeft,  User,} from "lucide-react";
 import useAuth from "../hooks/useAuth";
 import SEO from "../components/SEO";
 import PushListener from "../components/PushListener";
@@ -19,6 +19,7 @@ const navItems = [
   { path: "/admin/withdrawals", label: "Withdrawals", icon: Wallet },
   { path: "/admin/reviews", label: "Reviews", icon: Star },
   { path: "/admin/notifications", label: "Notifications", icon: Bell },
+  { path: "/admin/profile", label: "Profile", icon: User },
 ];
 
 const AdminLayout = () => {
@@ -158,6 +159,13 @@ const AdminLayout = () => {
                     exit={{ opacity: 0, y: -10 }}
                     className="absolute right-0 top-full mt-2 w-48 bg-gray-900 backdrop-blur-xl border border-green-700 rounded-xl shadow-2xl py-2"
                   >
+                    <NavLink
+                      to="/admin/profile"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white"
+                    >
+                      <User size={16} /> Profile
+                    </NavLink>
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 w-full"
