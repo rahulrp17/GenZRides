@@ -269,6 +269,7 @@ export const requestPasswordReset = async (email) => {
 
   // Best-effort email: try HTTPS API first (Resend/Brevo, never blocked),
   // then fall back to SMTP. Log OTP if all channels fail (dev convenience).
+  let emailWarning = null;
   try {
     const { getEmailConfig } = await import("./email.service.js");
     const cfg = getEmailConfig();
@@ -284,6 +285,7 @@ export const requestPasswordReset = async (email) => {
     const mailOpts = { from: cfg.from, to: user.email, subject: otpSubject, text: otpText, html: otpHtml };
 
     let sent = false;
+    let lastError = null;
 
     // 1. Try HTTPS API (Resend / Brevo) — port 443, never blocked
     if (!sent) {
@@ -291,34 +293,54 @@ export const requestPasswordReset = async (email) => {
         const { sendViaHttpApi } = await import("./email.service.js");
         await sendViaHttpApi(cfg, mailOpts);
         sent = true;
-      } catch { /* fall through to SMTP */ }
+        console.log(`[auth] OTP email sent via HTTPS API to ${user.email}`);
+      } catch (e) {
+        lastError = e;
+        console.warn(`[auth] HTTPS API failed for ${user.email}: ${e.message}`);
+      }
     }
 
     // 2. Fallback: SMTP transport
     if (!sent && cfg.host && cfg.user && cfg.pass) {
-      const { default: nodemailer } = await import("nodemailer");
-      const transporter = nodemailer.createTransport({
-        host: cfg.host,
-        port: cfg.port,
-        secure: cfg.secure,
-        requireTLS: !cfg.secure,
-        family: 4,
-        auth: { user: cfg.user, pass: cfg.pass },
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
-        tls: { rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== "false", servername: cfg.host },
-      });
-      await transporter.sendMail(mailOpts);
-      sent = true;
+      try {
+        const { default: nodemailer } = await import("nodemailer");
+        const transporter = nodemailer.createTransport({
+          host: cfg.host,
+          port: cfg.port,
+          secure: cfg.secure,
+          requireTLS: !cfg.secure,
+          family: 4,
+          auth: { user: cfg.user, pass: cfg.pass },
+          connectionTimeout: 10000,
+          greetingTimeout: 10000,
+          socketTimeout: 10000,
+          tls: { rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== "false", servername: cfg.host },
+        });
+        await transporter.sendMail(mailOpts);
+        sent = true;
+        console.log(`[auth] OTP email sent via SMTP to ${user.email}`);
+      } catch (e) {
+        lastError = e;
+        console.warn(`[auth] SMTP failed for ${user.email}: ${e.message}`);
+      }
     }
 
-    if (!sent) console.log(`[auth] OTP for ${clean}: ${otp} (no email channel configured)`);
+    if (!sent) {
+      emailWarning = "Email delivery failed. Please try again later or contact support.";
+      console.error(`[auth] ALL EMAIL CHANNELS FAILED for ${user.email}. Last error: ${lastError?.message || 'no channel configured'}`);
+      console.error(`[auth] OTP for ${clean}: ${otp}`);
+    }
   } catch (e) {
-    console.log(`[auth] OTP for ${clean}: ${otp} (email send failed: ${e.message})`);
+    console.error(`[auth] OTP for ${clean}: ${otp} (email send failed: ${e.message})`);
+    if (e.stack) console.error(`[auth] stack: ${e.stack.split('\n').slice(0, 3).join(' | ')}`);
   }
 
-  return { success: true, message: "OTP sent to your email. It expires in 10 minutes.", ...(process.env.NODE_ENV !== "production" ? { otp } : {}) };
+  return {
+    success: true,
+    message: "OTP sent to your email. It expires in 10 minutes.",
+    ...(process.env.NODE_ENV !== "production" ? { otp } : {}),
+    ...(emailWarning ? { emailWarning } : {}),
+  };
 };
 
 export const verifyResetOtp = async (email, otp) => {

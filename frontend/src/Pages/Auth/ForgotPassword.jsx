@@ -18,7 +18,11 @@ const ForgotPassword = () => {
     setLoading(true);
     try {
       const { data } = await authAPI.forgotPassword({ email: email.trim().toLowerCase() });
-      toast.success(data.message || "OTP sent to your email");
+      if (data.emailWarning) {
+        toast.error(data.emailWarning, { duration: 6000 });
+      } else {
+        toast.success(data.message || "OTP sent to your email");
+      }
       navigate("/reset-password", { state: { email: email.trim().toLowerCase() } });
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.errors?.[0]?.message || err.message || "Failed to send OTP";
