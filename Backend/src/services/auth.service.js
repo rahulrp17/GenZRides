@@ -277,7 +277,13 @@ export const requestPasswordReset = async (email) => {
         host: cfg.host,
         port: cfg.port,
         secure: cfg.secure,
+        requireTLS: !cfg.secure,
+        family: 4,
         auth: { user: cfg.user, pass: cfg.pass },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
+        tls: { rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== "false", servername: cfg.host },
       });
       await transporter.sendMail({
         from: cfg.from,
