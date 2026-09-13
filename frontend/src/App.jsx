@@ -74,6 +74,8 @@ const DriverContinue = lazy(() => import("./Pages/driver-auth/DriverContinue"));
 const NotFound = lazy(() => import("./Pages/NotFound"));
 const ForgotPassword = lazy(() => import("./Pages/Auth/ForgotPassword"));
 const ResetPassword = lazy(() => import("./Pages/Auth/ResetPassword"));
+const OtpVerification = lazy(() => import("./Pages/Auth/OtpVerification"));
+const NewPassword = lazy(() => import("./Pages/Auth/NewPassword"));
 
 const PageFallback = () => <LoadingPage />;
 
@@ -124,6 +126,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-otp" element={<OtpVerification />} />
+        <Route path="/new-password" element={<NewPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/about" element={<><Navbar /><About /><Footer /></>} />
         <Route path="/tariff" element={<><Navbar /><TariffChart /><Footer /></>} />

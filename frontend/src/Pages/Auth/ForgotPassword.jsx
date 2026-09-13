@@ -23,7 +23,7 @@ const ForgotPassword = () => {
       } else {
         toast.success(data.message || "OTP sent to your email");
       }
-      navigate("/reset-password", { state: { email: email.trim().toLowerCase() } });
+      navigate("/verify-otp", { state: { email: email.trim().toLowerCase() } });
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.errors?.[0]?.message || err.message || "Failed to send OTP";
       toast.error(msg);
