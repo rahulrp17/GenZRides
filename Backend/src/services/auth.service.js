@@ -267,11 +267,35 @@ export const requestPasswordReset = async (email) => {
   user.otpExpiry = expiry;
   await user.save();
 
-  // Best-effort email: if SMTP not configured, log OTP and still succeed (dev convenience)
+  // Best-effort email: try HTTPS API first (Resend/Brevo, never blocked),
+  // then fall back to SMTP. Log OTP if all channels fail (dev convenience).
   try {
     const { getEmailConfig } = await import("./email.service.js");
     const cfg = getEmailConfig();
-    if (cfg.host && cfg.user && cfg.pass) {
+    const otpSubject = "GenZRides — Password Reset OTP";
+    const otpText = `Your GenZRides OTP is ${otp}. It expires in 10 minutes. If you didn't request this, ignore this email.`;
+    const otpHtml = `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0a0f0d;color:#fff;border-radius:16px;">
+      <h2 style="color:#10b981;margin:0 0 12px;">GenZRides</h2>
+      <p style="color:#d1d5db;">Your OTP for password reset is:</p>
+      <div style="font-size:32px;font-weight:800;letter-spacing:8px;color:#10b981;background:#111827;padding:16px;text-align:center;border-radius:12px;margin:16px 0;">${otp}</div>
+      <p style="color:#9ca3af;font-size:13px;">Expires in 10 minutes. If you didn't request this, you can ignore this email.</p>
+    </div>`;
+
+    const mailOpts = { from: cfg.from, to: user.email, subject: otpSubject, text: otpText, html: otpHtml };
+
+    let sent = false;
+
+    // 1. Try HTTPS API (Resend / Brevo) — port 443, never blocked
+    if (!sent) {
+      try {
+        const { sendViaHttpApi } = await import("./email.service.js");
+        await sendViaHttpApi(cfg, mailOpts);
+        sent = true;
+      } catch { /* fall through to SMTP */ }
+    }
+
+    // 2. Fallback: SMTP transport
+    if (!sent && cfg.host && cfg.user && cfg.pass) {
       const { default: nodemailer } = await import("nodemailer");
       const transporter = nodemailer.createTransport({
         host: cfg.host,
@@ -285,21 +309,11 @@ export const requestPasswordReset = async (email) => {
         socketTimeout: 10000,
         tls: { rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== "false", servername: cfg.host },
       });
-      await transporter.sendMail({
-        from: cfg.from,
-        to: user.email,
-        subject: "GenZRides — Password Reset OTP",
-        text: `Your GenZRides OTP is ${otp}. It expires in 10 minutes. If you didn't request this, ignore this email.`,
-        html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0a0f0d;color:#fff;border-radius:16px;">
-          <h2 style="color:#10b981;margin:0 0 12px;">GenZRides</h2>
-          <p style="color:#d1d5db;">Your OTP for password reset is:</p>
-          <div style="font-size:32px;font-weight:800;letter-spacing:8px;color:#10b981;background:#111827;padding:16px;text-align:center;border-radius:12px;margin:16px 0;">${otp}</div>
-          <p style="color:#9ca3af;font-size:13px;">Expires in 10 minutes. If you didn't request this, you can ignore this email.</p>
-        </div>`,
-      });
-    } else {
-      console.log(`[auth] OTP for ${clean}: ${otp} (SMTP not configured)`);
+      await transporter.sendMail(mailOpts);
+      sent = true;
     }
+
+    if (!sent) console.log(`[auth] OTP for ${clean}: ${otp} (no email channel configured)`);
   } catch (e) {
     console.log(`[auth] OTP for ${clean}: ${otp} (email send failed: ${e.message})`);
   }

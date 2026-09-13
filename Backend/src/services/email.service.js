@@ -307,7 +307,7 @@ const defaultTransportFactory = async (config) => {
 // Vercel, etc.). If RESEND_API_KEY / BREVO_API_KEY / SENDGRID_API_KEY is
 // set, uses HTTPS (443) which is never blocked. Returns {messageId} or
 // throws like nodemailer.
-const sendViaHttpApi = async (config, { from, to, subject, text, html }) => {
+export const sendViaHttpApi = async (config, { from, to, subject, text, html }) => {
   const toArr = Array.isArray(to) ? to : [to];
   // Resend (https://resend.com) — simplest HTTPS email API
   // IMPORTANT: Resend requires the `from` domain to be verified at
