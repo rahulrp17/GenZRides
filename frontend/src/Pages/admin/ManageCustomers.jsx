@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Users, Eye, Ban, CheckCircle, Trash2, Search } from 'lucide-react';
 import { adminAPI } from '../../services/endpoints';
 import { TableSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import SearchBar from '../../components/shared/SearchBar';
@@ -18,13 +19,16 @@ const ManageCustomers = () => {
   const [actionDialog, setActionDialog] = useState({ open: false, action: null, id: null, title: '', message: '' });
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['adminCustomers', page, search],
     queryFn: async () => {
       const { data } = await adminAPI.getCustomers({ page, limit: 10, search });
       return data;
     },
+    staleTime: 30_000,
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load customers'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminCustomers'] })} />;
 
   const blockMutation = useMutation({
     mutationFn: (id) => adminAPI.blockCustomer(id),

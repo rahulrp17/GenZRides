@@ -5,19 +5,25 @@ import { toast } from 'react-hot-toast';
 import { User, Camera, Lock, Save, Mail, Phone, Shield } from 'lucide-react';
 import { authAPI, userAPI, uploadAPI } from '../../services/endpoints';
 import useAuth from '../../hooks/useAuth';
+import { ListSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import { motion as Motion } from 'framer-motion';
 
 const AdminProfile = () => {
   const { user, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
 
-  const { data: profileData } = useQuery({
+  const { data: profileData, isLoading, isError, error } = useQuery({
     queryKey: ['adminProfile'],
     queryFn: async () => {
       const { data } = await authAPI.getProfile();
       return data;
     },
+    staleTime: 30_000,
   });
+
+  if (isLoading) return <ListSkeleton count={3} />;
+  if (isError) return <ErrorState message={error?.message || 'Failed to load profile'} />;
 
   const profile = profileData?.data || user;
 

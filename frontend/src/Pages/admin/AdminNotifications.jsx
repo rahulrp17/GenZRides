@@ -6,6 +6,7 @@ import { Bell, CheckCheck, Trash2 } from 'lucide-react';
 import { notificationAPI } from '../../services/endpoints';
 import { useSocket } from '../../Context/SocketContext';
 import { ListSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import PushToggle from '../../components/PushToggle';
@@ -22,13 +23,16 @@ const AdminNotifications = () => {
   const navigate = useNavigate();
   const { socket } = useSocket();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['adminNotifications', page],
     queryFn: async () => {
       const { data } = await notificationAPI.getAll({ page, limit: 20 });
       return data;
     },
+    staleTime: 30_000,
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load notifications'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminNotifications'] })} />;
 
   const markAllMutation = useMutation({
     mutationFn: () => notificationAPI.markAllRead(),

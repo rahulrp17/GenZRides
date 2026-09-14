@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Star, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { adminAPI } from '../../services/endpoints';
 import { TableSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
@@ -15,7 +16,7 @@ const ManageReviews = () => {
   const [deleteId, setDeleteId] = useState(null);
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['adminReviews', page, ratingFilter],
     queryFn: async () => {
       const params = { page, limit: 10 };
@@ -23,7 +24,10 @@ const ManageReviews = () => {
       const { data } = await adminAPI.getReviews(params);
       return data;
     },
+    staleTime: 30_000,
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load reviews'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminReviews'] })} />;
 
   const hideMutation = useMutation({
     mutationFn: (id) => adminAPI.hideReview(id),

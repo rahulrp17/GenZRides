@@ -46,7 +46,7 @@ const AdminBookingRequests = () => {
   const openBooking = (id) => navigate(`/admin/bookings/${id}`);
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ["adminBookings"],
+    queryKey: ["adminPendingBookings"],
     queryFn: async () => {
       const { data } = await adminAPI.getBookings({
         page: 1,
@@ -56,6 +56,7 @@ const AdminBookingRequests = () => {
       return data;
     },
     refetchOnWindowFocus: false,
+    staleTime: 30_000,
   });
 
   // Real-time: new guest/customer bookings and status changes refresh the
@@ -63,7 +64,7 @@ const AdminBookingRequests = () => {
   useEffect(() => {
     if (!socket) return;
     const handleUpdate = () => {
-      queryClient.invalidateQueries({ queryKey: ["adminBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["adminPendingBookings"] });
     };
     socket.on("booking-created", handleUpdate);
     socket.on("booking-updated", handleUpdate);
@@ -83,6 +84,7 @@ const AdminBookingRequests = () => {
       const { data } = await adminAPI.getApprovedDrivers();
       return data;
     },
+    staleTime: 30_000,
   });
 
   const assignMutation = useMutation({
@@ -90,8 +92,8 @@ const AdminBookingRequests = () => {
       adminAPI.assignDriver(bookingId, { driverId }),
     onSuccess: () => {
       toast.success("Driver assigned successfully!");
+      queryClient.invalidateQueries({ queryKey: ["adminPendingBookings"] });
       queryClient.invalidateQueries({ queryKey: ["adminBookings"] });
-      queryClient.invalidateQueries({ queryKey: ["adminBookingsAll"] });
       setAssignDialog({ open: false, bookingId: null });
     },
     onError: (err) => {
@@ -105,8 +107,8 @@ const AdminBookingRequests = () => {
       adminAPI.cancelBooking(bookingId, { reason: "Cancelled by admin" }),
     onSuccess: () => {
       toast.success("Booking cancelled");
+      queryClient.invalidateQueries({ queryKey: ["adminPendingBookings"] });
       queryClient.invalidateQueries({ queryKey: ["adminBookings"] });
-      queryClient.invalidateQueries({ queryKey: ["adminBookingsAll"] });
       setCancelDialog({ open: false, bookingId: null });
     },
     onError: (err) => {

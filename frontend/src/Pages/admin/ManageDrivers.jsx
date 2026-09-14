@@ -59,6 +59,7 @@ const ManageDrivers = () => {
       const { data } = await adminAPI.getDrivers(params);
       return data;
     },
+    staleTime: 30_000,
   });
 
   // Full detail for the modal — shows every backend field (profile, phone,

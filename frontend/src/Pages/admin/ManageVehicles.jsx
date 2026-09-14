@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { Car, Plus, Pencil, Trash2, CheckCircle, XCircle, ImagePlus, X, Loader2, Users, Luggage, Gauge, Snowflake, Moon, Clock } from 'lucide-react';
 import { adminAPI } from '../../services/endpoints';
 import { TableSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Modal from '../../components/shared/Modal';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
@@ -12,6 +13,151 @@ import { motion as Motion } from 'framer-motion';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+const VehicleCard = React.memo(({ v, onEdit, onToggle, onDelete }) => (
+  <Motion.div
+    initial={{ opacity: 0, y: 16 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="group bg-white/[0.04] backdrop-blur-xl rounded-[28px] border border-white/[0.08] overflow-hidden hover:border-green-500/25 hover:shadow-[0_8px_40px_rgba(34,197,94,0.08)] transition-all duration-300"
+  >
+    {/* Image section */}
+    <div className="relative h-44 sm:h-48 overflow-hidden">
+      {v.image ? (
+        <img src={v.image} alt={v.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+      ) : (
+        <div className="w-full h-full bg-gradient-to-br from-white/5 to-white/[0.02] flex items-center justify-center">
+          <Car size={48} className="text-white/10" />
+        </div>
+      )}
+      <div className="absolute top-3 left-3">
+        <span className={`px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide backdrop-blur-md ${v.isActive ? 'bg-emerald-800 text-emerald-300 border border-emerald-400/30' : 'bg-red-500/25 text-red-300 border border-red-400/30'}`}>
+          {v.isActive ? 'ACTIVE' : 'INACTIVE'}
+        </span>
+      </div>
+      {v.isAC && (
+        <div className="absolute top-3 right-3">
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-500/20 text-blue-900 border border-blue-400/25 backdrop-blur-md flex items-center gap-1">
+            <Snowflake size={11} /> AC
+          </span>
+        </div>
+      )}
+    </div>
+
+    {/* Content */}
+    <div className="p-5">
+      <div className="flex items-start justify-between gap-2 mb-3">
+        <h3 className="text-lg font-bold text-white leading-tight">{v.name}</h3>
+        {v.driverBataHighDistance != null && (
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/20 shrink-0" title="Custom high-distance driver bata">
+            ₹{v.driverBataHighDistance}/day
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+          <Users size={13} className="text-green-400/70" />
+          <span>{v.seats} seats</span>
+        </div>
+        <div className="w-px h-3 bg-white/10" />
+        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+          <Luggage size={13} className="text-green-400/70" />
+          <span>{v.luggage} bags</span>
+        </div>
+      </div>
+
+      {/* Pricing — only show if fare data exists */}
+      {(v.oneWayBaseFare > 0 || v.roundTripBaseFare > 0) ? (
+        <div className="bg-white/[0.03] rounded-2xl p-3.5 mb-4 border border-white/[0.05]">
+          {v.oneWayBaseFare > 0 && (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-gray-500 uppercase tracking-wider">One-Way Base</span>
+                <span className="text-sm font-bold text-white">₹{v.oneWayBaseFare?.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-gray-500 uppercase tracking-wider">One-Way /km</span>
+                <span className="text-sm font-semibold text-green-400">₹{v.oneWayPerKm ?? '—'}</span>
+              </div>
+              {v.oneWayBaseKm > 0 && (
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs text-gray-500 uppercase tracking-wider">One-Way Base KM</span>
+                  <span className="text-sm font-semibold text-emerald-400">{v.oneWayBaseKm} km</span>
+                </div>
+              )}
+              <div className="border-t border-white/[0.05] my-2" />
+            </>
+          )}
+          {v.roundTripBaseFare > 0 && (
+            <>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-gray-500 uppercase tracking-wider">Round-Trip Base</span>
+                <span className="text-sm font-bold text-white">₹{v.roundTripBaseFare?.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-gray-500 uppercase tracking-wider">Round-Trip /km</span>
+                <span className="text-sm font-semibold text-emerald-400">₹{v.roundTripPerKm ?? '—'}</span>
+              </div>
+              {v.roundTripBaseKm > 0 && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500 uppercase tracking-wider">Round-Trip Base KM</span>
+                  <span className="text-sm font-semibold text-emerald-400">{v.roundTripBaseKm} km</span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      ) : (
+        <div className="bg-white/[0.03] rounded-2xl p-3.5 mb-4 border border-white/[0.05]">
+          <p className="text-xs text-gray-500 italic text-center">Pricing not configured</p>
+        </div>
+      )}
+
+      {/* Quick info pills — only show if values exist */}
+      {(v.nightCharge > 0 || v.waitingChargePerMinute > 0 || v.driverAllowance > 0) && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {v.nightCharge > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/15 text-purple-300 border border-purple-500/20">
+              <Moon size={10} /> ₹{v.nightCharge} night
+            </span>
+          )}
+          {v.waitingChargePerMinute > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/15 text-amber-300 border border-amber-500/20">
+              <Clock size={10} /> ₹{v.waitingChargePerMinute}/min wait
+            </span>
+          )}
+          {v.driverAllowance > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">
+              <Gauge size={10} /> ₹{v.driverAllowance} bata
+            </span>
+          )}
+        </div>
+      )}
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onEdit(v)}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs font-medium hover:bg-white/10 hover:text-white transition"
+        >
+          <Pencil size={13} /> Edit
+        </button>
+        <button
+          onClick={() => onToggle(v)}
+          className={`flex-1 py-2.5 text-xs font-medium rounded-xl border transition ${v.isActive ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'}`}
+        >
+          {v.isActive ? <XCircle size={13} className="inline mr-1" /> : <CheckCircle size={13} className="inline mr-1" />}
+          {v.isActive ? 'Disable' : 'Enable'}
+        </button>
+        <button
+          onClick={() => onDelete(v._id)}
+          className="py-2.5 px-3 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/20 transition"
+        >
+          <Trash2 size={13} />
+        </button>
+      </div>
+    </div>
+  </Motion.div>
+));
 
 const ManageVehicles = () => {
   const [showModal, setShowModal] = useState(false);
@@ -58,13 +204,16 @@ const ManageVehicles = () => {
     resetImageState();
   };
 
-  const { data: vehicles, isLoading } = useQuery({
+  const { data: vehicles, isLoading, isError, error } = useQuery({
     queryKey: ['adminVehicles'],
     queryFn: async () => {
       const { data } = await adminAPI.getVehicles();
       return data;
     },
+    staleTime: 30_000,
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load vehicles'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminVehicles'] })} />;
 
   const createMutation = useMutation({
     mutationFn: (data) => adminAPI.createVehicle(data),
@@ -187,139 +336,6 @@ const ManageVehicles = () => {
 
   const vehicleList = vehicles?.vehicles || [];
 
-  const VehicleCard = ({ v }) => (
-    <Motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="group bg-white/[0.04] backdrop-blur-xl rounded-[28px] border border-white/[0.08] overflow-hidden hover:border-green-500/25 hover:shadow-[0_8px_40px_rgba(34,197,94,0.08)] transition-all duration-300"
-    >
-      {/* Image section */}
-      <div className="relative h-44 sm:h-48 overflow-hidden">
-        {v.image ? (
-          <img src={v.image} alt={v.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-white/5 to-white/[0.02] flex items-center justify-center">
-            <Car size={48} className="text-white/10" />
-          </div>
-        )}
-        {/* Status badge */}
-        <div className="absolute top-3 left-3">
-          <span className={`px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide backdrop-blur-md ${v.isActive ? 'bg-emerald-800 text-emerald-300 border border-emerald-400/30' : 'bg-red-500/25 text-red-300 border border-red-400/30'}`}>
-            {v.isActive ? 'ACTIVE' : 'INACTIVE'}
-          </span>
-        </div>
-        {/* AC badge */}
-        {v.isAC && (
-          <div className="absolute top-3 right-3">
-            <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-500/20 text-blue-900 border border-blue-400/25 backdrop-blur-md flex items-center gap-1">
-              <Snowflake size={11} /> AC
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-2 mb-3">
-          <h3 className="text-lg font-bold text-white leading-tight">{v.name}</h3>
-          {v.driverBataHighDistance != null && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/20 shrink-0" title="Custom high-distance driver bata">
-              ₹{v.driverBataHighDistance}/day
-            </span>
-          )}
-        </div>
-
-        {/* Stats row */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex items-center gap-1.5 text-xs text-gray-400">
-            <Users size={13} className="text-green-400/70" />
-            <span>{v.seats} seats</span>
-          </div>
-          <div className="w-px h-3 bg-white/10" />
-          <div className="flex items-center gap-1.5 text-xs text-gray-400">
-            <Luggage size={13} className="text-green-400/70" />
-            <span>{v.luggage} bags</span>
-          </div>
-        </div>
-
-        {/* Pricing */}
-        <div className="bg-white/[0.03] rounded-2xl p-3.5 mb-4 border border-white/[0.05]">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">One-Way Base</span>
-            <span className="text-sm font-bold text-white">₹{v.oneWayBaseFare?.toLocaleString('en-IN')}</span>
-          </div>
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">One-Way /km</span>
-            <span className="text-sm font-semibold text-green-400">₹{v.oneWayPerKm ?? '—'}</span>
-          </div>
-          {v.oneWayBaseKm > 0 && (
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs text-gray-500 uppercase tracking-wider">One-Way Base KM</span>
-              <span className="text-sm font-semibold text-emerald-400">{v.oneWayBaseKm} km</span>
-            </div>
-          )}
-          <div className="border-t border-white/[0.05] my-2" />
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">Round-Trip Base</span>
-            <span className="text-sm font-bold text-white">₹{v.roundTripBaseFare?.toLocaleString('en-IN')}</span>
-          </div>
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">Round-Trip /km</span>
-            <span className="text-sm font-semibold text-emerald-400">₹{v.roundTripPerKm ?? '—'}</span>
-          </div>
-          {v.roundTripBaseKm > 0 && (
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 uppercase tracking-wider">Round-Trip Base KM</span>
-              <span className="text-sm font-semibold text-emerald-400">{v.roundTripBaseKm} km</span>
-            </div>
-          )}
-        </div>
-
-        {/* Quick info pills */}
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {v.nightCharge > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/15 text-purple-300 border border-purple-500/20">
-              <Moon size={10} /> ₹{v.nightCharge} night
-            </span>
-          )}
-          {v.waitingChargePerMinute > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/15 text-amber-300 border border-amber-500/20">
-              <Clock size={10} /> ₹{v.waitingChargePerMinute}/min wait
-            </span>
-          )}
-          {v.driverAllowance > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">
-              <Gauge size={10} /> ₹{v.driverAllowance} bata
-            </span>
-          )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => openEdit(v)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs font-medium hover:bg-white/10 hover:text-white transition"
-          >
-            <Pencil size={13} /> Edit
-          </button>
-          <button
-            onClick={() => v.isActive ? disableMutation.mutate(v._id) : enableMutation.mutate(v._id)}
-            className={`flex-1 py-2.5 text-xs font-medium rounded-xl border transition ${v.isActive ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'}`}
-          >
-            {v.isActive ? <XCircle size={13} className="inline mr-1" /> : <CheckCircle size={13} className="inline mr-1" />}
-            {v.isActive ? 'Disable' : 'Enable'}
-          </button>
-          <button
-            onClick={() => setDeleteId(v._id)}
-            className="py-2.5 px-3 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/20 transition"
-          >
-            <Trash2 size={13} />
-          </button>
-        </div>
-      </div>
-    </Motion.div>
-  );
-
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -353,7 +369,13 @@ const ManageVehicles = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {vehicleList.map((v) => (
-            <VehicleCard key={v._id} v={v} />
+            <VehicleCard
+              key={v._id}
+              v={v}
+              onEdit={openEdit}
+              onToggle={(veh) => veh.isActive ? disableMutation.mutate(veh._id) : enableMutation.mutate(veh._id)}
+              onDelete={setDeleteId}
+            />
           ))}
         </div>
       )}

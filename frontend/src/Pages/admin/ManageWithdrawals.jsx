@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Wallet, CheckCircle, XCircle } from 'lucide-react';
 import { adminAPI } from '../../services/endpoints';
 import { TableSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Modal from '../../components/shared/Modal';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
@@ -16,13 +17,16 @@ const ManageWithdrawals = () => {
   const [confirmAction, setConfirmAction] = useState({ open: false, action: null, id: null });
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['adminWithdrawals'],
     queryFn: async () => {
       const { data } = await adminAPI.getWithdrawals();
       return data;
     },
+    staleTime: 30_000,
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load withdrawals'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminWithdrawals'] })} />;
 
   const approveMutation = useMutation({
     mutationFn: (id) => adminAPI.approveWithdrawal(id),

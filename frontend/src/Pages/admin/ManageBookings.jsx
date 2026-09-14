@@ -94,6 +94,7 @@ const ManageBookings = () => {
       const { data } = await adminAPI.getBookings(params);
       return data;
     },
+    staleTime: 30_000,
   });
 
   const { data: driversData } = useQuery({
@@ -102,16 +103,17 @@ const ManageBookings = () => {
       const { data } = await adminAPI.getApprovedDrivers();
       return data;
     },
+    staleTime: 30_000,
   });
 
-  // Hero aggregates (existing dashboard contract — no new endpoints).
+  // Hero aggregates — reuse adminDashboard cache to avoid duplicate fetches.
   const { data: statsData } = useQuery({
-    queryKey: ["adminDashboardStats"],
+    queryKey: ["adminDashboard"],
     queryFn: async () => {
       const { data } = await adminAPI.getDashboard();
       return data;
     },
-    staleTime: 60 * 1000,
+    staleTime: 30_000,
   });
   const stats = statsData?.stats || {};
 
@@ -120,7 +122,7 @@ const ManageBookings = () => {
     onSuccess: () => {
       toast.success("Booking completed");
       queryClient.invalidateQueries({ queryKey: ["adminBookings"] });
-      queryClient.invalidateQueries({ queryKey: ["adminDashboardStats"] });
+      queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
     },
     onError: (err) =>
       toast.error(err?.response?.data?.message || "Failed to complete booking"),
@@ -131,7 +133,7 @@ const ManageBookings = () => {
     onSuccess: () => {
       toast.success("Booking cancelled");
       queryClient.invalidateQueries({ queryKey: ["adminBookings"] });
-      queryClient.invalidateQueries({ queryKey: ["adminDashboardStats"] });
+      queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
       setActionDialog({ open: false, action: null, id: null });
     },
     onError: (err) =>

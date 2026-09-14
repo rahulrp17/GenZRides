@@ -4,8 +4,8 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 
-const COLORS = ['#f59e0b', '#10b981', '#ef4444', '#6366f1'];
-const BAR_COLORS = ['#6366f1', '#10b981', '#3b82f6'];
+const COLORS = ['#f59e0b', '#10b981', '#ef4444', '#818cf8'];
+const BAR_COLORS = ['#818cf8', '#34d399', '#60a5fa'];
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -112,17 +112,18 @@ const AdminCharts = ({ stats = {} }) => {
                 <Pie
                   data={statusData}
                   cx="50%"
-                  cy="46%"
-                  outerRadius="72%"
-                  innerRadius="42%"
+                  cy="50%"
+                  outerRadius={100}
+                  innerRadius={55}
                   dataKey="value"
                   nameKey="name"
-                  stroke="none"
+                  stroke="#1e293b"
+                  strokeWidth={2}
                   label={({ name, percent }) => (percent > 0.05 ? `${name}: ${(percent * 100).toFixed(0)}%` : '')}
                   labelLine={false}
                 >
                   {statusData.map((entry, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={index} fill={COLORS[index % COLORS.length]} stroke="#1e293b" strokeWidth={1} />
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
@@ -137,15 +138,15 @@ const AdminCharts = ({ stats = {} }) => {
         <ChartCard title="Revenue by Trip Type" subtitle="Completed booking revenue split" accentColor="emerald">
           <ResponsiveContainer width="100%" height={280}>
             {hasRevenueData ? (
-              <BarChart data={revenueData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={52}>
+              <BarChart data={revenueData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={64}>
                 <defs>
                   <linearGradient id="gradOneWay" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6366f1" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.5} />
+                    <stop offset="0%" stopColor="#818cf8" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.8} />
                   </linearGradient>
                   <linearGradient id="gradRoundTrip" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.5} />
+                    <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.8} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -170,23 +171,23 @@ const AdminCharts = ({ stats = {} }) => {
         <ChartCard title="Total Bookings" subtitle="All bookings by current status" accentColor="blue">
           <ResponsiveContainer width="100%" height={260}>
             {hasBookingsStatusData ? (
-              <BarChart data={bookingsStatusData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={40}>
+              <BarChart data={bookingsStatusData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={48}>
                 <defs>
                   <linearGradient id="gradPending" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.85} />
                   </linearGradient>
                   <linearGradient id="gradCompleted" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.85} />
                   </linearGradient>
                   <linearGradient id="gradCancelled" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#ef4444" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#f87171" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#ef4444" stopOpacity={0.85} />
                   </linearGradient>
                   <linearGradient id="gradInProgress" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6366f1" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#818cf8" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.85} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -208,19 +209,19 @@ const AdminCharts = ({ stats = {} }) => {
         <ChartCard title="One-Way Bookings" subtitle="Point-to-point trip breakdown" accentColor="indigo">
           <ResponsiveContainer width="100%" height={260}>
             {hasOneWayData ? (
-              <BarChart data={oneWayData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={44}>
+              <BarChart data={oneWayData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={52}>
                 <defs>
                   <linearGradient id="gradOWPending" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.85} />
                   </linearGradient>
                   <linearGradient id="gradOWCompleted" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.85} />
                   </linearGradient>
                   <linearGradient id="gradOWCancelled" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#ef4444" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#f87171" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#ef4444" stopOpacity={0.85} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -245,19 +246,19 @@ const AdminCharts = ({ stats = {} }) => {
         <ChartCard title="Round-Trip Bookings" subtitle="Multi-day round-trip breakdown" accentColor="emerald">
           <ResponsiveContainer width="100%" height={260}>
             {hasRoundTripData ? (
-              <BarChart data={roundTripData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={44}>
+              <BarChart data={roundTripData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={52}>
                 <defs>
                   <linearGradient id="gradRTPending" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.85} />
                   </linearGradient>
                   <linearGradient id="gradRTCompleted" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.85} />
                   </linearGradient>
                   <linearGradient id="gradRTCancelled" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#ef4444" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#f87171" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#ef4444" stopOpacity={0.85} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -279,15 +280,15 @@ const AdminCharts = ({ stats = {} }) => {
         <ChartCard title="Weekly Bookings" subtitle="One-Way vs Round-Trip (last 7 days)" accentColor="purple">
           <ResponsiveContainer width="100%" height={260}>
             {hasWeeklyData ? (
-              <BarChart data={weeklyData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={28}>
+              <BarChart data={weeklyData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={32}>
                 <defs>
                   <linearGradient id="gradWeeklyOW" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6366f1" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#818cf8" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.85} />
                   </linearGradient>
                   <linearGradient id="gradWeeklyRT" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.4} />
+                    <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.85} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />

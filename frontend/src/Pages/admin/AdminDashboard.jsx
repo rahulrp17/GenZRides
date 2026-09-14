@@ -1,11 +1,11 @@
 import React, { Suspense, lazy } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { Users, Car, Calendar, DollarSign, TrendingUp, Clock, Star, Wallet } from 'lucide-react';
 import { adminAPI } from '../../services/endpoints';
 import { CardSkeleton } from '../../components/shared/Skeleton';
 import ErrorState from '../../components/shared/ErrorState';
 import StatsCard from '../../components/shared/StatsCard';
-// import FareNotes from '../../components/shared/FareNotes';
 import { motion as Motion } from 'framer-motion';
 
 // Recharts ships in its own chunk — same pattern as the driver dashboard.
@@ -24,6 +24,7 @@ const AdminDashboard = () => {
       const { data } = await adminAPI.getDashboard();
       return data;
     },
+    staleTime: 30_000,
   });
 
   const stats = dashboard?.stats || {};
@@ -74,14 +75,14 @@ const AdminDashboard = () => {
           { title: 'Withdrawals', desc: 'Process driver withdrawal requests', link: '/admin/withdrawals', color: 'from-rose-500/20 to-pink-500/20', border: 'hover:border-rose-500/30' },
           { title: 'Reviews', desc: 'Moderate customer reviews', link: '/admin/reviews', color: 'from-purple-500/20 to-fuchsia-500/20', border: 'hover:border-purple-500/30' },
         ].map((item) => (
-          <a
+          <Link
             key={item.link}
-            href={item.link}
+            to={item.link}
             className={`bg-gradient-to-r ${item.color} backdrop-blur-lg rounded-[30px] border border-white/10 p-6 text-white transition-all ${item.border} hover:shadow-[0_0_25px_rgba(34,197,94,0.1)]`}
           >
             <h3 className="font-semibold text-lg">{item.title}</h3>
             <p className="text-sm text-gray-400 mt-1">{item.desc}</p>
-          </a>
+          </Link>
         ))}
       </div>
     </Motion.div>
