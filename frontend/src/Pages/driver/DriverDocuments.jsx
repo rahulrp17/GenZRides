@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { FileText, Upload, CheckCircle, XCircle, Clock, AlertCircle, RefreshCw } from 'lucide-react';
+import { FileText, Upload, CheckCircle, XCircle, Clock, AlertCircle, RefreshCw, Pencil } from 'lucide-react';
 import { driverAPI, driverUploadAPI } from '../../services/endpoints';
+import ErrorState from '../../components/shared/ErrorState';
 import { motion as Motion } from 'framer-motion';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -29,12 +30,13 @@ const DriverDocuments = () => {
   const [uploadProgress, setUploadProgress] = useState({});
   const [uploadErrors, setUploadErrors] = useState({});
 
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading, isError, error } = useQuery({
     queryKey: ['driverProfile'],
     queryFn: async () => {
       const { data } = await driverAPI.getProfile();
       return data;
     },
+    staleTime: 60_000,
   });
 
   const uploadMutation = useMutation({
@@ -52,13 +54,15 @@ const DriverDocuments = () => {
       queryClient.invalidateQueries({ queryKey: ['driverProfile'] });
       setUploadProgress({});
     },
-    onError: (err) => {
+    onError: (err, variables) => {
       const msg = err.response?.data?.message || 'Upload failed';
       toast.error(msg);
-      setUploadErrors((prev) => ({ ...prev, [err.variable?.type || 'unknown']: msg }));
+      setUploadErrors((prev) => ({ ...prev, [variables?.type || 'unknown']: msg }));
       setUploadProgress({});
     },
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load documents'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['driverProfile'] })} />;
 
   const documents = profile?.data?.documents || {};
   const verificationStatus = documents.documentVerification || 'Pending';
@@ -115,8 +119,7 @@ const DriverDocuments = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {documentTypes.map((doc) => {
           const hasDoc = documents[doc.key];
-          const isUploading = uploadMutation.isPending && uploadMutation.variable?.type === doc.key;
-          const progress = uploadProgress[doc.key];
+          const isUploading = uploadMutation.isPending && uploadMutation.variables?.type === doc.key;
           const error = uploadErrors[doc.key];
 
           return (
@@ -129,8 +132,15 @@ const DriverDocuments = () => {
               {hasDoc ? (
                 <div className="space-y-3">
                   <img src={hasDoc} alt={doc.label} className="w-full h-32 object-cover rounded-lg border border-white/10" />
-                  <div className="flex items-center gap-2 text-sm text-emerald-400">
-                    <CheckCircle size={14} /> Uploaded
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-sm text-emerald-400">
+                      <CheckCircle size={14} /> Uploaded
+                    </div>
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-300 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:text-white cursor-pointer transition">
+                      <Pencil size={12} /> Replace
+                      <input type="file" accept={doc.accept} className="hidden"
+                        onChange={(e) => { const file = e.target.files?.[0]; if (file) handleUpload({ key: doc.key, file }); e.target.value = ''; }} />
+                    </label>
                   </div>
                 </div>
               ) : error ? (
@@ -164,11 +174,9 @@ const DriverDocuments = () => {
               )}
 
               {isUploading && (
-                <div className="mt-3">
-                  <div className="w-full bg-white/10 rounded-full h-1.5">
-                    <div className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style={{ width: `${progress !== undefined ? progress : 0}%` }} />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1 text-center">Uploading...</p>
+                <div className="mt-3 flex items-center justify-center gap-2 text-xs text-gray-400">
+                  <span className="w-3.5 h-3.5 border-2 border-white/20 border-t-indigo-400 rounded-full animate-spin" />
+                  Uploading...
                 </div>
               )}
             </div>

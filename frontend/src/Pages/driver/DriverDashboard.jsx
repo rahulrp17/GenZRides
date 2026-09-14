@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Car, Clock, Wallet, Star, TrendingUp, MapPin, ArrowRight, BarChart3, CircleDollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -48,6 +48,7 @@ const DriverDashboard = () => {
       return data;
     },
     refetchOnWindowFocus: true,
+    staleTime: 30_000,
   });
 
   const { data: stats } = useQuery({
@@ -56,6 +57,7 @@ const DriverDashboard = () => {
       const { data } = await driverAPI.getStatistics();
       return data;
     },
+    staleTime: 30_000,
   });
 
   const { data: currentBooking } = useQuery({
@@ -64,7 +66,9 @@ const DriverDashboard = () => {
       const { data } = await driverAPI.getCurrentBooking();
       return data;
     },
-    refetchInterval: 5000,
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: false,
+    staleTime: 10_000,
   });
 
   if (dashError) return <ErrorState message={dashErr?.message || 'Failed to load dashboard'} onRetry={refetch} />;
@@ -89,27 +93,34 @@ const DriverDashboard = () => {
 
   const hasAnyData = totalTrips > 0 || totalEarnings > 0;
 
-  const earningsData = [
+  const earningsData = useMemo(() => [
     { name: 'Today', amount: todayEarnings },
     { name: 'This Week', amount: weekEarnings },
     { name: 'This Month', amount: monthEarnings },
     { name: 'All Time', amount: totalEarnings },
-  ];
+  ], [todayEarnings, weekEarnings, monthEarnings, totalEarnings]);
 
-  const tripsData = [
+  const tripsData = useMemo(() => [
     { name: 'Completed', value: completedTrips },
     { name: 'Cancelled', value: cancelledTrips },
-  ];
+  ], [completedTrips, cancelledTrips]);
 
-  const rateData = completionRate > 0 || cancellationRate > 0
+  const rateData = useMemo(() => (completionRate > 0 || cancellationRate > 0
     ? [
         { name: 'Completed', value: completionRate },
         { name: 'Cancelled', value: cancellationRate },
       ]
-    : [];
+    : []), [completionRate, cancellationRate]);
 
-  const hasEarningsData = earningsData.some((e) => e.amount > 0);
-  const hasTripsData = tripsData.some((t) => t.value > 0);
+  const hasEarningsData = useMemo(() => earningsData.some((e) => e.amount > 0), [earningsData]);
+  const hasTripsData = useMemo(() => tripsData.some((t) => t.value > 0), [tripsData]);
+
+  const breakdownItems = useMemo(() => [
+    { label: 'Total Earnings', value: totalEarnings, color: 'bg-emerald-500', textColor: 'text-emerald-400' },
+    { label: 'This Week', value: weekEarnings, color: 'bg-indigo-500', textColor: 'text-indigo-400' },
+    { label: 'This Month', value: monthEarnings, color: 'bg-amber-500', textColor: 'text-amber-400' },
+    { label: 'Total Tips', value: totalTips, color: 'bg-purple-500', textColor: 'text-purple-400' },
+  ], [totalEarnings, weekEarnings, monthEarnings, totalTips]);
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 sm:space-y-6">
@@ -147,10 +158,10 @@ const DriverDashboard = () => {
               </div>
               <div className="space-y-1.5 sm:space-y-2">
                 <div className="flex items-start gap-2 text-sm">
-                  <MapPin size={14} className="shrink-0 mt-0.5" /> <span className="truncate">{currentBooking.data.pickup?.address}</span>
+                  <MapPin size={14} className="shrink-0 mt-0.5" /> <span className="truncate" title={currentBooking.data.pickup?.address}>{currentBooking.data.pickup?.address}</span>
                 </div>
                 <div className="flex items-start gap-2 text-sm">
-                  <MapPin size={14} className="shrink-0 mt-0.5" /> <span className="truncate">{currentBooking.data.drop?.address}</span>
+                  <MapPin size={14} className="shrink-0 mt-0.5" /> <span className="truncate" title={currentBooking.data.drop?.address}>{currentBooking.data.drop?.address}</span>
                 </div>
               </div>
               <Link to="/driver/ride" className="inline-flex items-center gap-2 mt-3 sm:mt-4 px-4 py-2 bg-white/20 rounded-xl text-sm font-medium hover:bg-white/30 transition">
@@ -178,12 +189,7 @@ const DriverDashboard = () => {
                 <BarChart3 size={18} className="text-green-400" /> Earnings Breakdown
               </h3>
               <div className="space-y-3 sm:space-y-4">
-                {[
-                  { label: 'Total Earnings', value: totalEarnings, color: 'bg-emerald-500', textColor: 'text-emerald-400' },
-                  { label: 'This Week', value: weekEarnings, color: 'bg-indigo-500', textColor: 'text-indigo-400' },
-                  { label: 'This Month', value: monthEarnings, color: 'bg-amber-500', textColor: 'text-amber-400' },
-                  { label: 'Total Tips', value: totalTips, color: 'bg-purple-500', textColor: 'text-purple-400' },
-                ].map((item) => (
+                {breakdownItems.map((item) => (
                   <div key={item.label} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`w-2.5 h-2.5 rounded-full ${item.color}`} />

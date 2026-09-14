@@ -113,12 +113,13 @@ const CurrentRide = () => {
     },
     refetchInterval: (q) => {
       const b = q.state.data?.data;
-      if (!b) return 3000;
+      if (!b) return 8000;
       const done = ['Completed', 'Cancelled'].includes(b.bookingStatus);
-      return done ? false : 4000;
+      return done ? false : 10000;
     },
-    refetchIntervalInBackground: true,
+    refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
+    staleTime: 5_000,
   });
 
   const { data: profile } = useQuery({
@@ -127,6 +128,7 @@ const CurrentRide = () => {
       const { data } = await driverAPI.getProfile();
       return data;
     },
+    staleTime: 60_000,
   });
 
   const booking = currentBooking?.data;

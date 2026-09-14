@@ -38,6 +38,8 @@ const DriverBookings = () => {
       return data;
     },
     refetchInterval: 10000,
+    refetchIntervalInBackground: false,
+    staleTime: 5_000,
   });
 
   // Active ride gates the available list — one ride at a time
@@ -47,7 +49,9 @@ const DriverBookings = () => {
       const { data } = await driverAPI.getCurrentBooking();
       return data;
     },
-    refetchInterval: 10000,
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: false,
+    staleTime: 10_000,
   });
 
   const activeRide = currentRideData?.data;

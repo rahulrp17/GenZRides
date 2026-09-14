@@ -59,7 +59,13 @@ const DriverLayout = () => {
   useEffect(() => {
     if (!user || user.role !== 'driver' || loading) return;
     let cancelled = false;
+    let lastOnlineAt = 0;
     const goOnline = async () => {
+      // Debounce: skip if we already went online in the last 60s
+      // (prevents REST storms on flaky socket reconnects).
+      const now = Date.now();
+      if (now - lastOnlineAt < 60_000) return;
+      lastOnlineAt = now;
       try {
         // Best-effort REST path (works even if socket not yet ready)
         await driverAPI.goOnline();

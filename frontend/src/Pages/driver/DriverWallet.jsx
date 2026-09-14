@@ -3,9 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { Wallet, ArrowUpRight, ArrowDownLeft, Plus, CreditCard } from 'lucide-react';
+import { Wallet, ArrowUpRight, ArrowDownLeft, Plus } from 'lucide-react';
 import { driverAPI } from '../../services/endpoints';
-import { TableSkeleton } from '../../components/shared/Skeleton';
+import { TableSkeleton, CardSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import Modal from '../../components/shared/Modal';
@@ -17,21 +18,25 @@ const DriverWallet = () => {
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
-  const { data: wallet } = useQuery({
+  const { data: wallet, isLoading: loadingWallet, isError: walletError, error: walletErr } = useQuery({
     queryKey: ['driverWallet'],
     queryFn: async () => {
       const { data } = await driverAPI.getWallet();
       return data;
     },
+    staleTime: 30_000,
   });
 
-  const { data: transactions, isLoading: loadingTx } = useQuery({
+  const { data: transactions, isLoading: loadingTx, isError: txError, error: txErr } = useQuery({
     queryKey: ['walletHistory', page],
     queryFn: async () => {
       const { data } = await driverAPI.getWalletHistory({ page, limit: 15 });
       return data;
     },
+    staleTime: 30_000,
   });
+
+  if (walletError || txError) return <ErrorState message={walletErr?.message || txErr?.message || 'Failed to load wallet'} onRetry={() => { queryClient.invalidateQueries({ queryKey: ['driverWallet'] }); queryClient.invalidateQueries({ queryKey: ['walletHistory'] }); }} />;
 
   const withdrawMutation = useMutation({
     mutationFn: (data) => driverAPI.requestWithdrawal(data),
@@ -71,25 +76,29 @@ const DriverWallet = () => {
       </div>
 
       {/* Balance Card */}
+      {loadingWallet ? (
+        <CardSkeleton />
+      ) : (
       <div className="bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl p-6 text-white">
         <Wallet size={24} className="mb-2 opacity-80" />
         <p className="text-sm opacity-80">Available Balance</p>
-        <p className="text-3xl font-bold mt-1">₹{walletData.balance || 0}</p>
+        <p className="text-3xl font-bold mt-1">₹{(walletData.balance ?? 0).toLocaleString('en-IN')}</p>
         <div className="flex gap-6 mt-4 text-sm">
           <div>
             <p className="opacity-70">Lifetime</p>
-            <p className="font-semibold">₹{walletData.lifetimeEarnings || 0}</p>
+            <p className="font-semibold">₹{(walletData.lifetimeEarnings ?? 0).toLocaleString('en-IN')}</p>
           </div>
           <div>
             <p className="opacity-70">Withdrawn</p>
-            <p className="font-semibold">₹{walletData.totalWithdrawn || 0}</p>
+            <p className="font-semibold">₹{(walletData.totalWithdrawn ?? 0).toLocaleString('en-IN')}</p>
           </div>
           <div>
             <p className="opacity-70">Pending</p>
-            <p className="font-semibold">₹{walletData.pendingWithdrawal || 0}</p>
+            <p className="font-semibold">₹{(walletData.pendingWithdrawal ?? 0).toLocaleString('en-IN')}</p>
           </div>
         </div>
       </div>
+      )}
 
       {/* Transactions */}
       <div className="bg-white/5 rounded-2xl shadow-sm border border-white/10">

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Clock, MapPin, Filter } from 'lucide-react';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { Clock, MapPin } from 'lucide-react';
 import { driverAPI } from '../../services/endpoints';
 import { TableSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import { motion as Motion } from 'framer-motion';
@@ -10,8 +11,9 @@ import { motion as Motion } from 'framer-motion';
 const DriverHistory = () => {
   const [page, setPage] = useState(1);
   const [tab, setTab] = useState('all');
+  const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching, isError, error } = useQuery({
     queryKey: ['driverHistory', page, tab],
     queryFn: async () => {
       const params = { page, limit: 10 };
@@ -22,7 +24,11 @@ const DriverHistory = () => {
       const { data } = await driverAPI.getHistory(params);
       return data;
     },
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load ride history'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['driverHistory'] })} />;
 
   const rides = data?.data?.rides || (Array.isArray(data?.data) ? data.data : []) || [];
   const pagination = data?.data?.pagination || {};
@@ -55,7 +61,7 @@ const DriverHistory = () => {
 
       {isLoading ? (
         <TableSkeleton rows={5} cols={5} />
-      ) : rides.length === 0 ? (
+      ) : rides.length === 0 && !isFetching ? (
         <EmptyState icon={Clock} title="No rides yet" description="Your ride history will appear here." />
       ) : (
         <>
@@ -100,7 +106,7 @@ const DriverHistory = () => {
             {rides.map((r) => (
               <div key={r._id} className="bg-white/5 rounded-xl p-4 shadow-sm border border-white/10">
                 <div className="flex items-center justify-between mb-2">
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[r.bookingStatus] || ''}`}>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[r.bookingStatus] || 'bg-white/10 text-gray-400'}`}>
                     {r.bookingStatus}
                   </span>
                   <span className="text-sm font-bold text-emerald-400">₹{r.driverEarning ?? r.finalFare ?? 0}</span>
@@ -116,7 +122,7 @@ const DriverHistory = () => {
             ))}
           </div>
 
-          <Pagination page={pagination.page || 1} totalPages={pagination.totalPages || 1} onPageChange={setPage} />
+          <Pagination page={pagination.page || 1} totalPages={pagination.totalPages || 1} onPageChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
         </>
       )}
     </Motion.div>

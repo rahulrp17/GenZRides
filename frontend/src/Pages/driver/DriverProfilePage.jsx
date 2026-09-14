@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { motion as Motion } from 'framer-motion';
@@ -6,18 +6,22 @@ import { toast } from 'react-hot-toast';
 import { User, Save, Car, Lock } from 'lucide-react';
 import { driverAPI, userAPI, uploadAPI } from '../../services/endpoints';
 import useAuth from '../../hooks/useAuth';
+import { CardSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 
 const DriverProfile = () => {
   const { user, refreshUser } = useAuth();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('profile');
+  const formSeededRef = useRef(false);
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading, isError, error } = useQuery({
     queryKey: ['driverProfile'],
     queryFn: async () => {
       const { data } = await driverAPI.getProfile();
       return data;
     },
+    staleTime: 60_000,
   });
 
   const { register, handleSubmit, reset } = useForm({
@@ -31,8 +35,10 @@ const DriverProfile = () => {
 
   const { register: registerPassword, handleSubmit: handleSubmitPassword, reset: resetPassword, formState: { errors: passwordErrors } } = useForm();
 
+  // Seed the form once — background refetches must not wipe dirty inputs.
   useEffect(() => {
-    if (profile?.data) {
+    if (profile?.data && !formSeededRef.current) {
+      formSeededRef.current = true;
       reset({
         vehicleBrand: profile.data.vehicleBrand || '',
         vehicleModel: profile.data.vehicleModel || '',
@@ -41,6 +47,9 @@ const DriverProfile = () => {
       });
     }
   }, [profile, reset]);
+
+  if (isLoading) return <div className="max-w-2xl mx-auto space-y-6"><CardSkeleton /><CardSkeleton /></div>;
+  if (isError) return <ErrorState message={error?.message || 'Failed to load profile'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['driverProfile'] })} />;
 
   const updateMutation = useMutation({
     mutationFn: (data) => driverAPI.updateProfile(data),
@@ -83,7 +92,7 @@ const DriverProfile = () => {
   ];
 
   return (
-    <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto space-y-6">
+    <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto space-y-6 pt-2 sm:pt-4">
       <h1 className="font-display text-2xl font-bold text-white tracking-tight">Driver Profile</h1>
 
       {/* Profile Header */}
@@ -116,10 +125,12 @@ const DriverProfile = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-white/10 rounded-xl p-1">
+      <div className="flex gap-1 bg-white/10 rounded-xl p-1" role="tablist" aria-label="Profile sections">
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            role="tab"
+            aria-selected={activeTab === tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 flex-1 justify-center py-2.5 rounded-lg text-sm font-medium transition ${
               activeTab === tab.id ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-gray-300'

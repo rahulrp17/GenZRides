@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -27,7 +27,8 @@ const EmptyChart = ({ message }) => (
 );
 
 // Lazy-loaded by DriverDashboard so recharts ships in its own chunk.
-const DriverCharts = ({ earningsData, hasEarningsData, tripsData, hasTripsData }) => (
+// Memoized: parent re-renders on polling, chart props are memo-stable.
+const DriverCharts = memo(({ earningsData, hasEarningsData, tripsData, hasTripsData }) => (
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <div className="bg-white/5 backdrop-blur-lg rounded-[30px] border border-white/10 p-6">
       <h3 className="font-semibold text-white mb-4">Earnings Overview</h3>
@@ -67,9 +68,9 @@ const DriverCharts = ({ earningsData, hasEarningsData, tripsData, hasTripsData }
       </ResponsiveContainer>
     </div>
   </div>
-);
+));
 
-export const DriverPie = ({ rateData }) => (
+export const DriverPie = memo(({ rateData }) => (
   <div className="bg-white/5 backdrop-blur-lg rounded-[30px] border border-white/10 p-6">
     <h3 className="font-semibold text-white mb-4">Completion vs Cancellation</h3>
     <ResponsiveContainer width="100%" height={260}>
@@ -85,8 +86,8 @@ export const DriverPie = ({ rateData }) => (
       ) : (
         <EmptyChart message="No rides completed yet" />
       )}
-    </ResponsiveContainer>
+      </ResponsiveContainer>
   </div>
-);
+));
 
 export default DriverCharts;
