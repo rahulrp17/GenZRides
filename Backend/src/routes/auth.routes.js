@@ -28,7 +28,7 @@ router.post("/register", validate(registerSchema), register);
 router.post("/register-driver", validate(registerSchema), registerDriver);
 router.post("/login", validate(loginSchema), login);
 router.post("/refresh-token", validate(refreshTokenSchema), refreshToken);
-router.post("/logout", authenticate, logout);
+router.post("/logout", logout);
 router.post("/logout-all", authenticate, logoutAll);
 router.get("/profile", authenticate, getProfile);
 router.post("/forgot-password", validate(forgotPasswordSchema), forgotPassword);

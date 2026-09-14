@@ -1,4 +1,5 @@
 import * as authService from "../services/auth.service.js";
+import { decodeToken } from "../services/jwt.service.js";
 import User from "../models/User.js";
 
 export const register = async (req, res) => {
@@ -67,8 +68,16 @@ export const refreshToken = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     const { refreshToken } = req.body;
-    await authService.logoutUser(req.user._id, refreshToken);
+    if (!refreshToken) {
+      return res.status(200).json({ success: true, message: "Logged out successfully." });
+    }
 
+    const decoded = decodeToken(refreshToken);
+    if (!decoded?.id) {
+      return res.status(200).json({ success: true, message: "Logged out successfully." });
+    }
+
+    await authService.logoutUser(decoded.id, refreshToken);
     return res.status(200).json({ success: true, message: "Logged out successfully." });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

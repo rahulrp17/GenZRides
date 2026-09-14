@@ -27,6 +27,7 @@ const AUTH_PATHS = [
   '/auth/register',
   '/auth/register-driver',
   '/auth/refresh-token',
+  '/auth/logout',
 ];
 
 const isAuthEndpoint = (url = '') => {
