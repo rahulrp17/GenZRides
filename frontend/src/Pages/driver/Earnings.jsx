@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { TrendingUp, DollarSign, Car, Star, Calendar, BarChart3, MapPin, Award, Wallet, Route } from 'lucide-react';
 import { driverAPI } from '../../services/endpoints';
 import { CardSkeleton } from '../../components/shared/Skeleton';
@@ -8,7 +8,6 @@ import EmptyState from '../../components/shared/EmptyState';
 import { motion as Motion } from 'framer-motion';
 
 const Earnings = () => {
-  const queryClient = useQueryClient();
   const { data: earnings, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['driverEarnings'],
     queryFn: async () => {

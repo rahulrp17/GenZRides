@@ -32,8 +32,6 @@ const Notifications = () => {
     staleTime: 30_000,
   });
 
-  if (isError) return <ErrorState message={error?.message || 'Failed to load notifications'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['notifications'] })} />;
-
   const markAllMutation = useMutation({
     mutationFn: () => notificationAPI.markAllRead(),
     onSuccess: () => {
@@ -102,84 +100,90 @@ const Notifications = () => {
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h1 className="font-display text-2xl font-bold text-white tracking-tight">Notifications</h1>
-        <div className="flex items-center gap-2">
-          <PushToggle />
-          {hasUnread && (
-            <button
-              onClick={() => markAllMutation.mutate()}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-400 bg-indigo-500/10 rounded-lg hover:bg-indigo-500/20 transition"
-            >
-              <CheckCheck size={16} /> Mark all read
-            </button>
-          )}
-        </div>
-      </div>
-
-      {isLoading ? (
-        <ListSkeleton count={5} />
-      ) : notifications.length === 0 ? (
-        <EmptyState icon={Bell} title="No notifications" description="You're all caught up!" />
+      {isError ? (
+        <ErrorState message={error?.message || 'Failed to load notifications'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['notifications'] })} />
       ) : (
         <>
-          <div className="space-y-2">
-            {notifications.map((n) => {
-              const hasBooking = !!bookingIdOf(n);
-              return (
-              <Motion.div
-                key={n._id}
-                onClick={() => handleOpen(n)}
-                className={`bg-white/5 backdrop-blur-lg rounded-xl p-4 shadow-sm border transition ${
-                  n.isRead ? 'border-white/10' : 'border-indigo-500/30 bg-indigo-500/10'
-                } ${hasBooking ? 'cursor-pointer hover:border-indigo-500/50' : ''}`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${typeColors[n.type] || 'bg-white/10'}`}>
-                    <Bell size={16} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="text-sm font-semibold text-white">{n.title}</h4>
-                      <div className="flex items-center gap-1 shrink-0 cursor-pointer" onClick={(e) => e.stopPropagation()}>
-                        {n.isRead ? (
-                          <span className="p-1" title="Seen">
-                            <CheckCheck size={14} className="text-emerald-400" />
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => markReadMutation.mutate(n._id)}
-                            className="p-1 hover:bg-white/10 rounded transition"
-                            title="Mark as read"
-                          >
-                            <CheckCheck size={14} className="text-gray-500" />
-                          </button>
-                        )}
-                        <button
-                          onClick={() => deleteMutation.mutate(n._id)}
-                          className="p-1 hover:bg-red-500/10 rounded transition"
-                          title="Delete"
-                        >
-                          <Trash2 size={14} className="text-gray-500 hover:text-red-500" />
-                        </button>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <h1 className="font-display text-2xl font-bold text-white tracking-tight">Notifications</h1>
+            <div className="flex items-center gap-2">
+              <PushToggle />
+              {hasUnread && (
+                <button
+                  onClick={() => markAllMutation.mutate()}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-400 bg-indigo-500/10 rounded-lg hover:bg-indigo-500/20 transition"
+                >
+                  <CheckCheck size={16} /> Mark all read
+                </button>
+              )}
+            </div>
+          </div>
+
+          {isLoading ? (
+            <ListSkeleton count={5} />
+          ) : notifications.length === 0 ? (
+            <EmptyState icon={Bell} title="No notifications" description="You're all caught up!" />
+          ) : (
+            <>
+              <div className="space-y-2">
+                {notifications.map((n) => {
+                  const hasBooking = !!bookingIdOf(n);
+                  return (
+                  <Motion.div
+                    key={n._id}
+                    onClick={() => handleOpen(n)}
+                    className={`bg-white/5 backdrop-blur-lg rounded-xl p-4 shadow-sm border transition ${
+                      n.isRead ? 'border-white/10' : 'border-indigo-500/30 bg-indigo-500/10'
+                    } ${hasBooking ? 'cursor-pointer hover:border-indigo-500/50' : ''}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${typeColors[n.type] || 'bg-white/10'}`}>
+                        <Bell size={16} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="text-sm font-semibold text-white">{n.title}</h4>
+                          <div className="flex items-center gap-1 shrink-0 cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                            {n.isRead ? (
+                              <span className="p-1" title="Seen">
+                                <CheckCheck size={14} className="text-emerald-400" />
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => markReadMutation.mutate(n._id)}
+                                className="p-1 hover:bg-white/10 rounded transition"
+                                title="Mark as read"
+                              >
+                                <CheckCheck size={14} className="text-gray-500" />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => deleteMutation.mutate(n._id)}
+                              className="p-1 hover:bg-red-500/10 rounded transition"
+                              title="Delete"
+                            >
+                              <Trash2 size={14} className="text-gray-500 hover:text-red-500" />
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-400 mt-1">{n.message}</p>
+                        <div className="flex items-center justify-between gap-2 mt-2">
+                          <p className="text-xs text-gray-500">
+                            {new Date(n.createdAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                          {hasBooking && (
+                            <span className="text-xs font-medium text-indigo-400">View booking →</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-400 mt-1">{n.message}</p>
-                    <div className="flex items-center justify-between gap-2 mt-2">
-                      <p className="text-xs text-gray-500">
-                        {new Date(n.createdAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                      {hasBooking && (
-                        <span className="text-xs font-medium text-indigo-400">View booking →</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </Motion.div>
-              );
-            })}
-          </div>
-          <Pagination page={pagination.page || 1} totalPages={pagination.totalPages || 1} onPageChange={setPage} />
+                  </Motion.div>
+                  );
+                })}
+              </div>
+              <Pagination page={pagination.page || 1} totalPages={pagination.totalPages || 1} onPageChange={setPage} />
+            </>
+          )}
         </>
       )}
     </Motion.div>

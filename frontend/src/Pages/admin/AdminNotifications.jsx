@@ -32,8 +32,6 @@ const AdminNotifications = () => {
     staleTime: 30_000,
   });
 
-  if (isError) return <ErrorState message={error?.message || 'Failed to load notifications'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminNotifications'] })} />;
-
   const markAllMutation = useMutation({
     mutationFn: () => notificationAPI.markAllRead(),
     onSuccess: () => {
@@ -65,7 +63,6 @@ const AdminNotifications = () => {
 
   const notifications = data?.data || [];
 
-  // Realtime list + bell badge refresh (read state persists server-side)
   useEffect(() => {
     if (!socket) return;
     const handleIncoming = () => {
@@ -84,6 +81,8 @@ const AdminNotifications = () => {
     if (!n.isRead) markReadMutation.mutate(n._id);
     navigate(`/admin/bookings/${bookingId}`);
   };
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load notifications'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminNotifications'] })} />;
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">

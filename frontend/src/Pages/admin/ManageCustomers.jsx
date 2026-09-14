@@ -28,8 +28,6 @@ const ManageCustomers = () => {
     staleTime: 30_000,
   });
 
-  if (isError) return <ErrorState message={error?.message || 'Failed to load customers'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminCustomers'] })} />;
-
   const blockMutation = useMutation({
     mutationFn: (id) => adminAPI.blockCustomer(id),
     onSuccess: () => { toast.success('Customer blocked'); queryClient.invalidateQueries({ queryKey: ['adminCustomers'] }); },
@@ -50,6 +48,8 @@ const ManageCustomers = () => {
 
   const customers = data?.customers || [];
   const pagination = data || {};
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load customers'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminCustomers'] })} />;
 
   const handleAction = (action, id) => {
     const actions = {

@@ -71,7 +71,7 @@ const RULES = [
   {
     icon: Wallet,
     title: "Driver bata",
-    desc: "₹400/day standard. One-way only: ₹600/day when total running > 400 km (per-vehicle override respected). Round-trip always ₹300/day.",
+    desc: "₹400/day standard. One-way only: ₹600/day when total running > 400 km (per-vehicle override respected). Round-trip always ₹400/day.",
   },
   {
     icon: Clock3,

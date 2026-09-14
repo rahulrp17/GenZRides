@@ -42,8 +42,6 @@ const Reviews = () => {
     staleTime: 30_000,
   });
 
-  if (isError) return <ErrorState message={error?.message || 'Failed to load reviews'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['myReviews'] })} />;
-
   // Deep-link from the completed-ride panel ("Rate Your Ride")
   // pre-selects that booking and opens the review modal.
   useEffect(() => {
@@ -75,54 +73,60 @@ const Reviews = () => {
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-bold text-white tracking-tight">My Reviews</h1>
-        {completedBookings?.length > 0 && (
-          <button
-            onClick={() => { setSelectedBooking(completedBookings[0]); setRating(5); setValue('rating', 5); setShowReviewModal(true); }}
-            className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg text-sm font-medium hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
-          >
-            Write a Review
-          </button>
-        )}
-      </div>
-
-      {isLoading ? (
-        <TableSkeleton rows={3} cols={3} />
-      ) : reviews.length === 0 ? (
-        <EmptyState
-          icon={Star}
-          title="No reviews yet"
-          description="You haven't left any reviews. Rate your completed rides!"
-        />
+      {isError ? (
+        <ErrorState message={error?.message || 'Failed to load reviews'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['myReviews'] })} />
       ) : (
         <>
-          <div className="space-y-4">
-            {reviews.map((r) => (
-              <div key={r._id} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-sm border border-white/10">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-1 mb-2">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} size={16} className={i < r.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-500'} />
-                      ))}
-                    </div>
-                    {r.review && <p className="text-sm text-gray-400">{r.review}</p>}
-                  </div>
-                  <p className="text-xs text-gray-400">
-                    {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                  </p>
-                </div>
-                {r.adminReply && (
-                  <div className="mt-3 bg-white/5 rounded-lg p-3 border-l-4 border-indigo-400">
-                    <p className="text-xs font-semibold text-gray-300 mb-1">Admin Reply</p>
-                    <p className="text-sm text-gray-400">{r.adminReply}</p>
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <h1 className="font-display text-2xl font-bold text-white tracking-tight">My Reviews</h1>
+            {completedBookings?.length > 0 && (
+              <button
+                onClick={() => { setSelectedBooking(completedBookings[0]); setRating(5); setValue('rating', 5); setShowReviewModal(true); }}
+                className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg text-sm font-medium hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
+              >
+                Write a Review
+              </button>
+            )}
           </div>
-          <Pagination page={pagination.page || 1} totalPages={pagination.totalPages || 1} onPageChange={setPage} />
+
+          {isLoading ? (
+            <TableSkeleton rows={3} cols={3} />
+          ) : reviews.length === 0 ? (
+            <EmptyState
+              icon={Star}
+              title="No reviews yet"
+              description="You haven't left any reviews. Rate your completed rides!"
+            />
+          ) : (
+            <>
+              <div className="space-y-4">
+                {reviews.map((r) => (
+                  <div key={r._id} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-sm border border-white/10">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center gap-1 mb-2">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star key={i} size={16} className={i < r.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-500'} />
+                          ))}
+                        </div>
+                        {r.review && <p className="text-sm text-gray-400">{r.review}</p>}
+                      </div>
+                      <p className="text-xs text-gray-400">
+                        {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                      </p>
+                    </div>
+                    {r.adminReply && (
+                      <div className="mt-3 bg-white/5 rounded-lg p-3 border-l-4 border-indigo-400">
+                        <p className="text-xs font-semibold text-gray-300 mb-1">Admin Reply</p>
+                        <p className="text-sm text-gray-400">{r.adminReply}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <Pagination page={pagination.page || 1} totalPages={pagination.totalPages || 1} onPageChange={setPage} />
+            </>
+          )}
         </>
       )}
 

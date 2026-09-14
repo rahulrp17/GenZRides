@@ -213,8 +213,6 @@ const ManageVehicles = () => {
     staleTime: 30_000,
   });
 
-  if (isError) return <ErrorState message={error?.message || 'Failed to load vehicles'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminVehicles'] })} />;
-
   const createMutation = useMutation({
     mutationFn: (data) => adminAPI.createVehicle(data),
     onSuccess: () => { toast.success('Vehicle created'); queryClient.invalidateQueries({ queryKey: ['adminVehicles'] }); closeModal(); },
@@ -241,6 +239,8 @@ const ManageVehicles = () => {
     mutationFn: (id) => adminAPI.deleteVehicle(id),
     onSuccess: () => { toast.success('Vehicle deleted'); queryClient.invalidateQueries({ queryKey: ['adminVehicles'] }); },
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load vehicles'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminVehicles'] })} />;
 
   const onSubmit = async (data) => {
     const parsedLuggage = parseInt(data.luggage, 10);

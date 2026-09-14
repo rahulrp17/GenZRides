@@ -27,8 +27,6 @@ const ManageReviews = () => {
     staleTime: 30_000,
   });
 
-  if (isError) return <ErrorState message={error?.message || 'Failed to load reviews'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminReviews'] })} />;
-
   const hideMutation = useMutation({
     mutationFn: (id) => adminAPI.hideReview(id),
     onSuccess: () => { toast.success('Review hidden'); queryClient.invalidateQueries({ queryKey: ['adminReviews'] }); },
@@ -49,6 +47,8 @@ const ManageReviews = () => {
 
   const reviews = data?.reviews || [];
   const pagination = data || {};
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load reviews'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminReviews'] })} />;
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">

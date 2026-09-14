@@ -145,7 +145,7 @@ const RideTimeline = ({ booking, currentStatusIndex }) => {
               const done = i < currentStatusIndex || isCompleted;
               const current = !isCompleted && stage.key === booking?.bookingStatus;
               const time = formatTime(booking?.[stage.tsKey]);
-              console.log(time);
+           
               
               const Icon = done ? CheckCircle : stage.icon;
               return (

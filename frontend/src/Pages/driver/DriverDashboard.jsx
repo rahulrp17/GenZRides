@@ -71,8 +71,6 @@ const DriverDashboard = () => {
     staleTime: 10_000,
   });
 
-  if (dashError) return <ErrorState message={dashErr?.message || 'Failed to load dashboard'} onRetry={refetch} />;
-
   const d = dashboard?.data || {};
   const s = stats?.data || {};
 
@@ -129,7 +127,9 @@ const DriverDashboard = () => {
         <p className="text-sm text-slate-200/80 mt-1">Here&apos;s your driving overview.</p>
       </div>
 
-      {isLoading ? (
+      {dashError ? (
+        <ErrorState message={dashErr?.message || 'Failed to load dashboard'} onRetry={refetch} />
+      ) : isLoading ? (
         <div className="space-y-5 sm:space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {[1,2,3,4].map((i) => <CardSkeleton key={i} />)}

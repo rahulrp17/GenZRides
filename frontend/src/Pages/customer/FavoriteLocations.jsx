@@ -28,8 +28,6 @@ const FavoriteLocations = () => {
     staleTime: 60_000,
   });
 
-  if (isError) return <ErrorState message={error?.message || 'Failed to load locations'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['favorites'] })} />;
-
   const createMutation = useMutation({
     mutationFn: (data) => favoriteAPI.create(data),
     onSuccess: () => {
@@ -99,52 +97,58 @@ const FavoriteLocations = () => {
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold text-white tracking-tight">Favorite Locations</h1>
-        <button
-          onClick={() => { setEditing(null); reset(); setShowModal(true); }}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg text-sm font-medium hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
-        >
-          <Plus size={16} /> Add Location
-        </button>
-      </div>
-
-      {isLoading ? (
-        <ListSkeleton count={3} />
-      ) : locations.length === 0 ? (
-        <EmptyState
-          icon={MapPin}
-          title="No saved locations"
-          description="Save your frequent places for quick booking."
-        />
+      {isError ? (
+        <ErrorState message={error?.message || 'Failed to load locations'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['favorites'] })} />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {locations.map((fav) => {
-            const Icon = icons[fav.label] || MapPin;
-            return (
-              <div key={fav._id} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-sm border border-white/10 hover:shadow-md transition">
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${colors[fav.label] || 'bg-white/10'}`}>
-                    <Icon size={22} />
+        <>
+          <div className="flex items-center justify-between">
+            <h1 className="font-display text-2xl font-bold text-white tracking-tight">Favorite Locations</h1>
+            <button
+              onClick={() => { setEditing(null); reset(); setShowModal(true); }}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg text-sm font-medium hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
+            >
+              <Plus size={16} /> Add Location
+            </button>
+          </div>
+
+          {isLoading ? (
+            <ListSkeleton count={3} />
+          ) : locations.length === 0 ? (
+            <EmptyState
+              icon={MapPin}
+              title="No saved locations"
+              description="Save your frequent places for quick booking."
+            />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {locations.map((fav) => {
+                const Icon = icons[fav.label] || MapPin;
+                return (
+                  <div key={fav._id} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-sm border border-white/10 hover:shadow-md transition">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${colors[fav.label] || 'bg-white/10'}`}>
+                        <Icon size={22} />
+                      </div>
+                      <div className="flex gap-1">
+                        <button onClick={() => openEdit(fav)} className="p-2 hover:bg-white/10 rounded-lg transition">
+                          <Pencil size={14} className="text-gray-500" />
+                        </button>
+                        <button onClick={() => setDeleteId(fav._id)} className="p-2 hover:bg-red-500/10 rounded-lg transition">
+                          <Trash2 size={14} className="text-gray-500 hover:text-red-500" />
+                        </button>
+                      </div>
+                    </div>
+                    <h3 className="font-semibold text-white">{fav.nickname || fav.label}</h3>
+                    <p className="text-sm text-gray-400 mt-1 truncate">{fav.address}</p>
+                    {!fav.latitude && !fav.longitude && (
+                      <p className="text-[11px] text-amber-400/80 mt-1">No coordinates — edit to add for quick booking</p>
+                    )}
                   </div>
-                  <div className="flex gap-1">
-                    <button onClick={() => openEdit(fav)} className="p-2 hover:bg-white/10 rounded-lg transition">
-                      <Pencil size={14} className="text-gray-500" />
-                    </button>
-                    <button onClick={() => setDeleteId(fav._id)} className="p-2 hover:bg-red-500/10 rounded-lg transition">
-                      <Trash2 size={14} className="text-gray-500 hover:text-red-500" />
-                    </button>
-                  </div>
-                </div>
-                <h3 className="font-semibold text-white">{fav.nickname || fav.label}</h3>
-                <p className="text-sm text-gray-400 mt-1 truncate">{fav.address}</p>
-                {!fav.latitude && !fav.longitude && (
-                  <p className="text-[11px] text-amber-400/80 mt-1">No coordinates — edit to add for quick booking</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
 
       <Modal

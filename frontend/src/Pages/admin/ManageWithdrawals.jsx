@@ -26,8 +26,6 @@ const ManageWithdrawals = () => {
     staleTime: 30_000,
   });
 
-  if (isError) return <ErrorState message={error?.message || 'Failed to load withdrawals'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminWithdrawals'] })} />;
-
   const approveMutation = useMutation({
     mutationFn: (id) => adminAPI.approveWithdrawal(id),
     onSuccess: () => { toast.success('Withdrawal approved'); queryClient.invalidateQueries({ queryKey: ['adminWithdrawals'] }); },
@@ -47,6 +45,8 @@ const ManageWithdrawals = () => {
     Rejected: 'bg-red-500/20 text-red-400 border border-red-500/30',
     Processing: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
   };
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load withdrawals'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['adminWithdrawals'] })} />;
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">

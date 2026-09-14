@@ -23,8 +23,6 @@ const STATUS_COLORS = {
   Cancelled: 'bg-red-500/10 text-red-400',
 };
 
-const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN') : 'N/A';
-
 const RideHistory = () => {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');

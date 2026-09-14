@@ -27,7 +27,7 @@ const validateFile = (file) => {
 
 const DriverDocuments = () => {
   const queryClient = useQueryClient();
-  const [uploadProgress, setUploadProgress] = useState({});
+  const [_uploadProgress, setUploadProgress] = useState({});
   const [uploadErrors, setUploadErrors] = useState({});
 
   const { data: profile, isLoading, isError, error } = useQuery({

@@ -218,7 +218,7 @@ const Navbar = () => {
             <div className="relative" ref={transportRef}>
               <button
                 onClick={() => setTransportOpen((v) => !v)}
-                className={`relative flex items-center gap-1.5 transition-all duration-300 ${transportOpen || transportItems.some((t)=> window.location.pathname.startsWith(t.path)) ? "text-green-400" : "text-gray-300 hover:text-green-400"}`}
+                className={`relative flex items-center cursor-pointer gap-1.5 transition-all duration-300 ${transportOpen || transportItems.some((t)=> window.location.pathname.startsWith(t.path)) ? "text-green-400" : "text-gray-300 hover:text-green-400"}`}
               >
                 Transport <ChevronDown size={14} className={`transition-transform ${transportOpen ? "rotate-180" : ""}`} />
                 {(transportOpen || transportItems.some((t)=> window.location.pathname.startsWith(t.path))) && (
@@ -232,7 +232,7 @@ const Navbar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8, scale: 0.97 }}
                     transition={{ duration: 0.18 }}
-                    className="absolute left-1/2 -translate-x-1/2 top-full mt-3 w-72 bg-[#0a0f0d]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden p-2"
+                    className="absolute left-1/2  -translate-x-1/2 top-full mt-3 w-72 bg-[#0a0f0d]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden p-2"
                   >
                     {transportItems.map((t) => (
                       <button

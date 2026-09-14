@@ -58,7 +58,7 @@ const OtpVerification = () => {
   const [otpDigits, setOtpDigits] = useState(Array(OTP_LENGTH).fill(""));
   const [verifying, setVerifying] = useState(false);
   const [verified, setVerified] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, _setSubmitting] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const inputRefs = useRef([]);
 
