@@ -17,7 +17,12 @@ const shouldRetry = (failureCount, error) => {
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { retry: shouldRetry, refetchOnWindowFocus: false },
+    queries: {
+      retry: shouldRetry,
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+    },
     mutations: { retry: false },
   },
 });

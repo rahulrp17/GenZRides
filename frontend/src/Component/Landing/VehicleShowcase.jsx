@@ -34,6 +34,8 @@ const VehicleShowcase = () => {
       const { data } = await vehicleAPI.getAll();
       return data;
     },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const vehicles = (data?.vehicles || []).filter((v) => v.isActive !== false);
