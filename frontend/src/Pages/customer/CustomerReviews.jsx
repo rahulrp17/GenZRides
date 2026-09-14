@@ -4,9 +4,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { Star, MessageSquare } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { reviewAPI, bookingAPI } from '../../services/endpoints';
 import { TableSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import Modal from '../../components/shared/Modal';
@@ -18,15 +19,18 @@ const Reviews = () => {
   const queryClient = useQueryClient();
   const location = useLocation();
 
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, setValue } = useForm({
+    defaultValues: { rating: 5, review: '' },
+  });
   const [rating, setRating] = useState(5);
 
-  const { data: reviewsData, isLoading } = useQuery({
+  const { data: reviewsData, isLoading, isError, error } = useQuery({
     queryKey: ['myReviews', page],
     queryFn: async () => {
       const { data } = await reviewAPI.getMyReviews({ page, limit: 10 });
       return data;
     },
+    staleTime: 60_000,
   });
 
   const { data: completedBookings } = useQuery({
@@ -35,7 +39,10 @@ const Reviews = () => {
       const { data } = await bookingAPI.getMyBookings({ page: 1, limit: 50 });
       return (data?.bookings || []).filter((b) => b.bookingStatus === 'Completed' && !b.rating);
     },
+    staleTime: 30_000,
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load reviews'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['myReviews'] })} />;
 
   // Deep-link from the completed-ride panel ("Rate Your Ride")
   // pre-selects that booking and opens the review modal.
@@ -72,7 +79,7 @@ const Reviews = () => {
         <h1 className="font-display text-2xl font-bold text-white tracking-tight">My Reviews</h1>
         {completedBookings?.length > 0 && (
           <button
-            onClick={() => { setSelectedBooking(completedBookings[0]); setShowReviewModal(true); }}
+            onClick={() => { setSelectedBooking(completedBookings[0]); setRating(5); setValue('rating', 5); setShowReviewModal(true); }}
             className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg text-sm font-medium hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
           >
             Write a Review
@@ -121,6 +128,22 @@ const Reviews = () => {
 
       <Modal isOpen={showReviewModal} onClose={() => setShowReviewModal(false)} title="Write a Review">
         <form onSubmit={handleSubmit((data) => reviewMutation.mutate(data))} className="space-y-4">
+          {completedBookings?.length > 1 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Ride</label>
+              <select
+                value={selectedBooking?._id || ''}
+                onChange={(e) => setSelectedBooking(completedBookings.find((b) => b._id === e.target.value) || null)}
+                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none [color-scheme:dark]"
+              >
+                {completedBookings.map((b) => (
+                  <option key={b._id} value={b._id} className="bg-gray-900">
+                    {b.pickup?.address?.slice(0, 24) || 'Ride'} → {b.drop?.address?.slice(0, 24) || ''} · ₹{b.finalFare ?? 0}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Rating</label>
             <div className="flex gap-1">
@@ -128,7 +151,7 @@ const Reviews = () => {
                 <button
                   key={s}
                   type="button"
-                  onClick={() => { setRating(s); register('rating').onChange({ target: { value: s } }); }}
+                  onClick={() => { setRating(s); setValue('rating', s, { shouldValidate: true }); }}
                   className="p-1"
                 >
                   <Star
@@ -138,7 +161,7 @@ const Reviews = () => {
                 </button>
               ))}
             </div>
-            <input type="hidden" {...register('rating', { required: true, value: rating })} />
+            <input type="hidden" {...register('rating', { required: true })} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Review (optional)</label>

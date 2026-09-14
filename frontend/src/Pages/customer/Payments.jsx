@@ -1,34 +1,41 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { CreditCard, Wallet, Eye, Calendar } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { CreditCard, Eye } from 'lucide-react';
 import { paymentAPI } from '../../services/endpoints';
 import { TableSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import Modal from '../../components/shared/Modal';
 import { motion as Motion } from 'framer-motion';
 
+const STATUS_COLORS = {
+  Created: 'bg-white/10 text-gray-400',
+  Paid: 'bg-emerald-500/10 text-emerald-400',
+  Failed: 'bg-red-500/10 text-red-400',
+  Refunded: 'bg-amber-500/10 text-amber-400',
+};
+
 const Payments = () => {
   const [page, setPage] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState(null);
+  const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['paymentHistory', page],
     queryFn: async () => {
       const { data } = await paymentAPI.getHistory({ page, limit: 10 });
       return data;
     },
+    staleTime: 30_000,
   });
 
   const payments = data?.payments || [];
   const pagination = data || {};
 
-  const statusColors = {
-    Created: 'bg-white/10 text-gray-400',
-    Paid: 'bg-emerald-500/10 text-emerald-400',
-    Failed: 'bg-red-500/10 text-red-400',
-    Refunded: 'bg-amber-500/10 text-amber-400',
-  };
+  if (isError) return <ErrorState message={error?.message || 'Failed to load payments'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['paymentHistory'] })} />;
+
+  const statusColors = STATUS_COLORS;
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">

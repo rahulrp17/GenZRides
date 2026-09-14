@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/api';
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
@@ -119,6 +119,7 @@ const CurrentRideCustomer = () => {
       const cancelled = res?.data?.booking || res?.booking;
       if (cancelled) setLiveStatus(cancelled);
       toast.success('Booking cancelled');
+      queryClient.invalidateQueries({ queryKey: ['currentRideCustomer'] });
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
       setCancelDialogOpen(false);
     },
@@ -130,6 +131,7 @@ const CurrentRideCustomer = () => {
     onSuccess: () => {
       toast.success('Review submitted!');
       setReviewSubmitted(true);
+      queryClient.invalidateQueries({ queryKey: ['currentRideCustomer'] });
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
     },
     onError: (err) => {
@@ -148,7 +150,7 @@ const CurrentRideCustomer = () => {
   });
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['myBookings'],
+    queryKey: ['currentRideCustomer'],
     queryFn: async () => {
       const { data } = await bookingAPI.getMyBookings({ page: 1, limit: 20 });
       return data;
@@ -157,10 +159,11 @@ const CurrentRideCustomer = () => {
       const bookings = query.state.data?.bookings || [];
       const active = bookings.find((b) => !['Completed', 'Cancelled'].includes(b.bookingStatus));
       if (!active) return false;
-      return 8000;
+      return 10000;
     },
-    refetchIntervalInBackground: true,
+    refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
+    staleTime: 5_000,
   });
 
   const bookings = data?.bookings || [];
@@ -263,6 +266,7 @@ const CurrentRideCustomer = () => {
 
     const handleBookingUpdated = (data) => {
       setLiveStatus((prev) => ({ ...(prev || {}), ...data, _id: data._id || prev?._id }));
+      queryClient.invalidateQueries({ queryKey: ['currentRideCustomer'] });
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
       if (data?.bookingStatus) toast.success(`Ride status updated to ${data.bookingStatus}`);
     };
@@ -274,6 +278,7 @@ const CurrentRideCustomer = () => {
 
     const handleRideStatusUpdated = (data) => {
       setLiveStatus((prev) => ({ ...(prev || {}), ...data }));
+      queryClient.invalidateQueries({ queryKey: ['currentRideCustomer'] });
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
     };
 
@@ -282,14 +287,16 @@ const CurrentRideCustomer = () => {
     socket.on('ride-status-updated', handleRideStatusUpdated);
     const handleNotification = (n) => {
       if (n?.booking && String(n.booking) === String(booking._id)) {
-        queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+        queryClient.invalidateQueries({ queryKey: ['currentRideCustomer'] });
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
       }
     };
     socket.on('notification', handleNotification);
 
     const onVisibility = () => {
       if (document.visibilityState === 'visible') {
-        queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+        queryClient.invalidateQueries({ queryKey: ['currentRideCustomer'] });
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
       }
     };
     document.addEventListener('visibilitychange', onVisibility);
@@ -339,12 +346,12 @@ const CurrentRideCustomer = () => {
         title="No active ride"
         description="You don't have any active rides. Book a ride to get started!"
         action={
-          <a
-            href="/customer/book"
+          <Link
+            to="/customer/book"
             className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg text-sm font-medium hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
           >
             <Car size={16} /> Book a Ride
-          </a>
+          </Link>
         }
       />
     );

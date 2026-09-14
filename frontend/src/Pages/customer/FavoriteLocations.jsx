@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { MapPin, Home, Briefcase, Plus, Pencil, Trash2 } from 'lucide-react';
 import { favoriteAPI } from '../../services/endpoints';
 import { ListSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Modal from '../../components/shared/Modal';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
@@ -18,13 +19,16 @@ const FavoriteLocations = () => {
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
 
-  const { data: favorites, isLoading } = useQuery({
+  const { data: favorites, isLoading, isError, error } = useQuery({
     queryKey: ['favorites'],
     queryFn: async () => {
       const { data } = await favoriteAPI.getAll();
       return data;
     },
+    staleTime: 60_000,
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load locations'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['favorites'] })} />;
 
   const createMutation = useMutation({
     mutationFn: (data) => favoriteAPI.create(data),
@@ -54,16 +58,22 @@ const FavoriteLocations = () => {
     onSuccess: () => {
       toast.success('Location deleted');
       queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      setDeleteId(null);
     },
+    onError: (err) => toast.error(err.response?.data?.message || 'Failed to delete'),
   });
 
   const onSubmit = (data) => {
+    const lat = parseFloat(data.latitude);
+    const lng = parseFloat(data.longitude);
     const payload = {
       label: data.label,
       address: data.address,
       nickname: data.nickname || '',
-      latitude: 0,
-      longitude: 0,
+      // Preserve existing coords on edit when fields are left blank;
+      // fall back to 0 only when nothing is known.
+      latitude: Number.isFinite(lat) ? lat : (editing?.latitude ?? 0),
+      longitude: Number.isFinite(lng) ? lng : (editing?.longitude ?? 0),
     };
     if (editing) {
       updateMutation.mutate({ id: editing._id, ...payload });
@@ -77,6 +87,8 @@ const FavoriteLocations = () => {
     setValue('label', fav.label);
     setValue('address', fav.address);
     setValue('nickname', fav.nickname || '');
+    setValue('latitude', fav.latitude || '');
+    setValue('longitude', fav.longitude || '');
     setShowModal(true);
   };
 
@@ -126,6 +138,9 @@ const FavoriteLocations = () => {
                 </div>
                 <h3 className="font-semibold text-white">{fav.nickname || fav.label}</h3>
                 <p className="text-sm text-gray-400 mt-1 truncate">{fav.address}</p>
+                {!fav.latitude && !fav.longitude && (
+                  <p className="text-[11px] text-amber-400/80 mt-1">No coordinates — edit to add for quick booking</p>
+                )}
               </div>
             );
           })}
@@ -166,6 +181,29 @@ const FavoriteLocations = () => {
               className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none [color-scheme:dark]"
             />
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Latitude (optional)</label>
+              <input
+                type="number"
+                step="any"
+                {...register('latitude')}
+                placeholder="e.g. 13.0827"
+                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none [color-scheme:dark]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Longitude (optional)</label>
+              <input
+                type="number"
+                step="any"
+                {...register('longitude')}
+                placeholder="e.g. 80.2707"
+                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none [color-scheme:dark]"
+              />
+            </div>
+          </div>
+          <p className="text-[11px] text-gray-500">Coordinates power quick booking &amp; fare estimates. Long-press any spot in Google Maps to copy them.</p>
           <button
             type="submit"
             disabled={createMutation.isPending || updateMutation.isPending}

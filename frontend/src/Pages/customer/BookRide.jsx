@@ -169,6 +169,7 @@ const BookRide = () => {
         const { data } = await vehicleAPI.getAll();
         return data;
       },
+      staleTime: 5 * 60_000,
     });
 
   // Auto-select the first cab type so the fare calculates immediately and
@@ -241,12 +242,13 @@ const BookRide = () => {
   });
 
   // Only 1 active ride at a time — detect an existing one to gate the form
-  const { data: myBookingsData } = useQuery({
-    queryKey: ["myBookings", "active-gate"],
+  const { data: myBookingsData, isLoading: gateLoading } = useQuery({
+    queryKey: ["activeRideGate"],
     queryFn: async () => {
       const { data } = await bookingAPI.getMyBookings({ page: 1, limit: 5 });
       return data;
     },
+    staleTime: 15_000,
   });
 
   const existingActiveRide = (myBookingsData?.bookings || []).find(
@@ -259,6 +261,7 @@ const BookRide = () => {
     onSuccess: (_data, variables) => {
       toast.success("Booking cancelled");
       queryClient.invalidateQueries({ queryKey: ["myBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["activeRideGate"] });
       setCancelDialogOpen(false);
       setCancelledInfo({ reason: variables.reason });
       setCreatedBookingId(null);
@@ -592,8 +595,9 @@ const BookRide = () => {
 
   // Gate: only 1 active ride at a time — a fresh visit with an
   // existing active ride shows ride status + cancel instead of the form
+  // Don't flash the booking form before the gate check loads
   const showActiveGate =
-    bookingFlow === "idle" && !!existingActiveRide;
+    bookingFlow === "idle" && !gateLoading && !!existingActiveRide;
 
   const activeGatePanel = existingActiveRide && (
     <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -606,7 +610,7 @@ const BookRide = () => {
           <div className="w-16 h-16 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center mx-auto mb-4">
             <Car size={30} className="text-green-400" />
           </div>
-          <h2 className="font-display text-xl font-bold text-white tracking-tight">
+          <h2 className="font-display text-xl font-bold text-white">
             You have an active ride
           </h2>
           <p className="text-sm text-slate-200/80 mt-2">

@@ -18,14 +18,16 @@ const Invoices = () => {
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['myBookings', page],
+    queryKey: ['invoiceBookings', page],
     queryFn: async () => {
-      const { data } = await bookingAPI.getMyBookings({ page, limit: 10 });
+      const { data } = await bookingAPI.getMyBookings({ page, limit: 10, status: 'Completed' });
       return data;
     },
+    staleTime: 30_000,
   });
 
   // Backend contract: GET /bookings/my-bookings -> { success, bookings, total, page, totalPages }
+  // Server-side status=Completed filter keeps pagination totals correct.
   const allBookings = data?.bookings || [];
   const completedBookings = allBookings.filter((b) => b.bookingStatus === 'Completed');
   const totalPages = data?.totalPages || 1;
@@ -74,7 +76,7 @@ const Invoices = () => {
     return (
       <ErrorState
         message={error?.response?.data?.message || error?.message || 'Failed to load invoices'}
-        onRetry={() => queryClient.invalidateQueries({ queryKey: ['myBookings'] })}
+        onRetry={() => queryClient.invalidateQueries({ queryKey: ['invoiceBookings'] })}
       />
     );
   }

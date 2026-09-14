@@ -12,6 +12,19 @@ import Modal from '../../components/shared/Modal';
 import CancelReasonDialog from '../../components/shared/CancelReasonDialog';
 import { motion as Motion } from 'framer-motion';
 
+const STATUS_COLORS = {
+  Pending: 'bg-amber-500/10 text-amber-400',
+  Accepted: 'bg-blue-500/10 text-blue-400',
+  'On The Way': 'bg-purple-500/10 text-purple-400',
+  Arrived: 'bg-cyan-500/10 text-cyan-400',
+  Started: 'bg-indigo-500/10 text-indigo-400',
+  Reached: 'bg-amber-500/10 text-amber-400',
+  Completed: 'bg-emerald-500/10 text-emerald-400',
+  Cancelled: 'bg-red-500/10 text-red-400',
+};
+
+const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN') : 'N/A';
+
 const RideHistory = () => {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
@@ -28,13 +41,13 @@ const RideHistory = () => {
       const { data } = await historyAPI.getAll(params);
       return data;
     },
-    staleTime: 0,
+    staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
     placeholderData: (prev) => prev,
     refetchOnMount: 'always',
     refetchOnWindowFocus: true,
-    refetchInterval: 15000,
-    refetchIntervalInBackground: true,
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
   });
 
   useEffect(() => {
@@ -71,17 +84,21 @@ const RideHistory = () => {
   });
 
   const handleDownloadInvoice = async (bookingId) => {
+    let url = null;
     try {
       const response = await invoiceAPI.download(bookingId);
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `invoice-${bookingId}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
+      toast.success('Invoice downloaded');
     } catch {
       toast.error('Failed to download invoice');
+    } finally {
+      if (url) setTimeout(() => window.URL.revokeObjectURL(url), 4000);
     }
   };
 
@@ -90,16 +107,7 @@ const RideHistory = () => {
 
   if (isError) return <ErrorState message={error?.message || 'Failed to load ride history'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['rideHistory'] })} />;
 
-  const statusColors = {
-    Pending: 'bg-amber-500/10 text-amber-400',
-    Accepted: 'bg-blue-500/10 text-blue-400',
-    'On The Way': 'bg-purple-500/10 text-purple-400',
-    Arrived: 'bg-cyan-500/10 text-cyan-400',
-    Started: 'bg-indigo-500/10 text-indigo-400',
-    Reached: 'bg-amber-500/10 text-amber-400',
-    Completed: 'bg-emerald-500/10 text-emerald-400',
-    Cancelled: 'bg-red-500/10 text-red-400',
-  };
+  const statusColors = STATUS_COLORS;
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">

@@ -41,13 +41,13 @@ const CustomerBookings = () => {
       const { data } = await bookingAPI.getMyBookings(params);
       return data;
     },
-    staleTime: 0,
+    staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
     placeholderData: (prev) => prev,
     refetchOnMount: 'always',
     refetchOnWindowFocus: true,
-    refetchInterval: 15000,
-    refetchIntervalInBackground: true,
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
   });
 
   useEffect(() => {
@@ -84,17 +84,21 @@ const CustomerBookings = () => {
   });
 
   const handleDownloadInvoice = async (bookingId) => {
+    let url = null;
     try {
       const response = await invoiceAPI.download(bookingId);
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `invoice-${bookingId}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
+      toast.success('Invoice downloaded');
     } catch {
       toast.error('Failed to download invoice');
+    } finally {
+      if (url) setTimeout(() => window.URL.revokeObjectURL(url), 4000);
     }
   };
 

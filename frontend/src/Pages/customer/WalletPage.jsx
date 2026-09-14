@@ -1,24 +1,32 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Wallet, TrendingUp, TrendingDown, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Wallet, TrendingUp, TrendingDown, ArrowUpRight } from 'lucide-react';
 import { bookingAPI } from '../../services/endpoints';
 import { TableSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import { motion as Motion } from 'framer-motion';
 
 const WalletPage = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ['myBookings'],
+  const queryClient = useQueryClient();
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['walletBookings'],
     queryFn: async () => {
       const { data } = await bookingAPI.getMyBookings({ page: 1, limit: 100 });
       return data;
     },
+    staleTime: 60_000,
   });
 
-  const bookings = data?.bookings || [];
-  const completedBookings = bookings.filter((b) => b.bookingStatus === 'Completed' && b.paymentStatus === 'Paid');
-  const totalSpent = completedBookings.reduce((sum, b) => sum + (b.finalFare || 0), 0);
-  const totalTips = completedBookings.reduce((sum, b) => sum + (b.tipAmount || 0), 0);
+  const bookings = useMemo(() => data?.bookings || [], [data]);
+  const completedBookings = useMemo(
+    () => bookings.filter((b) => b.bookingStatus === 'Completed' && b.paymentStatus === 'Paid'),
+    [bookings]
+  );
+  const totalSpent = useMemo(() => completedBookings.reduce((sum, b) => sum + (b.finalFare || 0), 0), [completedBookings]);
+  const totalTips = useMemo(() => completedBookings.reduce((sum, b) => sum + (b.tipAmount || 0), 0), [completedBookings]);
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load wallet'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['walletBookings'] })} />;
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -29,12 +37,12 @@ const WalletPage = () => {
         <div className="bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl p-6 text-white">
           <Wallet size={24} className="mb-3 opacity-80" />
           <p className="text-sm opacity-80">Total Spent</p>
-          <p className="text-2xl font-bold mt-1">₹{totalSpent}</p>
+          <p className="text-2xl font-bold mt-1">₹{totalSpent.toLocaleString('en-IN')}</p>
         </div>
         <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-sm border border-white/10">
           <TrendingUp size={24} className="text-emerald-500 mb-3" />
           <p className="text-sm text-gray-400">Tips Given</p>
-          <p className="text-2xl font-bold text-white mt-1">₹{totalTips}</p>
+          <p className="text-2xl font-bold text-white mt-1">₹{totalTips.toLocaleString('en-IN')}</p>
         </div>
         <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-sm border border-white/10">
           <TrendingDown size={24} className="text-blue-500 mb-3" />

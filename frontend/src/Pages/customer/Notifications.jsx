@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -6,6 +6,7 @@ import { Bell, CheckCheck, Trash2 } from 'lucide-react';
 import { notificationAPI } from '../../services/endpoints';
 import { useSocket } from '../../Context/SocketContext';
 import { ListSkeleton } from '../../components/shared/Skeleton';
+import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import PushToggle from '../../components/PushToggle';
@@ -22,13 +23,16 @@ const Notifications = () => {
   const navigate = useNavigate();
   const { socket } = useSocket();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['notifications', page],
     queryFn: async () => {
       const { data } = await notificationAPI.getAll({ page, limit: 20 });
       return data;
     },
+    staleTime: 30_000,
   });
+
+  if (isError) return <ErrorState message={error?.message || 'Failed to load notifications'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['notifications'] })} />;
 
   const markAllMutation = useMutation({
     mutationFn: () => notificationAPI.markAllRead(),
@@ -61,6 +65,7 @@ const Notifications = () => {
 
   const notifications = data?.data || [];
   const pagination = data || {};
+  const hasUnread = useMemo(() => notifications.some((n) => !n.isRead), [notifications]);
 
   // Realtime list + bell badge refresh (read state persists server-side)
   useEffect(() => {
@@ -79,7 +84,9 @@ const Notifications = () => {
     const bookingId = bookingIdOf(n);
     if (!bookingId) return;
     if (!n.isRead) markReadMutation.mutate(n._id);
-    navigate(`/customer/bookings/${bookingId}`);
+    // /customer/bookings is a list page (no :id route) — pass the id so the
+    // list can highlight/scroll to it instead of hitting a dead route.
+    navigate('/customer/bookings', { state: { highlightBookingId: bookingId } });
   };
 
   const typeColors = {
@@ -99,7 +106,7 @@ const Notifications = () => {
         <h1 className="font-display text-2xl font-bold text-white tracking-tight">Notifications</h1>
         <div className="flex items-center gap-2">
           <PushToggle />
-          {notifications.some((n) => !n.isRead) && (
+          {hasUnread && (
             <button
               onClick={() => markAllMutation.mutate()}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-400 bg-indigo-500/10 rounded-lg hover:bg-indigo-500/20 transition"
@@ -122,7 +129,6 @@ const Notifications = () => {
               return (
               <Motion.div
                 key={n._id}
-                layout
                 onClick={() => handleOpen(n)}
                 className={`bg-white/5 backdrop-blur-lg rounded-xl p-4 shadow-sm border transition ${
                   n.isRead ? 'border-white/10' : 'border-indigo-500/30 bg-indigo-500/10'

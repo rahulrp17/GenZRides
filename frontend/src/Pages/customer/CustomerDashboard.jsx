@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Car, Clock, CreditCard, Bell, Star, MapPin, ArrowRight } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Car, Clock, CreditCard, Bell, MapPin, ArrowRight } from 'lucide-react';
 import { bookingAPI, notificationAPI } from '../../services/endpoints';
 import { CardSkeleton } from '../../components/shared/Skeleton';
 import ErrorState from '../../components/shared/ErrorState';
@@ -9,30 +9,58 @@ import StatsCard from '../../components/shared/StatsCard';
 import useAuth from '../../hooks/useAuth';
 import { motion as Motion } from 'framer-motion';
 
+const STATUS_BADGE = {
+  Completed: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+  Cancelled: 'bg-red-500/20 text-red-400 border border-red-500/30',
+  Accepted: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
+};
+
 const CustomerDashboard = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: bookings, isLoading: loadingBookings, isError: bookingsError, error: bookingsErr } = useQuery({
-    queryKey: ['myBookings'],
+    queryKey: ['dashboardRecent'],
     queryFn: async () => {
       const { data } = await bookingAPI.getMyBookings({ page: 1, limit: 5 });
       return data;
     },
+    staleTime: 30_000,
   });
 
-  const { data: notifications, isError: notifError, error: notifErr } = useQuery({
+  // Server-side status totals (limit:1 keeps payload tiny) — the recent-5
+  // list alone cannot produce correct Pending/Completed counts.
+  const { data: pendingData } = useQuery({
+    queryKey: ['dashboardCount', 'Pending'],
+    queryFn: async () => {
+      const { data } = await bookingAPI.getMyBookings({ page: 1, limit: 1, status: 'Pending' });
+      return data;
+    },
+    staleTime: 30_000,
+  });
+
+  const { data: completedData } = useQuery({
+    queryKey: ['dashboardCount', 'Completed'],
+    queryFn: async () => {
+      const { data } = await bookingAPI.getMyBookings({ page: 1, limit: 1, status: 'Completed' });
+      return data;
+    },
+    staleTime: 30_000,
+  });
+
+  const { data: notifications } = useQuery({
     queryKey: ['unreadCount'],
     queryFn: async () => {
       const { data } = await notificationAPI.getUnreadCount();
       return data;
     },
+    staleTime: 30_000,
   });
 
-  const recentBookings = bookings?.bookings || [];
+  const recentBookings = useMemo(() => bookings?.bookings || [], [bookings]);
   const unreadCount = notifications?.unread || 0;
 
-  if (bookingsError) return <ErrorState message={bookingsErr?.message || 'Failed to load bookings'} />;
-  if (notifError) return <ErrorState message={notifErr?.message || 'Failed to load notifications'} />;
+  if (bookingsError) return <ErrorState message={bookingsErr?.message || 'Failed to load bookings'} onRetry={() => { queryClient.invalidateQueries({ queryKey: ['dashboardRecent'] }); queryClient.invalidateQueries({ queryKey: ['dashboardCount'] }); }} />;
 
   return (
     <Motion.div
@@ -51,8 +79,8 @@ const CustomerDashboard = () => {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard icon={Car} label="Total Rides" value={bookings?.total || 0} color="indigo" />
-        <StatsCard icon={Clock} label="Pending" value={recentBookings.filter(b => b.bookingStatus === 'Pending').length} color="amber" />
-        <StatsCard icon={CreditCard} label="Completed" value={recentBookings.filter(b => b.bookingStatus === 'Completed').length} color="emerald" />
+        <StatsCard icon={Clock} label="Pending" value={pendingData?.total ?? 0} color="amber" />
+        <StatsCard icon={CreditCard} label="Completed" value={completedData?.total ?? 0} color="emerald" />
         <StatsCard icon={Bell} label="Notifications" value={unreadCount} color="blue" />
       </div>
 
@@ -124,9 +152,7 @@ const CustomerDashboard = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      booking.bookingStatus === 'Completed' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                      booking.bookingStatus === 'Cancelled' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                      'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                      STATUS_BADGE[booking.bookingStatus] || 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                     }`}>
                       <Car size={18} />
                     </div>
@@ -143,10 +169,7 @@ const CustomerDashboard = () => {
                   </div>
                   <div className="text-right">
                     <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      booking.bookingStatus === 'Completed' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                      booking.bookingStatus === 'Cancelled' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                      booking.bookingStatus === 'Accepted' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                      'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                      STATUS_BADGE[booking.bookingStatus] || 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                     }`}>
                       {booking.bookingStatus}
                     </span>

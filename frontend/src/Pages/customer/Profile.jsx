@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { User, Camera, Lock, Save } from 'lucide-react';
+import { User, Camera, Lock, Save, Loader2 } from 'lucide-react';
 import { userAPI, uploadAPI } from '../../services/endpoints';
 import useAuth from '../../hooks/useAuth';
 import { motion as Motion } from 'framer-motion';
@@ -11,9 +11,14 @@ const Profile = () => {
   const { user, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: { name: user?.name || '', email: user?.email || '', phone: user?.phone || '' },
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    defaultValues: { name: user?.name || '' },
   });
+
+  // useForm defaultValues apply once — re-sync when async user arrives.
+  useEffect(() => {
+    if (user?.name) reset({ name: user.name });
+  }, [user?.name, reset]);
 
   const { register: registerPassword, handleSubmit: handleSubmitPassword, reset: resetPassword, formState: { errors: passwordErrors } } = useForm();
 
@@ -69,9 +74,9 @@ const Profile = () => {
                 <span className="text-3xl font-bold text-green-400">{user?.name?.charAt(0)?.toUpperCase()}</span>
               )}
             </div>
-            <label className="absolute bottom-0 right-0 p-1.5 bg-green-500 text-white rounded-full cursor-pointer hover:bg-green-600 transition">
-              <Camera size={14} />
-              <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+            <label className={`absolute bottom-0 right-0 p-1.5 bg-green-500 text-white rounded-full transition ${imageMutation.isPending ? 'opacity-60 cursor-wait' : 'cursor-pointer hover:bg-green-600'}`}>
+              {imageMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
+              <input type="file" accept="image/*" className="hidden" disabled={imageMutation.isPending} onChange={handleImageChange} />
             </label>
           </div>
           <div>
@@ -85,10 +90,12 @@ const Profile = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-white/10 rounded-xl p-1">
+      <div className="flex gap-1 bg-white/10 rounded-xl p-1" role="tablist" aria-label="Profile sections">
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            role="tab"
+            aria-selected={activeTab === tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 flex-1 justify-center py-2.5 rounded-lg text-sm font-medium transition ${
               activeTab === tab.id ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-gray-300'
