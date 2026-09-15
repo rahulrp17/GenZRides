@@ -1398,9 +1398,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CurrentRideCustomer.jsx": {
-    "mtime": 1789491529.8430643,
-    "seen": 1789491696.4833586,
-    "ast_hash": "39dc3dbe659df7378ed2f58e44a2619f",
+    "mtime": 1789493965.051039,
+    "seen": 1789494043.4930775,
+    "ast_hash": "fb82b03dab3a18c64b291f5164b5990e",
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CustomerBookings.jsx": {

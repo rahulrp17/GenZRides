@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
-import { GoogleMap, useJsApiLoader, Marker, Polyline, Circle } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/api';
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { MapPin, Navigation, Car, Clock, Phone, User, CheckCircle, X, Download, Star } from 'lucide-react';
@@ -76,58 +76,6 @@ function decodePolyline(encoded) {
   }
   return points;
 }
-
-const AnimatedDriverMarker = ({ target }) => {
-  const targetRef = useRef(target);
-  const [pos, setPos] = useState(target);
-  const [pulse, setPulse] = useState(0);
-
-  useEffect(() => {
-    targetRef.current = target;
-  }, [target]);
-
-  useEffect(() => {
-    let raf;
-    const start = Date.now();
-    const loop = () => {
-      const t = targetRef.current;
-      if (t) {
-        setPos((prev) => {
-          if (!prev) return { ...t };
-          const dLat = t.lat - prev.lat;
-          const dLng = t.lng - prev.lng;
-          if (Math.abs(dLat) < 1e-6 && Math.abs(dLng) < 1e-6) return prev;
-          return { lat: prev.lat + dLat * 0.2, lng: prev.lng + dLng * 0.2 };
-        });
-      }
-      setPulse((Date.now() - start) / 1000);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  if (!pos) return null;
-
-  const cycle = (pulse * 1.2) % 22;
-  return (
-    <>
-      <Circle
-        center={pos}
-        radius={14 + cycle}
-        options={{
-          strokeColor: '#4f46e5',
-          strokeOpacity: 0.6,
-          strokeWeight: 1,
-          fillColor: '#4f46e5',
-          fillOpacity: 0.4 - (cycle / 22) * 0.25,
-          clickable: false,
-        }}
-      />
-      <Marker position={pos} icon={DRIVER_MARKER} title="Driver - live" />
-    </>
-  );
-};
 
 const StarRating = ({ rating, onRate, size = 24, interactive = true }) => (
   <div className="flex gap-1">
@@ -660,7 +608,7 @@ const CurrentRideCustomer = () => {
                   >
                     {pickupCoords && <Marker position={pickupCoords} icon={GREEN_MARKER} title={booking.pickup?.address || "Pickup"} />}
                     {dropCoords && <Marker position={dropCoords} icon={RED_MARKER} title={booking.drop?.address || "Drop"} />}
-                    {driverLocation && !isCompleted && !isCancelled && <AnimatedDriverMarker target={driverLocation} />}
+                    {driverLocation && !isCompleted && !isCancelled && <Marker position={driverLocation} icon={DRIVER_MARKER} title="Driver — live" />}
                     {(livePath || (pickupCoords && dropCoords && booking.routePolyline)) && (
                       <Polyline
                         path={livePath || decodePolyline(booking.routePolyline)}
