@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/api';
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { MapPin, Navigation, Car, Clock, Phone, User, CheckCircle, X, Download, Star } from 'lucide-react';
+import { MapPin, Navigation, Car, Clock, Phone, User, CheckCircle, X, Download, Star, RefreshCw } from 'lucide-react';
 import { bookingAPI, invoiceAPI, reviewAPI, mapsAPI } from '../../services/endpoints';
 import { useSocket } from '../../Context/SocketContext';
 import { CardSkeleton } from '../../components/shared/Skeleton';
@@ -105,6 +105,8 @@ const CurrentRideCustomer = () => {
   const [lastLocUpdateAt, setLastLocUpdateAt] = useState(null);
   const [nowTick, setNowTick] = useState(Date.now());
   const [liveStatus, setLiveStatus] = useState(null);
+  const [isPolling, setIsPolling] = useState(false);
+  const pollingRef = useRef(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const mapRef = useRef(null);
   const hasInteractedRef = useRef(false);
@@ -357,6 +359,45 @@ const CurrentRideCustomer = () => {
     const id = setInterval(() => setNowTick(Date.now()), 1000);
     return () => clearInterval(id);
   }, [lastLocUpdateAt]);
+
+  const stopPolling = useCallback(() => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+    setIsPolling(false);
+  }, []);
+
+  // Polling fallback: fetch driver location every 5 s (works even when the
+  // driver has minimized their tab and socket events stop arriving).
+  const startPolling = useCallback(() => {
+    if (pollingRef.current) return;
+    setIsPolling(true);
+    pollingRef.current = setInterval(async () => {
+      try {
+        const { data } = await bookingAPI.getMyBookings({ page: 1, limit: 20 });
+        const bookings = data?.bookings || [];
+        const active = bookings.find((b) => !['Completed', 'Cancelled'].includes(b.bookingStatus));
+        const c = active?.driver?.currentLocation?.coordinates;
+        if (c && typeof c[0] === 'number' && typeof c[1] === 'number') {
+          setDriverLocation({ lat: c[1], lng: c[0] });
+          setLastLocUpdateAt(Date.now());
+          setNowTick(Date.now());
+        }
+        if (!active || ['Completed', 'Cancelled'].includes(active?.bookingStatus)) {
+          stopPolling();
+        }
+      } catch { /* silent — retry next tick */ }
+    }, 5000);
+  }, [stopPolling]);
+
+  // Stop polling when ride ends
+  useEffect(() => {
+    const status = booking?.bookingStatus;
+    if (status && ['Completed', 'Cancelled'].includes(status)) {
+      stopPolling();
+    }
+  }, [booking?.bookingStatus, stopPolling]);
 
   const handleSubmitReview = () => {
     if (!reviewRating) return toast.error('Please select a rating');
@@ -632,8 +673,23 @@ const CurrentRideCustomer = () => {
                     {lastUpdatedAtText && <span className="text-slate-300">· {lastUpdatedAtText}</span>}
                   </div>
                 )}
-                {/* Recenter button */}
-                <button
+                  {/* Refresh button — polls driver location every 5 s */}
+                  <button
+                    onClick={() => {
+                      if (isPolling) stopPolling();
+                      else startPolling();
+                    }}
+                    className={`absolute top-3 right-3 px-2.5 py-1.5 rounded-full border text-xs font-medium backdrop-blur transition ${
+                      isPolling
+                        ? 'bg-emerald-600/80 text-white border-emerald-400'
+                        : 'bg-black/70 text-white border-white/10 hover:bg-black/80'
+                    }`}
+                    title={isPolling ? 'Stop polling' : 'Refresh driver location every 5s'}
+                  >
+                    <RefreshCw size={14} className={isPolling ? 'animate-spin' : ''} />
+                  </button>
+                  {/* Recenter button */}
+                  <button
                   onClick={() => {
                     hasInteractedRef.current = false;
                     const map = mapRef.current;

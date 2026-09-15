@@ -297,8 +297,9 @@ const CurrentRide = () => {
       if (document.visibilityState === 'visible') {
         requestWakeLock();
         if (isRideActive && gpsActiveRef.current && socketConnected) {
-          // re-kick watch if throttled
-          // no-op: watch continues; just ensure socket rejoins
+          // Restart GPS sharing — watchPosition is throttled/ended in background
+          stopGpsSharing();
+          startGpsSharing();
           if (socket && booking?._id) socket.emit('join-booking', booking._id);
         }
         queryClient.invalidateQueries({ queryKey: ['currentRide'] });
@@ -313,7 +314,7 @@ const CurrentRide = () => {
       document.removeEventListener('visibilitychange', onVis);
       window.removeEventListener('pageshow', onPageShow);
     };
-  }, [isRideActive, socketConnected, booking?._id, queryClient, requestWakeLock, startGpsSharing, socket]);
+  }, [isRideActive, socketConnected, booking?._id, queryClient, requestWakeLock, stopGpsSharing, startGpsSharing, socket]);
 
   useEffect(() => {
     if (!socket) return;

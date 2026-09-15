@@ -1182,9 +1182,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/driver/CurrentRide.jsx": {
-    "mtime": 1789446407.830212,
-    "seen": 1789452933.4548483,
-    "ast_hash": "3b0d13e0ac438c4ffea3c1f358c181a0",
+    "mtime": 1789495884.3063202,
+    "seen": 1789496426.546785,
+    "ast_hash": "0759a7879c70666e8960614d0fc0156d",
     "semantic_hash": ""
   },
   "frontend/src/Pages/driver/DriverDashboard.jsx": {
@@ -1398,9 +1398,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CurrentRideCustomer.jsx": {
-    "mtime": 1789493965.051039,
-    "seen": 1789494043.4930775,
-    "ast_hash": "fb82b03dab3a18c64b291f5164b5990e",
+    "mtime": 1789496235.7238677,
+    "seen": 1789496426.5466034,
+    "ast_hash": "3873b2727afcdb8d19de63cad5c3e73f",
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CustomerBookings.jsx": {

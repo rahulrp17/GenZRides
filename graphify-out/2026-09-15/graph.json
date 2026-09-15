@@ -282,30 +282,6 @@
       "source_location": "L16"
     },
     {
-      "id": "frontend_src_component_landing_vehicleshowcase_imagefor",
-      "label": "imageFor()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "SEO.jsx",
-      "file_type": "code",
-      "norm_label": "imagefor()",
-      "source_file": "frontend/src/Component/Landing/VehicleShowcase.jsx",
-      "source_location": "L11"
-    },
-    {
-      "id": "frontend_src_component_landing_vehicleshowcase_vehicleshowcase",
-      "label": "VehicleShowcase()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "SEO.jsx",
-      "file_type": "code",
-      "norm_label": "vehicleshowcase()",
-      "source_file": "frontend/src/Component/Landing/VehicleShowcase.jsx",
-      "source_location": "L30"
-    },
-    {
       "id": "frontend_src_component_landing_vehicleshowcase_vehicleskeleton",
       "label": "VehicleSkeleton()",
       "_callable": true,
@@ -412,6 +388,18 @@
       "norm_label": "upsertmeta()",
       "source_file": "frontend/src/components/SEO.jsx",
       "source_location": "L11"
+    },
+    {
+      "id": "frontend_src_components_shared_farenotes_farenotes",
+      "label": "FareNotes()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SEO.jsx",
+      "file_type": "code",
+      "norm_label": "farenotes()",
+      "source_file": "frontend/src/components/shared/FareNotes.jsx",
+      "source_location": "L35"
     },
     {
       "id": "frontend_src_pages_aboutus_about_about",
@@ -810,18 +798,6 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_bn",
-      "label": "bn()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 100,
-      "community_name": "wd",
-      "file_type": "code",
-      "norm_label": "bn()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_br",
       "label": "br()",
       "_callable": true,
@@ -842,18 +818,6 @@
       "community_name": "wd",
       "file_type": "code",
       "norm_label": "bt()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_cr",
-      "label": "cr()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 100,
-      "community_name": "wd",
-      "file_type": "code",
-      "norm_label": "cr()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -902,18 +866,6 @@
       "community_name": "wd",
       "file_type": "code",
       "norm_label": "ft()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_hn",
-      "label": "Hn()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 100,
-      "community_name": "wd",
-      "file_type": "code",
-      "norm_label": "hn()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -990,18 +942,6 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pr",
-      "label": "pr()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 100,
-      "community_name": "wd",
-      "file_type": "code",
-      "norm_label": "pr()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pt",
       "label": "Pt()",
       "_callable": true,
@@ -1038,6 +978,18 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_va_u",
+      "label": "u()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 100,
+      "community_name": "wd",
+      "file_type": "code",
+      "norm_label": "u()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_vm",
       "label": "vm()",
       "_callable": true,
@@ -1070,18 +1022,6 @@
       "community_name": "wd",
       "file_type": "code",
       "norm_label": "wd()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_wr",
-      "label": "wr()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 100,
-      "community_name": "wd",
-      "file_type": "code",
-      "norm_label": "wr()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -2478,36 +2418,12 @@
       "source_location": "L2"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_add",
-      "label": "add()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "add()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L67"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_addin",
-      "label": "addIn()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "addin()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L68"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ai",
       "label": "ai()",
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "ai()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
@@ -2519,95 +2435,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "ba()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_bf",
-      "label": "Bf()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "bf()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L107"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_delete",
-      "label": "delete()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "delete()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L103"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_deletein",
-      "label": "deleteIn()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "deletein()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L68"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_dn",
-      "label": "dn()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "dn()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L12"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ec_a",
-      "label": "a()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "a()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L54"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_en",
-      "label": "en()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "en()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_enter",
-      "label": "enter()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "enter()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L53"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_es",
@@ -2615,47 +2447,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "es()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_exit",
-      "label": "exit()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "exit()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L53"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_fa",
-      "label": "fa()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "fa()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_filteredactions",
-      "label": "filteredActions()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "filteredactions()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L12"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_fs",
@@ -2663,47 +2459,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "fs()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_get",
-      "label": "get()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "get()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L103"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_gf",
-      "label": "gf()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "gf()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_has",
-      "label": "has()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "has()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L103"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_is",
@@ -2711,59 +2471,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "is()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kf",
-      "label": "kf()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "kf()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kr",
-      "label": "kr()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "kr()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kr_a",
-      "label": "a()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "a()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L25"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kr_o",
-      "label": "o()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "o()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L27"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_li",
@@ -2771,7 +2483,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "li()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
@@ -2783,23 +2495,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "ls()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_mf",
-      "label": "Mf()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "mf()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ms",
@@ -2807,7 +2507,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "ms()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
@@ -2819,7 +2519,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "ns()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
@@ -2831,35 +2531,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "oi()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_qr",
-      "label": "qr()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "qr()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L29"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_renderactiontree",
-      "label": "renderActionTree()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "renderactiontree()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L12"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_rs",
@@ -2867,35 +2543,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "rs()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_set",
-      "label": "set()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "set()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L103"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_setin",
-      "label": "setIn()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "setin()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L68"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_si",
@@ -2903,7 +2555,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "si()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
@@ -2915,7 +2567,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "ss()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
@@ -2927,7 +2579,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "ts()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
@@ -2939,33 +2591,9 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "us()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_vf",
-      "label": "vf()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "vf()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_vo",
-      "label": "Vo()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "vo()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -2975,7 +2603,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "we()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
@@ -2987,21 +2615,9 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "ws()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_z",
-      "label": "z()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 107,
-      "community_name": "get",
-      "file_type": "code",
-      "norm_label": "z()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -3011,7 +2627,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 107,
-      "community_name": "get",
+      "community_name": "ts",
       "file_type": "code",
       "norm_label": "zs()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
@@ -5322,6 +4938,18 @@
       "source_location": "L54"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_it",
+      "label": "it()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "a",
+      "file_type": "code",
+      "norm_label": "it()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_jm",
       "label": "jm()",
       "_callable": true,
@@ -5658,6 +5286,18 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_va_a",
+      "label": "a()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "a",
+      "file_type": "code",
+      "norm_label": "a()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_va_c",
       "label": "c()",
       "_callable": true,
@@ -5702,6 +5342,18 @@
       "community_name": "a",
       "file_type": "code",
       "norm_label": "l()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_va_n",
+      "label": "n()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "a",
+      "file_type": "code",
+      "norm_label": "n()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -5762,18 +5414,6 @@
       "community_name": "a",
       "file_type": "code",
       "norm_label": "t()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_va_u",
-      "label": "u()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 16,
-      "community_name": "a",
-      "file_type": "code",
-      "norm_label": "u()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -5860,6 +5500,18 @@
       "norm_label": "xp()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L145"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ya",
+      "label": "ya()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "a",
+      "file_type": "code",
+      "norm_label": "ya()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_yt",
@@ -6582,6 +6234,18 @@
       "source_location": "L182"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_al",
+      "label": "Al()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "al()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ariasnapshot",
       "label": "ariaSnapshot()",
       "_callable": true,
@@ -6810,6 +6474,18 @@
       "source_location": "L63"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_cr",
+      "label": "cr()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "cr()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_createariarefengine",
       "label": "_createAriaRefEngine()",
       "_callable": true,
@@ -7002,6 +6678,18 @@
       "source_location": "L63"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_createtestidengine",
+      "label": "_createTestIdEngine()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "_createtestidengine()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L54"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_createtextengine",
       "label": "_createTextEngine()",
       "_callable": true,
@@ -7110,6 +6798,18 @@
       "source_location": "L12"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_et",
+      "label": "et()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "et()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_eval",
       "label": "eval()",
       "_callable": true,
@@ -7206,6 +6906,18 @@
       "source_location": "L54"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_f",
+      "label": "$f()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "$f()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_failedaction",
       "label": "failedAction()",
       "_callable": true,
@@ -7300,6 +7012,30 @@
       "norm_label": "generateplaywrightrequestcall()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L29"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_generateselectors",
+      "label": "_generateSelectors()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "_generateselectors()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L59"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_generateselectorsimple",
+      "label": "generateSelectorSimple()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "generateselectorsimple()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L54"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_getallelementsmatchingexpectariatemplate",
@@ -7482,18 +7218,6 @@
       "source_location": "L66"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_io",
-      "label": "io()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "defaultSettingsView-Ds6CBOo0.js",
-      "file_type": "code",
-      "norm_label": "io()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_isclosed",
       "label": "isClosed()",
       "_callable": true,
@@ -7542,6 +7266,18 @@
       "source_location": "L10"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kl",
+      "label": "kl()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "kl()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_km",
       "label": "km()",
       "_callable": true,
@@ -7552,6 +7288,18 @@
       "norm_label": "km()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L182"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_la",
+      "label": "la()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "la()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L53"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_lh",
@@ -7660,6 +7408,18 @@
       "norm_label": "mh()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L182"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ml",
+      "label": "Ml()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "ml()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_mn",
@@ -7806,6 +7566,18 @@
       "source_location": "L182"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pa",
+      "label": "pa()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "pa()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ping",
       "label": "ping()",
       "_callable": true,
@@ -7828,6 +7600,30 @@
       "norm_label": "pingnoreply()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L182"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pl",
+      "label": "Pl()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "pl()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pr",
+      "label": "pr()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "pr()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_prettyprintobject",
@@ -8030,18 +7826,6 @@
       "community_name": "defaultSettingsView-Ds6CBOo0.js",
       "file_type": "code",
       "norm_label": "rn()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ro",
-      "label": "Ro()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "defaultSettingsView-Ds6CBOo0.js",
-      "file_type": "code",
-      "norm_label": "ro()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -8394,6 +8178,18 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ua",
+      "label": "ua()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "ua()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L53"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_uninstall",
       "label": "uninstall()",
       "_callable": true,
@@ -8478,6 +8274,18 @@
       "source_location": "L182"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_wr",
+      "label": "wr()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "defaultSettingsView-Ds6CBOo0.js",
+      "file_type": "code",
+      "norm_label": "wr()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_xd",
       "label": "Xd()",
       "_callable": true,
@@ -8522,18 +8330,6 @@
       "community_name": "defaultSettingsView-Ds6CBOo0.js",
       "file_type": "code",
       "norm_label": "zl()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_zo",
-      "label": "zo()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "defaultSettingsView-Ds6CBOo0.js",
-      "file_type": "code",
-      "norm_label": "zo()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -9219,7 +9015,7 @@
       "file_type": "code",
       "norm_label": "usesocket()",
       "source_file": "frontend/src/Context/SocketContext.jsx",
-      "source_location": "L61"
+      "source_location": "L63"
     },
     {
       "id": "frontend_src_pages_admin_adminbookingrequests_adminbookingrequests",
@@ -9364,18 +9160,6 @@
       "norm_label": "driverbookingdetail()",
       "source_file": "frontend/src/Pages/driver/DriverBookingDetail.jsx",
       "source_location": "L12"
-    },
-    {
-      "id": "frontend_src_pages_driver_driverbookings_driverbookings",
-      "label": "DriverBookings()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 24,
-      "community_name": "useSocket",
-      "file_type": "code",
-      "norm_label": "driverbookings()",
-      "source_file": "frontend/src/Pages/driver/DriverBookings.jsx",
-      "source_location": "L27"
     },
     {
       "id": "frontend_src_utils_bookingtext_copytexttoclipboard",
@@ -10559,7 +10343,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "counter()",
       "source_file": "frontend/src/Component/Hero/Hero.jsx",
@@ -10571,7 +10355,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "hero()",
       "source_file": "frontend/src/Component/Hero/Hero.jsx",
@@ -10583,7 +10367,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "cartypepage()",
       "source_file": "frontend/src/Pages/guest/CarTypePage.jsx",
@@ -10595,7 +10379,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "imagefor()",
       "source_file": "frontend/src/Pages/guest/CarTypePage.jsx",
@@ -10607,7 +10391,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "confirmpage()",
       "source_file": "frontend/src/Pages/guest/ConfirmPage.jsx",
@@ -10619,7 +10403,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "fmtwhen()",
       "source_file": "frontend/src/Pages/guest/ConfirmPage.jsx",
@@ -10631,7 +10415,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "formatcurrency()",
       "source_file": "frontend/src/Pages/guest/ConfirmPage.jsx",
@@ -10643,7 +10427,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "datetimefield()",
       "source_file": "frontend/src/Pages/guest/GuestBookingForm.jsx",
@@ -10655,7 +10439,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "guestbookingform()",
       "source_file": "frontend/src/Pages/guest/GuestBookingForm.jsx",
@@ -10667,7 +10451,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "pad()",
       "source_file": "frontend/src/Pages/guest/GuestBookingForm.jsx",
@@ -10679,7 +10463,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "placefield()",
       "source_file": "frontend/src/Pages/guest/GuestBookingForm.jsx",
@@ -10691,7 +10475,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "cleardraft()",
       "source_file": "frontend/src/Pages/guest/guestDraft.js",
@@ -10703,7 +10487,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "daysbetween()",
       "source_file": "frontend/src/Pages/guest/guestDraft.js",
@@ -10715,7 +10499,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "loaddraft()",
       "source_file": "frontend/src/Pages/guest/guestDraft.js",
@@ -10727,7 +10511,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "minpickupiso()",
       "source_file": "frontend/src/Pages/guest/guestDraft.js",
@@ -10739,7 +10523,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "savedraft()",
       "source_file": "frontend/src/Pages/guest/guestDraft.js",
@@ -10751,7 +10535,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "tolocalinputvalue()",
       "source_file": "frontend/src/Pages/guest/guestDraft.js",
@@ -10780,18 +10564,6 @@
       "norm_label": "shouldretry()",
       "source_file": "frontend/src/providers/QueryProvider.jsx",
       "source_location": "L4"
-    },
-    {
-      "id": "backend_src_controllers_history_controller_getridehistory",
-      "label": "getRideHistory()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "user.routes.js",
-      "file_type": "code",
-      "norm_label": "getridehistory()",
-      "source_file": "backend/src/controllers/history.controller.js",
-      "source_location": "L7"
     },
     {
       "id": "backend_src_controllers_user_controller_changepassword",
@@ -10828,42 +10600,6 @@
       "norm_label": "updateprofile()",
       "source_file": "backend/src/controllers/user.controller.js",
       "source_location": "L6"
-    },
-    {
-      "id": "backend_src_middleware_role_middleware_authorize",
-      "label": "authorize()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "user.routes.js",
-      "file_type": "code",
-      "norm_label": "authorize()",
-      "source_file": "backend/src/middleware/role.middleware.js",
-      "source_location": "L5"
-    },
-    {
-      "id": "backend_src_middleware_validate_middleware_validatequery",
-      "label": "validateQuery()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "user.routes.js",
-      "file_type": "code",
-      "norm_label": "validatequery()",
-      "source_file": "backend/src/middleware/validate.middleware.js",
-      "source_location": "L33"
-    },
-    {
-      "id": "backend_src_services_history_service_getridehistory",
-      "label": "getRideHistory()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "user.routes.js",
-      "file_type": "code",
-      "norm_label": "getridehistory()",
-      "source_file": "backend/src/services/history.service.js",
-      "source_location": "L7"
     },
     {
       "id": "backend_src_services_user_service_changepassword",
@@ -11082,6 +10818,18 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ct",
+      "label": "ct()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "ct()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_dispose",
       "label": "dispose()",
       "_callable": true,
@@ -11092,6 +10840,18 @@
       "norm_label": "dispose()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L182"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_dp",
+      "label": "dp()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "dp()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ei",
@@ -11116,6 +10876,18 @@
       "norm_label": "fn()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_fp",
+      "label": "Fp()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "fp()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_getin",
@@ -11164,6 +10936,42 @@
       "norm_label": "ie()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L2"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ip",
+      "label": "ip()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "ip()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ip_unstable_schedulehydration",
+      "label": ".unstable_scheduleHydration()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": ".unstable_schedulehydration()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_je",
+      "label": "je()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "je()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ji",
@@ -11236,6 +11044,18 @@
       "norm_label": "lt()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_mp",
+      "label": "mp()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "mp()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_n",
@@ -11322,6 +11142,42 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pp",
+      "label": "pp()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "pp()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pp_n",
+      "label": "n()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "n()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pp_t",
+      "label": "t()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "t()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_qf",
       "label": "qf()",
       "_callable": true,
@@ -11380,6 +11236,18 @@
       "norm_label": "r()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L2"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_sa",
+      "label": "sa()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "sa()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_sc",
@@ -11478,6 +11346,18 @@
       "source_location": "L12"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_up",
+      "label": "up()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "up()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_v",
       "label": "v()",
       "_callable": true,
@@ -11488,18 +11368,6 @@
       "norm_label": "v()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L2"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_va_n",
-      "label": "n()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 44,
-      "community_name": "n",
-      "file_type": "code",
-      "norm_label": "n()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_va_v",
@@ -11558,6 +11426,18 @@
       "community_name": "n",
       "file_type": "code",
       "norm_label": "xo()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_xt",
+      "label": "xt()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "n",
+      "file_type": "code",
+      "norm_label": "xt()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -11646,6 +11526,18 @@
       "source_location": "L8"
     },
     {
+      "id": "backend_src_controllers_history_controller_getridehistory",
+      "label": "getRideHistory()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 47,
+      "community_name": "common.validator.js",
+      "file_type": "code",
+      "norm_label": "getridehistory()",
+      "source_file": "backend/src/controllers/history.controller.js",
+      "source_location": "L7"
+    },
+    {
       "id": "backend_src_controllers_rating_controller_ratedriver",
       "label": "rateDriver()",
       "_callable": true,
@@ -11694,54 +11586,6 @@
       "source_location": "L32"
     },
     {
-      "id": "backend_src_controllers_vehicle_controller_createvehicle",
-      "label": "createVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 47,
-      "community_name": "common.validator.js",
-      "file_type": "code",
-      "norm_label": "createvehicle()",
-      "source_file": "backend/src/controllers/vehicle.controller.js",
-      "source_location": "L3"
-    },
-    {
-      "id": "backend_src_controllers_vehicle_controller_deletevehicle",
-      "label": "deleteVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 47,
-      "community_name": "common.validator.js",
-      "file_type": "code",
-      "norm_label": "deletevehicle()",
-      "source_file": "backend/src/controllers/vehicle.controller.js",
-      "source_location": "L56"
-    },
-    {
-      "id": "backend_src_controllers_vehicle_controller_getvehicles",
-      "label": "getVehicles()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 47,
-      "community_name": "common.validator.js",
-      "file_type": "code",
-      "norm_label": "getvehicles()",
-      "source_file": "backend/src/controllers/vehicle.controller.js",
-      "source_location": "L20"
-    },
-    {
-      "id": "backend_src_controllers_vehicle_controller_updatevehicle",
-      "label": "updateVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 47,
-      "community_name": "common.validator.js",
-      "file_type": "code",
-      "norm_label": "updatevehicle()",
-      "source_file": "backend/src/controllers/vehicle.controller.js",
-      "source_location": "L36"
-    },
-    {
       "id": "backend_src_middleware_validate_middleware_validate",
       "label": "validate()",
       "_callable": true,
@@ -11754,16 +11598,28 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_src_middleware_validate_middleware_validateparams",
-      "label": "validateParams()",
+      "id": "backend_src_middleware_validate_middleware_validatequery",
+      "label": "validateQuery()",
       "_callable": true,
       "_origin": "ast",
       "community": 47,
       "community_name": "common.validator.js",
       "file_type": "code",
-      "norm_label": "validateparams()",
+      "norm_label": "validatequery()",
       "source_file": "backend/src/middleware/validate.middleware.js",
-      "source_location": "L17"
+      "source_location": "L33"
+    },
+    {
+      "id": "backend_src_services_history_service_getridehistory",
+      "label": "getRideHistory()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 47,
+      "community_name": "common.validator.js",
+      "file_type": "code",
+      "norm_label": "getridehistory()",
+      "source_file": "backend/src/services/history.service.js",
+      "source_location": "L7"
     },
     {
       "id": "backend_src_validators_rating_validator_validate",
@@ -12906,18 +12762,6 @@
       "source_location": "L107"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ct",
-      "label": "ct()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "ct()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_cu",
       "label": "Cu()",
       "_callable": true,
@@ -12954,18 +12798,6 @@
       "source_location": "L181"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_dp",
-      "label": "dp()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "dp()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_du",
       "label": "Du()",
       "_callable": true,
@@ -12990,18 +12822,6 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_et",
-      "label": "et()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "et()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_eu",
       "label": "Eu()",
       "_callable": true,
@@ -13012,18 +12832,6 @@
       "norm_label": "eu()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_f",
-      "label": "$f()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "$f()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_fm",
@@ -13038,16 +12846,16 @@
       "source_location": "L181"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_fp",
-      "label": "Fp()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_from",
+      "label": "from()",
       "_callable": true,
       "_origin": "ast",
       "community": 49,
       "community_name": "bu",
       "file_type": "code",
-      "norm_label": "fp()",
+      "norm_label": "from()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
+      "source_location": "L103"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_fu",
@@ -13110,30 +12918,6 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ip",
-      "label": "ip()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "ip()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ip_unstable_schedulehydration",
-      "label": ".unstable_scheduleHydration()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": ".unstable_schedulehydration()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_iu",
       "label": "Iu()",
       "_callable": true,
@@ -13146,16 +12930,16 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_je",
-      "label": "je()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_jd",
+      "label": "jd()",
       "_callable": true,
       "_origin": "ast",
       "community": 49,
       "community_name": "bu",
       "file_type": "code",
-      "norm_label": "je()",
+      "norm_label": "jd()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
+      "source_location": "L9"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_jp",
@@ -13182,6 +12966,18 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kd",
+      "label": "kd()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "bu",
+      "file_type": "code",
+      "norm_label": "kd()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L99"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ku",
       "label": "ku()",
       "_callable": true,
@@ -13204,18 +13000,6 @@
       "norm_label": "lu()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_mp",
-      "label": "mp()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "mp()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_mu",
@@ -13302,42 +13086,6 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pp",
-      "label": "pp()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "pp()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pp_n",
-      "label": "n()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "n()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pp_t",
-      "label": "t()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "t()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pu",
       "label": "Pu()",
       "_callable": true,
@@ -13406,6 +13154,18 @@
       "community_name": "bu",
       "file_type": "code",
       "norm_label": "rp()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_sf",
+      "label": "sf()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "bu",
+      "file_type": "code",
+      "norm_label": "sf()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L10"
     },
@@ -13506,18 +13266,6 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_up",
-      "label": "up()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "up()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_vu",
       "label": "vu()",
       "_callable": true,
@@ -13552,18 +13300,6 @@
       "norm_label": "xh()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L182"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_xt",
-      "label": "xt()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "bu",
-      "file_type": "code",
-      "norm_label": "xt()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_xu",
@@ -13626,16 +13362,28 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_al",
-      "label": "Al()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_add",
+      "label": "add()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "i",
       "file_type": "code",
-      "norm_label": "al()",
+      "norm_label": "add()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
+      "source_location": "L67"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_addin",
+      "label": "addIn()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "addin()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L68"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_appendchild",
@@ -13648,6 +13396,18 @@
       "norm_label": "appendchild()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L54"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_bf",
+      "label": "Bf()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "bf()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L107"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_bl",
@@ -13686,28 +13446,28 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_createtestidengine",
-      "label": "_createTestIdEngine()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_delete",
+      "label": "delete()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "i",
       "file_type": "code",
-      "norm_label": "_createtestidengine()",
+      "norm_label": "delete()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L54"
+      "source_location": "L103"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_cs",
-      "label": "cs()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_deletein",
+      "label": "deleteIn()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "i",
       "file_type": "code",
-      "norm_label": "cs()",
+      "norm_label": "deletein()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
+      "source_location": "L68"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_df",
@@ -13734,6 +13494,30 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_dn",
+      "label": "dn()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "dn()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L12"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ec_a",
+      "label": "a()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "a()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L54"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ec_i",
       "label": "i()",
       "_callable": true,
@@ -13744,6 +13528,30 @@
       "norm_label": "i()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L54"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_en",
+      "label": "en()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "en()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_enter",
+      "label": "enter()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "enter()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L53"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_eo",
@@ -13758,14 +13566,62 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ff",
-      "label": "ff()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_exit",
+      "label": "exit()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "i",
       "file_type": "code",
-      "norm_label": "ff()",
+      "norm_label": "exit()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L53"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_fa",
+      "label": "fa()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "fa()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_filteredactions",
+      "label": "filteredActions()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "filteredactions()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L12"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_get",
+      "label": "get()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "get()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L103"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_gf",
+      "label": "gf()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "gf()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L10"
     },
@@ -13780,6 +13636,18 @@
       "norm_label": "gl()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_has",
+      "label": "has()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "has()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L103"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_hf",
@@ -13854,16 +13722,52 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kl",
-      "label": "kl()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kf",
+      "label": "kf()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "i",
       "file_type": "code",
-      "norm_label": "kl()",
+      "norm_label": "kf()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kr",
+      "label": "kr()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "kr()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kr_a",
+      "label": "a()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "a()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L25"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kr_o",
+      "label": "o()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "o()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L27"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_l",
@@ -13876,18 +13780,6 @@
       "norm_label": "l()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L2"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_la",
-      "label": "la()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "i",
-      "file_type": "code",
-      "norm_label": "la()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L53"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_lf",
@@ -13914,16 +13806,16 @@
       "source_location": "L12"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ml",
-      "label": "Ml()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_mf",
+      "label": "Mf()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "i",
       "file_type": "code",
-      "norm_label": "ml()",
+      "norm_label": "mf()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
+      "source_location": "L10"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_nf",
@@ -13950,18 +13842,6 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_np_t",
-      "label": "t()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "i",
-      "file_type": "code",
-      "norm_label": "t()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ol",
       "label": "Ol()",
       "_callable": true,
@@ -13974,30 +13854,6 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_onmessage",
-      "label": "onmessage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "i",
-      "file_type": "code",
-      "norm_label": "onmessage()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L182"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pa",
-      "label": "pa()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "i",
-      "file_type": "code",
-      "norm_label": "pa()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pf",
       "label": "pf()",
       "_callable": true,
@@ -14006,30 +13862,6 @@
       "community_name": "i",
       "file_type": "code",
       "norm_label": "pf()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pl",
-      "label": "Pl()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "i",
-      "file_type": "code",
-      "norm_label": "pl()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pp_e",
-      "label": "e()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "i",
-      "file_type": "code",
-      "norm_label": "e()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L10"
     },
@@ -14058,6 +13890,30 @@
       "source_location": "L10"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_qr",
+      "label": "qr()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "qr()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L29"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_renderactiontree",
+      "label": "renderActionTree()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "renderactiontree()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L12"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_rl",
       "label": "rl()",
       "_callable": true,
@@ -14070,28 +13926,28 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_sa",
-      "label": "sa()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_set",
+      "label": "set()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "i",
       "file_type": "code",
-      "norm_label": "sa()",
+      "norm_label": "set()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
+      "source_location": "L103"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_setupgloballistenersremovaldetection",
-      "label": "_setupGlobalListenersRemovalDetection()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_setin",
+      "label": "setIn()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "i",
       "file_type": "code",
-      "norm_label": "_setupgloballistenersremovaldetection()",
+      "norm_label": "setin()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L63"
+      "source_location": "L68"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_tf",
@@ -14130,18 +13986,6 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ua",
-      "label": "ua()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "i",
-      "file_type": "code",
-      "norm_label": "ua()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L53"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_un",
       "label": "un()",
       "_callable": true,
@@ -14166,6 +14010,18 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_vf",
+      "label": "vf()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "vf()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_vl",
       "label": "vl()",
       "_callable": true,
@@ -14174,6 +14030,18 @@
       "community_name": "i",
       "file_type": "code",
       "norm_label": "vl()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_vo",
+      "label": "Vo()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "vo()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -14246,6 +14114,18 @@
       "community_name": "i",
       "file_type": "code",
       "norm_label": "yl()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_z",
+      "label": "z()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "i",
+      "file_type": "code",
+      "norm_label": "z()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -14584,6 +14464,30 @@
       "norm_label": "whychooseus()",
       "source_file": "frontend/src/Component/Landing/StorySections.jsx",
       "source_location": "L41"
+    },
+    {
+      "id": "frontend_src_component_landing_vehicleshowcase_imagefor",
+      "label": "imageFor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "Home.jsx",
+      "file_type": "code",
+      "norm_label": "imagefor()",
+      "source_file": "frontend/src/Component/Landing/VehicleShowcase.jsx",
+      "source_location": "L11"
+    },
+    {
+      "id": "frontend_src_component_landing_vehicleshowcase_vehicleshowcase",
+      "label": "VehicleShowcase()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 52,
+      "community_name": "Home.jsx",
+      "file_type": "code",
+      "norm_label": "vehicleshowcase()",
+      "source_file": "frontend/src/Component/Landing/VehicleShowcase.jsx",
+      "source_location": "L30"
     },
     {
       "id": "frontend_src_components_ai_aiassistant_aiassistant",
@@ -16698,6 +16602,18 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_bn",
+      "label": "bn()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "bn()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_c",
       "label": "C()",
       "_callable": true,
@@ -16756,6 +16672,30 @@
       "norm_label": "co()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L53"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_cs",
+      "label": "cs()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "cs()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_d",
+      "label": "D()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "d()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L2"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_da",
@@ -16866,6 +16806,18 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ff",
+      "label": "ff()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "ff()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_fi",
       "label": "fi()",
       "_callable": true,
@@ -16902,28 +16854,16 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_generateselectors",
-      "label": "_generateSelectors()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_getobject",
+      "label": "getObject()",
       "_callable": true,
       "_origin": "ast",
       "community": 62,
       "community_name": "ic",
       "file_type": "code",
-      "norm_label": "_generateselectors()",
+      "norm_label": "getobject()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L59"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_generateselectorsimple",
-      "label": "generateSelectorSimple()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 62,
-      "community_name": "ic",
-      "file_type": "code",
-      "norm_label": "generateselectorsimple()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L54"
+      "source_location": "L2"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_gi",
@@ -16970,6 +16910,18 @@
       "community_name": "ic",
       "file_type": "code",
       "norm_label": "hi()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_hn",
+      "label": "Hn()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "hn()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -17034,14 +16986,14 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_it",
-      "label": "it()",
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_io",
+      "label": "io()",
       "_callable": true,
       "_origin": "ast",
       "community": 62,
       "community_name": "ic",
       "file_type": "code",
-      "norm_label": "it()",
+      "norm_label": "io()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -17238,6 +17190,18 @@
       "source_location": "L9"
     },
     {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_np_t",
+      "label": "t()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "t()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
+    },
+    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_oc",
       "label": "Oc()",
       "_callable": true,
@@ -17248,6 +17212,18 @@
       "norm_label": "oc()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_onmessage",
+      "label": "onmessage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "onmessage()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L182"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_oo",
@@ -17308,6 +17284,18 @@
       "norm_label": "po()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_pp_e",
+      "label": "e()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "e()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L10"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ps",
@@ -17380,6 +17368,42 @@
       "norm_label": "rf()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L10"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ro",
+      "label": "Ro()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "ro()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_setobject",
+      "label": "setObject()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "setobject()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L2"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_setupgloballistenersremovaldetection",
+      "label": "_setupGlobalListenersRemovalDetection()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "_setupgloballistenersremovaldetection()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L63"
     },
     {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_sl",
@@ -17462,18 +17486,6 @@
       "community_name": "ic",
       "file_type": "code",
       "norm_label": "uo()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_va_a",
-      "label": "a()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 62,
-      "community_name": "ic",
-      "file_type": "code",
-      "norm_label": "a()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -17586,18 +17598,6 @@
       "source_location": "L9"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_ya",
-      "label": "ya()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 62,
-      "community_name": "ic",
-      "file_type": "code",
-      "norm_label": "ya()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
       "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_yc",
       "label": "yc()",
       "_callable": true,
@@ -17630,6 +17630,18 @@
       "community_name": "ic",
       "file_type": "code",
       "norm_label": "ys()",
+      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_zo",
+      "label": "zo()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "ic",
+      "file_type": "code",
+      "norm_label": "zo()",
       "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
       "source_location": "L9"
     },
@@ -20862,6 +20874,18 @@
       "source_location": "L10"
     },
     {
+      "id": "frontend_src_pages_driver_driverbookings_driverbookings",
+      "label": "DriverBookings()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 78,
+      "community_name": "Skeleton.jsx",
+      "file_type": "code",
+      "norm_label": "driverbookings()",
+      "source_file": "frontend/src/Pages/driver/DriverBookings.jsx",
+      "source_location": "L27"
+    },
+    {
       "id": "frontend_src_pages_driver_driverhistory_driverhistory",
       "label": "DriverHistory()",
       "_callable": true,
@@ -20934,16 +20958,148 @@
       "source_location": "L14"
     },
     {
+      "id": "backend_src_controllers_dispatch_controller_acceptbooking",
+      "label": "acceptBooking()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "acceptbooking()",
+      "source_file": "backend/src/controllers/dispatch.controller.js",
+      "source_location": "L34"
+    },
+    {
+      "id": "backend_src_controllers_dispatch_controller_dispatchbooking",
+      "label": "dispatchBooking()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "dispatchbooking()",
+      "source_file": "backend/src/controllers/dispatch.controller.js",
+      "source_location": "L7"
+    },
+    {
+      "id": "backend_src_controllers_dispatch_controller_handledrivertimeout",
+      "label": "handleDriverTimeout()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "handledrivertimeout()",
+      "source_file": "backend/src/controllers/dispatch.controller.js",
+      "source_location": "L111"
+    },
+    {
+      "id": "backend_src_controllers_dispatch_controller_rejectbooking",
+      "label": "rejectBooking()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "rejectbooking()",
+      "source_file": "backend/src/controllers/dispatch.controller.js",
+      "source_location": "L60"
+    },
+    {
+      "id": "backend_src_controllers_dispatch_controller_sendtonextdriver",
+      "label": "sendToNextDriver()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "sendtonextdriver()",
+      "source_file": "backend/src/controllers/dispatch.controller.js",
+      "source_location": "L86"
+    },
+    {
       "id": "backend_src_controllers_invoice_controller_downloadinvoice",
       "label": "downloadInvoice()",
       "_callable": true,
       "_origin": "ast",
       "community": 81,
-      "community_name": "invoice.service.js",
+      "community_name": "vehicle.routes.js",
       "file_type": "code",
       "norm_label": "downloadinvoice()",
       "source_file": "backend/src/controllers/invoice.controller.js",
       "source_location": "L7"
+    },
+    {
+      "id": "backend_src_controllers_vehicle_controller_createvehicle",
+      "label": "createVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "createvehicle()",
+      "source_file": "backend/src/controllers/vehicle.controller.js",
+      "source_location": "L3"
+    },
+    {
+      "id": "backend_src_controllers_vehicle_controller_deletevehicle",
+      "label": "deleteVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "deletevehicle()",
+      "source_file": "backend/src/controllers/vehicle.controller.js",
+      "source_location": "L56"
+    },
+    {
+      "id": "backend_src_controllers_vehicle_controller_getvehicles",
+      "label": "getVehicles()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "getvehicles()",
+      "source_file": "backend/src/controllers/vehicle.controller.js",
+      "source_location": "L20"
+    },
+    {
+      "id": "backend_src_controllers_vehicle_controller_updatevehicle",
+      "label": "updateVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "updatevehicle()",
+      "source_file": "backend/src/controllers/vehicle.controller.js",
+      "source_location": "L36"
+    },
+    {
+      "id": "backend_src_middleware_role_middleware_authorize",
+      "label": "authorize()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "authorize()",
+      "source_file": "backend/src/middleware/role.middleware.js",
+      "source_location": "L5"
+    },
+    {
+      "id": "backend_src_middleware_validate_middleware_validateparams",
+      "label": "validateParams()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "validateparams()",
+      "source_file": "backend/src/middleware/validate.middleware.js",
+      "source_location": "L17"
     },
     {
       "id": "backend_src_services_invoice_service_generateinvoice",
@@ -20951,7 +21107,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 81,
-      "community_name": "invoice.service.js",
+      "community_name": "vehicle.routes.js",
       "file_type": "code",
       "norm_label": "generateinvoice()",
       "source_file": "backend/src/services/invoice.service.js",
@@ -22746,66 +22902,6 @@
       "source_location": "L63"
     },
     {
-      "id": "backend_src_controllers_dispatch_controller_acceptbooking",
-      "label": "acceptBooking()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 90,
-      "community_name": "auth.middleware.js",
-      "file_type": "code",
-      "norm_label": "acceptbooking()",
-      "source_file": "backend/src/controllers/dispatch.controller.js",
-      "source_location": "L34"
-    },
-    {
-      "id": "backend_src_controllers_dispatch_controller_dispatchbooking",
-      "label": "dispatchBooking()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 90,
-      "community_name": "auth.middleware.js",
-      "file_type": "code",
-      "norm_label": "dispatchbooking()",
-      "source_file": "backend/src/controllers/dispatch.controller.js",
-      "source_location": "L7"
-    },
-    {
-      "id": "backend_src_controllers_dispatch_controller_handledrivertimeout",
-      "label": "handleDriverTimeout()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 90,
-      "community_name": "auth.middleware.js",
-      "file_type": "code",
-      "norm_label": "handledrivertimeout()",
-      "source_file": "backend/src/controllers/dispatch.controller.js",
-      "source_location": "L111"
-    },
-    {
-      "id": "backend_src_controllers_dispatch_controller_rejectbooking",
-      "label": "rejectBooking()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 90,
-      "community_name": "auth.middleware.js",
-      "file_type": "code",
-      "norm_label": "rejectbooking()",
-      "source_file": "backend/src/controllers/dispatch.controller.js",
-      "source_location": "L60"
-    },
-    {
-      "id": "backend_src_controllers_dispatch_controller_sendtonextdriver",
-      "label": "sendToNextDriver()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 90,
-      "community_name": "auth.middleware.js",
-      "file_type": "code",
-      "norm_label": "sendtonextdriver()",
-      "source_file": "backend/src/controllers/dispatch.controller.js",
-      "source_location": "L86"
-    },
-    {
       "id": "backend_src_controllers_driverstatus_controller_getdriverperformance",
       "label": "getDriverPerformance()",
       "_callable": true,
@@ -23286,18 +23382,6 @@
       "source_location": "L68"
     },
     {
-      "id": "frontend_src_components_shared_farenotes_farenotes",
-      "label": "FareNotes()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 95,
-      "community_name": "BookRide.jsx",
-      "file_type": "code",
-      "norm_label": "farenotes()",
-      "source_file": "frontend/src/components/shared/FareNotes.jsx",
-      "source_location": "L35"
-    },
-    {
       "id": "frontend_src_pages_customer_bookride_bookride",
       "label": "BookRide()",
       "_callable": true,
@@ -23742,90 +23826,6 @@
       "source_location": "L165"
     },
     {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_d",
-      "label": "D()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 99,
-      "community_name": "D",
-      "file_type": "code",
-      "norm_label": "d()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L2"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_from",
-      "label": "from()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 99,
-      "community_name": "D",
-      "file_type": "code",
-      "norm_label": "from()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L103"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_getobject",
-      "label": "getObject()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 99,
-      "community_name": "D",
-      "file_type": "code",
-      "norm_label": "getobject()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L2"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_jd",
-      "label": "jd()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 99,
-      "community_name": "D",
-      "file_type": "code",
-      "norm_label": "jd()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_kd",
-      "label": "kd()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 99,
-      "community_name": "D",
-      "file_type": "code",
-      "norm_label": "kd()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L99"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_setobject",
-      "label": "setObject()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 99,
-      "community_name": "D",
-      "file_type": "code",
-      "norm_label": "setobject()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L2"
-    },
-    {
-      "id": "playwright_report_trace_assets_defaultsettingsview_ds6cboo0_sf",
-      "label": "sf()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 99,
-      "community_name": "D",
-      "file_type": "code",
-      "norm_label": "sf()",
-      "source_file": "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js",
-      "source_location": "L10"
-    },
-    {
       "id": "backend_src_controllers_webhook_controller",
       "label": "webhook.controller.js",
       "_origin": "ast",
@@ -23991,6 +23991,50 @@
       "source_location": "L1"
     },
     {
+      "id": "frontend_src_component_navbar_navbar",
+      "label": "Navbar.jsx",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SEO.jsx",
+      "file_type": "code",
+      "norm_label": "navbar.jsx",
+      "source_file": "frontend/src/Component/Navbar/Navbar.jsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_component_navbar_navbar_dashboard_routes",
+      "label": "DASHBOARD_ROUTES",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SEO.jsx",
+      "file_type": "code",
+      "norm_label": "dashboard_routes",
+      "source_file": "frontend/src/Component/Navbar/Navbar.jsx",
+      "source_location": "L23"
+    },
+    {
+      "id": "frontend_src_component_navbar_navbar_notif_routes",
+      "label": "NOTIF_ROUTES",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SEO.jsx",
+      "file_type": "code",
+      "norm_label": "notif_routes",
+      "source_file": "frontend/src/Component/Navbar/Navbar.jsx",
+      "source_location": "L35"
+    },
+    {
+      "id": "frontend_src_component_navbar_navbar_profile_routes",
+      "label": "PROFILE_ROUTES",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SEO.jsx",
+      "file_type": "code",
+      "norm_label": "profile_routes",
+      "source_file": "frontend/src/Component/Navbar/Navbar.jsx",
+      "source_location": "L29"
+    },
+    {
       "id": "frontend_src_components_seo",
       "label": "SEO.jsx",
       "_origin": "ast",
@@ -24000,6 +24044,28 @@
       "norm_label": "seo.jsx",
       "source_file": "frontend/src/components/SEO.jsx",
       "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_components_shared_farenotes",
+      "label": "FareNotes.jsx",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SEO.jsx",
+      "file_type": "code",
+      "norm_label": "farenotes.jsx",
+      "source_file": "frontend/src/components/shared/FareNotes.jsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_components_shared_farenotes_notes",
+      "label": "NOTES",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SEO.jsx",
+      "file_type": "code",
+      "norm_label": "notes",
+      "source_file": "frontend/src/components/shared/FareNotes.jsx",
+      "source_location": "L4"
     },
     {
       "id": "frontend_src_pages_aboutus_about",
@@ -24288,6 +24354,17 @@
       "source_location": "L1"
     },
     {
+      "id": "frontend_src_pages_guest_confirmpage",
+      "label": "ConfirmPage.jsx",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SEO.jsx",
+      "file_type": "code",
+      "norm_label": "confirmpage.jsx",
+      "source_file": "frontend/src/Pages/guest/ConfirmPage.jsx",
+      "source_location": "L1"
+    },
+    {
       "id": "frontend_src_pages_guest_guestbookingpage",
       "label": "GuestBookingPage.jsx",
       "_origin": "ast",
@@ -24572,6 +24649,17 @@
       "norm_label": "authapi",
       "source_file": "frontend/src/services/endpoints.js",
       "source_location": "L4"
+    },
+    {
+      "id": "frontend_src_services_endpoints_guestapi",
+      "label": "guestAPI",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "SEO.jsx",
+      "file_type": "code",
+      "norm_label": "guestapi",
+      "source_file": "frontend/src/services/endpoints.js",
+      "source_location": "L25"
     },
     {
       "id": "frontend_src_services_endpoints_vehicleapi",
@@ -24980,17 +25068,6 @@
       "source_location": "L17"
     },
     {
-      "id": "frontend_package_dependencies_lucide_react",
-      "label": "lucide-react",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "dependencies",
-      "file_type": "code",
-      "norm_label": "lucide-react",
-      "source_file": "frontend/package.json",
-      "source_location": "L18"
-    },
-    {
       "id": "frontend_package_dependencies_react",
       "label": "react",
       "_origin": "ast",
@@ -25011,6 +25088,17 @@
       "norm_label": "react-dom",
       "source_file": "frontend/package.json",
       "source_location": "L20"
+    },
+    {
+      "id": "frontend_package_dependencies_react_google_maps_api",
+      "label": "@react-google-maps/api",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "dependencies",
+      "file_type": "code",
+      "norm_label": "@react-google-maps/api",
+      "source_file": "frontend/package.json",
+      "source_location": "L13"
     },
     {
       "id": "frontend_package_dependencies_react_icons",
@@ -25079,17 +25167,6 @@
       "source_location": "L16"
     },
     {
-      "id": "lucide_react",
-      "label": "lucide-react",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "dependencies",
-      "file_type": "concept",
-      "norm_label": "lucide-react",
-      "source_file": "frontend/package.json",
-      "source_location": "L18"
-    },
-    {
       "id": "react",
       "label": "react",
       "_origin": "ast",
@@ -25110,6 +25187,17 @@
       "norm_label": "react-dom",
       "source_file": "frontend/package.json",
       "source_location": "L20"
+    },
+    {
+      "id": "react_google_maps_api",
+      "label": "@react-google-maps/api",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "dependencies",
+      "file_type": "concept",
+      "norm_label": "@react-google-maps/api",
+      "source_file": "frontend/package.json",
+      "source_location": "L13"
     },
     {
       "id": "react_icons",
@@ -25178,70 +25266,92 @@
       "source_location": "L65"
     },
     {
-      "id": "backend_package_dependencies_express_rate_limit",
-      "label": "express-rate-limit",
+      "id": "backend_package_jest_modulefileextensions",
+      "label": "moduleFileExtensions",
       "_origin": "ast",
       "community": 122,
-      "community_name": "express-rate-limit",
+      "community_name": "moduleFileExtensions",
       "file_type": "code",
-      "norm_label": "express-rate-limit",
+      "norm_label": "modulefileextensions",
       "source_file": "backend/package.json",
-      "source_location": "L66"
+      "source_location": "L30"
     },
     {
-      "id": "express_rate_limit",
-      "label": "express-rate-limit",
+      "id": "ref_js",
+      "label": "js",
       "_origin": "ast",
       "community": 122,
-      "community_name": "express-rate-limit",
+      "community_name": "moduleFileExtensions",
       "file_type": "concept",
-      "norm_label": "express-rate-limit",
+      "norm_label": "js",
       "source_file": "backend/package.json",
-      "source_location": "L66"
+      "source_location": "L30"
     },
     {
-      "id": "backend_package_dependencies_bcryptjs",
-      "label": "bcryptjs",
+      "id": "ref_json",
+      "label": "json",
+      "_origin": "ast",
+      "community": 122,
+      "community_name": "moduleFileExtensions",
+      "file_type": "concept",
+      "norm_label": "json",
+      "source_file": "backend/package.json",
+      "source_location": "L30"
+    },
+    {
+      "id": "ref_mjs",
+      "label": "mjs",
+      "_origin": "ast",
+      "community": 122,
+      "community_name": "moduleFileExtensions",
+      "file_type": "concept",
+      "norm_label": "mjs",
+      "source_file": "backend/package.json",
+      "source_location": "L30"
+    },
+    {
+      "id": "backend_package_dependencies_express_validator",
+      "label": "express-validator",
       "_origin": "ast",
       "community": 124,
-      "community_name": "bcryptjs",
+      "community_name": "express-validator",
       "file_type": "code",
-      "norm_label": "bcryptjs",
+      "norm_label": "express-validator",
       "source_file": "backend/package.json",
-      "source_location": "L58"
+      "source_location": "L67"
     },
     {
-      "id": "bcryptjs",
-      "label": "bcryptjs",
+      "id": "express_validator",
+      "label": "express-validator",
       "_origin": "ast",
       "community": 124,
-      "community_name": "bcryptjs",
+      "community_name": "express-validator",
       "file_type": "concept",
-      "norm_label": "bcryptjs",
+      "norm_label": "express-validator",
       "source_file": "backend/package.json",
-      "source_location": "L58"
+      "source_location": "L67"
     },
     {
-      "id": "backend_package_dependencies_dotenv",
-      "label": "dotenv",
+      "id": "backend_package_dependencies_ioredis",
+      "label": "ioredis",
       "_origin": "ast",
       "community": 125,
-      "community_name": "dotenv",
+      "community_name": "ioredis",
       "file_type": "code",
-      "norm_label": "dotenv",
+      "norm_label": "ioredis",
       "source_file": "backend/package.json",
-      "source_location": "L64"
+      "source_location": "L69"
     },
     {
-      "id": "dotenv",
-      "label": "dotenv",
+      "id": "ioredis",
+      "label": "ioredis",
       "_origin": "ast",
       "community": 125,
-      "community_name": "dotenv",
+      "community_name": "ioredis",
       "file_type": "concept",
-      "norm_label": "dotenv",
+      "norm_label": "ioredis",
       "source_file": "backend/package.json",
-      "source_location": "L64"
+      "source_location": "L69"
     },
     {
       "id": "backend_package_dependencies_nodemailer",
@@ -25288,26 +25398,26 @@
       "source_location": "L77"
     },
     {
-      "id": "backend_package_dependencies_multer",
-      "label": "multer",
+      "id": "backend_package_dependencies_mongoose",
+      "label": "mongoose",
       "_origin": "ast",
       "community": 128,
-      "community_name": "multer",
+      "community_name": "mongoose",
       "file_type": "code",
-      "norm_label": "multer",
+      "norm_label": "mongoose",
       "source_file": "backend/package.json",
-      "source_location": "L73"
+      "source_location": "L71"
     },
     {
-      "id": "multer",
-      "label": "multer",
+      "id": "mongoose",
+      "label": "mongoose",
       "_origin": "ast",
       "community": 128,
-      "community_name": "multer",
+      "community_name": "mongoose",
       "file_type": "concept",
-      "norm_label": "multer",
+      "norm_label": "mongoose",
       "source_file": "backend/package.json",
-      "source_location": "L73"
+      "source_location": "L71"
     },
     {
       "id": "backend_package_dependencies_zod",
@@ -25475,48 +25585,70 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_package_dependencies_pdfkit",
-      "label": "pdfkit",
+      "id": "backend_package_dependencies_morgan",
+      "label": "morgan",
       "_origin": "ast",
       "community": 130,
-      "community_name": "pdfkit",
+      "community_name": "morgan",
       "file_type": "code",
-      "norm_label": "pdfkit",
+      "norm_label": "morgan",
       "source_file": "backend/package.json",
-      "source_location": "L75"
+      "source_location": "L72"
     },
     {
-      "id": "pdfkit",
-      "label": "pdfkit",
+      "id": "morgan",
+      "label": "morgan",
       "_origin": "ast",
       "community": 130,
-      "community_name": "pdfkit",
+      "community_name": "morgan",
       "file_type": "concept",
-      "norm_label": "pdfkit",
+      "norm_label": "morgan",
       "source_file": "backend/package.json",
-      "source_location": "L75"
+      "source_location": "L72"
     },
     {
-      "id": "frontend_package_dependencies_react_google_maps_api",
-      "label": "@react-google-maps/api",
+      "id": "backend_package_dependencies_socket_io_redis_adapter",
+      "label": "@socket.io/redis-adapter",
       "_origin": "ast",
       "community": 131,
-      "community_name": "@react-google-maps/api",
+      "community_name": "@socket.io/redis-adapter",
       "file_type": "code",
-      "norm_label": "@react-google-maps/api",
-      "source_file": "frontend/package.json",
-      "source_location": "L13"
+      "norm_label": "@socket.io/redis-adapter",
+      "source_file": "backend/package.json",
+      "source_location": "L56"
     },
     {
-      "id": "react_google_maps_api",
-      "label": "@react-google-maps/api",
+      "id": "socket_io_redis_adapter",
+      "label": "@socket.io/redis-adapter",
       "_origin": "ast",
       "community": 131,
-      "community_name": "@react-google-maps/api",
+      "community_name": "@socket.io/redis-adapter",
       "file_type": "concept",
-      "norm_label": "@react-google-maps/api",
+      "norm_label": "@socket.io/redis-adapter",
+      "source_file": "backend/package.json",
+      "source_location": "L56"
+    },
+    {
+      "id": "frontend_package_dependencies_lucide_react",
+      "label": "lucide-react",
+      "_origin": "ast",
+      "community": 132,
+      "community_name": "lucide-react",
+      "file_type": "code",
+      "norm_label": "lucide-react",
       "source_file": "frontend/package.json",
-      "source_location": "L13"
+      "source_location": "L18"
+    },
+    {
+      "id": "lucide_react",
+      "label": "lucide-react",
+      "_origin": "ast",
+      "community": 132,
+      "community_name": "lucide-react",
+      "file_type": "concept",
+      "norm_label": "lucide-react",
+      "source_file": "frontend/package.json",
+      "source_location": "L18"
     },
     {
       "id": "backend_src_models_favoritelocation",
@@ -26003,17 +26135,6 @@
       "source_location": "L21"
     },
     {
-      "id": "backend_package_jest_modulefileextensions",
-      "label": "moduleFileExtensions",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "jest",
-      "file_type": "code",
-      "norm_label": "modulefileextensions",
-      "source_file": "backend/package.json",
-      "source_location": "L30"
-    },
-    {
       "id": "backend_package_jest_setupfiles",
       "label": "setupFiles",
       "_origin": "ast",
@@ -26078,39 +26199,6 @@
       "norm_label": "^.+\\\\.js$",
       "source_file": "backend/package.json",
       "source_location": "L28"
-    },
-    {
-      "id": "ref_js",
-      "label": "js",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "jest",
-      "file_type": "concept",
-      "norm_label": "js",
-      "source_file": "backend/package.json",
-      "source_location": "L30"
-    },
-    {
-      "id": "ref_json",
-      "label": "json",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "jest",
-      "file_type": "concept",
-      "norm_label": "json",
-      "source_file": "backend/package.json",
-      "source_location": "L30"
-    },
-    {
-      "id": "ref_mjs",
-      "label": "mjs",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "jest",
-      "file_type": "concept",
-      "norm_label": "mjs",
-      "source_file": "backend/package.json",
-      "source_location": "L30"
     },
     {
       "id": "ref_node_modules_axios_supertest",
@@ -26509,17 +26597,6 @@
       "source_location": "L61"
     },
     {
-      "id": "frontend_src_app_driverbookings",
-      "label": "DriverBookings",
-      "_origin": "ast",
-      "community": 24,
-      "community_name": "useSocket",
-      "file_type": "code",
-      "norm_label": "driverbookings",
-      "source_file": "frontend/src/App.jsx",
-      "source_location": "L60"
-    },
-    {
       "id": "frontend_src_components_shared_cancelreasondialog",
       "label": "CancelReasonDialog.jsx",
       "_origin": "ast",
@@ -26738,39 +26815,6 @@
       "norm_label": "driverbookingdetail.jsx",
       "source_file": "frontend/src/Pages/driver/DriverBookingDetail.jsx",
       "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_pages_driver_driverbookings",
-      "label": "DriverBookings.jsx",
-      "_origin": "ast",
-      "community": 24,
-      "community_name": "useSocket",
-      "file_type": "code",
-      "norm_label": "driverbookings.jsx",
-      "source_file": "frontend/src/Pages/driver/DriverBookings.jsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_pages_driver_driverbookings_pay_tabs",
-      "label": "PAY_TABS",
-      "_origin": "ast",
-      "community": 24,
-      "community_name": "useSocket",
-      "file_type": "code",
-      "norm_label": "pay_tabs",
-      "source_file": "frontend/src/Pages/driver/DriverBookings.jsx",
-      "source_location": "L15"
-    },
-    {
-      "id": "frontend_src_pages_driver_driverbookings_sorts",
-      "label": "SORTS",
-      "_origin": "ast",
-      "community": 24,
-      "community_name": "useSocket",
-      "file_type": "code",
-      "norm_label": "sorts",
-      "source_file": "frontend/src/Pages/driver/DriverBookings.jsx",
-      "source_location": "L21"
     },
     {
       "id": "frontend_src_services_endpoints_bookingapi",
@@ -27394,6 +27438,17 @@
       "source_location": "L57"
     },
     {
+      "id": "backend_package_dependencies_bcryptjs",
+      "label": "bcryptjs",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "dependencies",
+      "file_type": "code",
+      "norm_label": "bcryptjs",
+      "source_file": "backend/package.json",
+      "source_location": "L58"
+    },
+    {
       "id": "backend_package_dependencies_cloudinary",
       "label": "cloudinary",
       "_origin": "ast",
@@ -27449,15 +27504,26 @@
       "source_location": "L63"
     },
     {
-      "id": "backend_package_dependencies_express_validator",
-      "label": "express-validator",
+      "id": "backend_package_dependencies_dotenv",
+      "label": "dotenv",
       "_origin": "ast",
       "community": 4,
       "community_name": "dependencies",
       "file_type": "code",
-      "norm_label": "express-validator",
+      "norm_label": "dotenv",
       "source_file": "backend/package.json",
-      "source_location": "L67"
+      "source_location": "L64"
+    },
+    {
+      "id": "backend_package_dependencies_express_rate_limit",
+      "label": "express-rate-limit",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "dependencies",
+      "file_type": "code",
+      "norm_label": "express-rate-limit",
+      "source_file": "backend/package.json",
+      "source_location": "L66"
     },
     {
       "id": "backend_package_dependencies_helmet",
@@ -27471,17 +27537,6 @@
       "source_location": "L68"
     },
     {
-      "id": "backend_package_dependencies_ioredis",
-      "label": "ioredis",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "dependencies",
-      "file_type": "code",
-      "norm_label": "ioredis",
-      "source_file": "backend/package.json",
-      "source_location": "L69"
-    },
-    {
       "id": "backend_package_dependencies_jsonwebtoken",
       "label": "jsonwebtoken",
       "_origin": "ast",
@@ -27493,26 +27548,26 @@
       "source_location": "L70"
     },
     {
-      "id": "backend_package_dependencies_mongoose",
-      "label": "mongoose",
+      "id": "backend_package_dependencies_multer",
+      "label": "multer",
       "_origin": "ast",
       "community": 4,
       "community_name": "dependencies",
       "file_type": "code",
-      "norm_label": "mongoose",
+      "norm_label": "multer",
       "source_file": "backend/package.json",
-      "source_location": "L71"
+      "source_location": "L73"
     },
     {
-      "id": "backend_package_dependencies_morgan",
-      "label": "morgan",
+      "id": "backend_package_dependencies_pdfkit",
+      "label": "pdfkit",
       "_origin": "ast",
       "community": 4,
       "community_name": "dependencies",
       "file_type": "code",
-      "norm_label": "morgan",
+      "norm_label": "pdfkit",
       "source_file": "backend/package.json",
-      "source_location": "L72"
+      "source_location": "L75"
     },
     {
       "id": "backend_package_dependencies_razorpay",
@@ -27524,17 +27579,6 @@
       "norm_label": "razorpay",
       "source_file": "backend/package.json",
       "source_location": "L76"
-    },
-    {
-      "id": "backend_package_dependencies_socket_io_redis_adapter",
-      "label": "@socket.io/redis-adapter",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "dependencies",
-      "file_type": "code",
-      "norm_label": "@socket.io/redis-adapter",
-      "source_file": "backend/package.json",
-      "source_location": "L56"
     },
     {
       "id": "backend_package_dependencies_web_push",
@@ -27568,6 +27612,17 @@
       "norm_label": "web-push",
       "source_file": "backend/package.json",
       "source_location": "L78"
+    },
+    {
+      "id": "bcryptjs",
+      "label": "bcryptjs",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "dependencies",
+      "file_type": "concept",
+      "norm_label": "bcryptjs",
+      "source_file": "backend/package.json",
+      "source_location": "L58"
     },
     {
       "id": "cloudinary",
@@ -27625,15 +27680,26 @@
       "source_location": "L63"
     },
     {
-      "id": "express_validator",
-      "label": "express-validator",
+      "id": "dotenv",
+      "label": "dotenv",
       "_origin": "ast",
       "community": 4,
       "community_name": "dependencies",
       "file_type": "concept",
-      "norm_label": "express-validator",
+      "norm_label": "dotenv",
       "source_file": "backend/package.json",
-      "source_location": "L67"
+      "source_location": "L64"
+    },
+    {
+      "id": "express_rate_limit",
+      "label": "express-rate-limit",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "dependencies",
+      "file_type": "concept",
+      "norm_label": "express-rate-limit",
+      "source_file": "backend/package.json",
+      "source_location": "L66"
     },
     {
       "id": "helmet",
@@ -27647,17 +27713,6 @@
       "source_location": "L68"
     },
     {
-      "id": "ioredis",
-      "label": "ioredis",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "dependencies",
-      "file_type": "concept",
-      "norm_label": "ioredis",
-      "source_file": "backend/package.json",
-      "source_location": "L69"
-    },
-    {
       "id": "jsonwebtoken",
       "label": "jsonwebtoken",
       "_origin": "ast",
@@ -27669,26 +27724,26 @@
       "source_location": "L70"
     },
     {
-      "id": "mongoose",
-      "label": "mongoose",
+      "id": "multer",
+      "label": "multer",
       "_origin": "ast",
       "community": 4,
       "community_name": "dependencies",
       "file_type": "concept",
-      "norm_label": "mongoose",
+      "norm_label": "multer",
       "source_file": "backend/package.json",
-      "source_location": "L71"
+      "source_location": "L73"
     },
     {
-      "id": "morgan",
-      "label": "morgan",
+      "id": "pdfkit",
+      "label": "pdfkit",
       "_origin": "ast",
       "community": 4,
       "community_name": "dependencies",
       "file_type": "concept",
-      "norm_label": "morgan",
+      "norm_label": "pdfkit",
       "source_file": "backend/package.json",
-      "source_location": "L72"
+      "source_location": "L75"
     },
     {
       "id": "razorpay",
@@ -27702,47 +27757,14 @@
       "source_location": "L76"
     },
     {
-      "id": "socket_io_redis_adapter",
-      "label": "@socket.io/redis-adapter",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "dependencies",
-      "file_type": "concept",
-      "norm_label": "@socket.io/redis-adapter",
-      "source_file": "backend/package.json",
-      "source_location": "L56"
-    },
-    {
-      "id": "frontend_src_app_confirmpage",
-      "label": "ConfirmPage",
-      "_origin": "ast",
-      "community": 40,
-      "community_name": "ConfirmPage.jsx",
-      "file_type": "code",
-      "norm_label": "confirmpage",
-      "source_file": "frontend/src/App.jsx",
-      "source_location": "L16"
-    },
-    {
       "id": "frontend_src_component_hero_hero",
       "label": "Hero.jsx",
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "hero.jsx",
       "source_file": "frontend/src/Component/Hero/Hero.jsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_pages_guest_confirmpage",
-      "label": "ConfirmPage.jsx",
-      "_origin": "ast",
-      "community": 40,
-      "community_name": "ConfirmPage.jsx",
-      "file_type": "code",
-      "norm_label": "confirmpage.jsx",
-      "source_file": "frontend/src/Pages/guest/ConfirmPage.jsx",
       "source_location": "L1"
     },
     {
@@ -27750,7 +27772,7 @@
       "label": "GuestBookingForm.jsx",
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "guestbookingform.jsx",
       "source_file": "frontend/src/Pages/guest/GuestBookingForm.jsx",
@@ -27761,22 +27783,11 @@
       "label": "guestDraft.js",
       "_origin": "ast",
       "community": 40,
-      "community_name": "ConfirmPage.jsx",
+      "community_name": "GuestBookingForm.jsx",
       "file_type": "code",
       "norm_label": "guestdraft.js",
       "source_file": "frontend/src/Pages/guest/guestDraft.js",
       "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_services_endpoints_guestapi",
-      "label": "guestAPI",
-      "_origin": "ast",
-      "community": 40,
-      "community_name": "ConfirmPage.jsx",
-      "file_type": "code",
-      "norm_label": "guestapi",
-      "source_file": "frontend/src/services/endpoints.js",
-      "source_location": "L25"
     },
     {
       "id": "frontend_src_providers_queryprovider",
@@ -27801,17 +27812,6 @@
       "source_location": "L10"
     },
     {
-      "id": "backend_src_controllers_history_controller",
-      "label": "history.controller.js",
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "user.routes.js",
-      "file_type": "code",
-      "norm_label": "history.controller.js",
-      "source_file": "backend/src/controllers/history.controller.js",
-      "source_location": "L1"
-    },
-    {
       "id": "backend_src_controllers_user_controller",
       "label": "user.controller.js",
       "_origin": "ast",
@@ -27821,39 +27821,6 @@
       "norm_label": "user.controller.js",
       "source_file": "backend/src/controllers/user.controller.js",
       "source_location": "L1"
-    },
-    {
-      "id": "backend_src_middleware_role_middleware",
-      "label": "role.middleware.js",
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "user.routes.js",
-      "file_type": "code",
-      "norm_label": "role.middleware.js",
-      "source_file": "backend/src/middleware/role.middleware.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_routes_history_routes",
-      "label": "history.routes.js",
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "user.routes.js",
-      "file_type": "code",
-      "norm_label": "history.routes.js",
-      "source_file": "backend/src/routes/history.routes.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_routes_history_routes_router",
-      "label": "router",
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "user.routes.js",
-      "file_type": "code",
-      "norm_label": "router",
-      "source_file": "backend/src/routes/history.routes.js",
-      "source_location": "L8"
     },
     {
       "id": "backend_src_routes_user_routes",
@@ -27878,17 +27845,6 @@
       "source_location": "L13"
     },
     {
-      "id": "backend_src_services_history_service",
-      "label": "history.service.js",
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "user.routes.js",
-      "file_type": "code",
-      "norm_label": "history.service.js",
-      "source_file": "backend/src/services/history.service.js",
-      "source_location": "L1"
-    },
-    {
       "id": "backend_src_services_user_service",
       "label": "user.service.js",
       "_origin": "ast",
@@ -27898,17 +27854,6 @@
       "norm_label": "user.service.js",
       "source_file": "backend/src/services/user.service.js",
       "source_location": "L1"
-    },
-    {
-      "id": "backend_src_validators_common_validator_paginationqueryschema",
-      "label": "paginationQuerySchema",
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "user.routes.js",
-      "file_type": "code",
-      "norm_label": "paginationqueryschema",
-      "source_file": "backend/src/validators/common.validator.js",
-      "source_location": "L31"
     },
     {
       "id": "backend_src_validators_user_validator",
@@ -28164,61 +28109,6 @@
       "source_location": "L2"
     },
     {
-      "id": "backend_package_scripts",
-      "label": "scripts",
-      "_origin": "ast",
-      "community": 45,
-      "community_name": "backend/package.json",
-      "file_type": "code",
-      "norm_label": "scripts",
-      "source_file": "backend/package.json",
-      "source_location": "L6"
-    },
-    {
-      "id": "backend_package_scripts_dev",
-      "label": "dev",
-      "_origin": "ast",
-      "community": 45,
-      "community_name": "backend/package.json",
-      "file_type": "code",
-      "norm_label": "dev",
-      "source_file": "backend/package.json",
-      "source_location": "L9"
-    },
-    {
-      "id": "backend_package_scripts_start",
-      "label": "start",
-      "_origin": "ast",
-      "community": 45,
-      "community_name": "backend/package.json",
-      "file_type": "code",
-      "norm_label": "start",
-      "source_file": "backend/package.json",
-      "source_location": "L10"
-    },
-    {
-      "id": "backend_package_scripts_test",
-      "label": "test",
-      "_origin": "ast",
-      "community": 45,
-      "community_name": "backend/package.json",
-      "file_type": "code",
-      "norm_label": "test",
-      "source_file": "backend/package.json",
-      "source_location": "L7"
-    },
-    {
-      "id": "backend_package_scripts_test_ci",
-      "label": "test:ci",
-      "_origin": "ast",
-      "community": 45,
-      "community_name": "backend/package.json",
-      "file_type": "code",
-      "norm_label": "test:ci",
-      "source_file": "backend/package.json",
-      "source_location": "L8"
-    },
-    {
       "id": "backend_package_type",
       "label": "type",
       "_origin": "ast",
@@ -28263,6 +28153,17 @@
       "source_location": "L1"
     },
     {
+      "id": "backend_src_controllers_history_controller",
+      "label": "history.controller.js",
+      "_origin": "ast",
+      "community": 47,
+      "community_name": "common.validator.js",
+      "file_type": "code",
+      "norm_label": "history.controller.js",
+      "source_file": "backend/src/controllers/history.controller.js",
+      "source_location": "L1"
+    },
+    {
       "id": "backend_src_controllers_rating_controller",
       "label": "rating.controller.js",
       "_origin": "ast",
@@ -28282,17 +28183,6 @@
       "file_type": "code",
       "norm_label": "review.controller.js",
       "source_file": "backend/src/controllers/review.controller.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_controllers_vehicle_controller",
-      "label": "vehicle.controller.js",
-      "_origin": "ast",
-      "community": 47,
-      "community_name": "common.validator.js",
-      "file_type": "code",
-      "norm_label": "vehicle.controller.js",
-      "source_file": "backend/src/controllers/vehicle.controller.js",
       "source_location": "L1"
     },
     {
@@ -28329,25 +28219,25 @@
       "source_location": "L8"
     },
     {
-      "id": "backend_src_routes_invoice_routes",
-      "label": "invoice.routes.js",
+      "id": "backend_src_routes_history_routes",
+      "label": "history.routes.js",
       "_origin": "ast",
       "community": 47,
       "community_name": "common.validator.js",
       "file_type": "code",
-      "norm_label": "invoice.routes.js",
-      "source_file": "backend/src/routes/invoice.routes.js",
+      "norm_label": "history.routes.js",
+      "source_file": "backend/src/routes/history.routes.js",
       "source_location": "L1"
     },
     {
-      "id": "backend_src_routes_invoice_routes_router",
+      "id": "backend_src_routes_history_routes_router",
       "label": "router",
       "_origin": "ast",
       "community": 47,
       "community_name": "common.validator.js",
       "file_type": "code",
       "norm_label": "router",
-      "source_file": "backend/src/routes/invoice.routes.js",
+      "source_file": "backend/src/routes/history.routes.js",
       "source_location": "L8"
     },
     {
@@ -28395,26 +28285,15 @@
       "source_location": "L13"
     },
     {
-      "id": "backend_src_routes_vehicle_routes",
-      "label": "vehicle.routes.js",
+      "id": "backend_src_services_history_service",
+      "label": "history.service.js",
       "_origin": "ast",
       "community": 47,
       "community_name": "common.validator.js",
       "file_type": "code",
-      "norm_label": "vehicle.routes.js",
-      "source_file": "backend/src/routes/vehicle.routes.js",
+      "norm_label": "history.service.js",
+      "source_file": "backend/src/services/history.service.js",
       "source_location": "L1"
-    },
-    {
-      "id": "backend_src_routes_vehicle_routes_router",
-      "label": "router",
-      "_origin": "ast",
-      "community": 47,
-      "community_name": "common.validator.js",
-      "file_type": "code",
-      "norm_label": "router",
-      "source_file": "backend/src/routes/vehicle.routes.js",
-      "source_location": "L19"
     },
     {
       "id": "backend_src_validators_common_validator",
@@ -28470,6 +28349,17 @@
       "norm_label": "objectid",
       "source_file": "backend/src/validators/common.validator.js",
       "source_location": "L3"
+    },
+    {
+      "id": "backend_src_validators_common_validator_paginationqueryschema",
+      "label": "paginationQuerySchema",
+      "_origin": "ast",
+      "community": 47,
+      "community_name": "common.validator.js",
+      "file_type": "code",
+      "norm_label": "paginationqueryschema",
+      "source_file": "backend/src/validators/common.validator.js",
+      "source_location": "L31"
     },
     {
       "id": "backend_src_validators_common_validator_typeparamschema",
@@ -28558,50 +28448,6 @@
       "norm_label": "point",
       "source_file": "backend/__tests__/vehicleFilter.test.js",
       "source_location": "L23"
-    },
-    {
-      "id": "frontend_src_component_navbar_navbar",
-      "label": "Navbar.jsx",
-      "_origin": "ast",
-      "community": 51,
-      "community_name": "SocketContext.jsx",
-      "file_type": "code",
-      "norm_label": "navbar.jsx",
-      "source_file": "frontend/src/Component/Navbar/Navbar.jsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_component_navbar_navbar_dashboard_routes",
-      "label": "DASHBOARD_ROUTES",
-      "_origin": "ast",
-      "community": 51,
-      "community_name": "SocketContext.jsx",
-      "file_type": "code",
-      "norm_label": "dashboard_routes",
-      "source_file": "frontend/src/Component/Navbar/Navbar.jsx",
-      "source_location": "L23"
-    },
-    {
-      "id": "frontend_src_component_navbar_navbar_notif_routes",
-      "label": "NOTIF_ROUTES",
-      "_origin": "ast",
-      "community": 51,
-      "community_name": "SocketContext.jsx",
-      "file_type": "code",
-      "norm_label": "notif_routes",
-      "source_file": "frontend/src/Component/Navbar/Navbar.jsx",
-      "source_location": "L35"
-    },
-    {
-      "id": "frontend_src_component_navbar_navbar_profile_routes",
-      "label": "PROFILE_ROUTES",
-      "_origin": "ast",
-      "community": 51,
-      "community_name": "SocketContext.jsx",
-      "file_type": "code",
-      "norm_label": "profile_routes",
-      "source_file": "frontend/src/Component/Navbar/Navbar.jsx",
-      "source_location": "L29"
     },
     {
       "id": "frontend_src_context_authcontext",
@@ -28976,6 +28822,17 @@
       "norm_label": "cartypepage",
       "source_file": "frontend/src/App.jsx",
       "source_location": "L15"
+    },
+    {
+      "id": "frontend_src_app_confirmpage",
+      "label": "ConfirmPage",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "App.jsx",
+      "file_type": "code",
+      "norm_label": "confirmpage",
+      "source_file": "frontend/src/App.jsx",
+      "source_location": "L16"
     },
     {
       "id": "frontend_src_app_contactus",
@@ -31233,6 +31090,17 @@
       "source_location": "L1"
     },
     {
+      "id": "frontend_src_app_driverbookings",
+      "label": "DriverBookings",
+      "_origin": "ast",
+      "community": 78,
+      "community_name": "Skeleton.jsx",
+      "file_type": "code",
+      "norm_label": "driverbookings",
+      "source_file": "frontend/src/App.jsx",
+      "source_location": "L60"
+    },
+    {
       "id": "frontend_src_components_shared_assigndriverdialog",
       "label": "AssignDriverDialog.jsx",
       "_origin": "ast",
@@ -31550,6 +31418,39 @@
       "norm_label": "walletpage.jsx",
       "source_file": "frontend/src/Pages/customer/WalletPage.jsx",
       "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_pages_driver_driverbookings",
+      "label": "DriverBookings.jsx",
+      "_origin": "ast",
+      "community": 78,
+      "community_name": "Skeleton.jsx",
+      "file_type": "code",
+      "norm_label": "driverbookings.jsx",
+      "source_file": "frontend/src/Pages/driver/DriverBookings.jsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_src_pages_driver_driverbookings_pay_tabs",
+      "label": "PAY_TABS",
+      "_origin": "ast",
+      "community": 78,
+      "community_name": "Skeleton.jsx",
+      "file_type": "code",
+      "norm_label": "pay_tabs",
+      "source_file": "frontend/src/Pages/driver/DriverBookings.jsx",
+      "source_location": "L15"
+    },
+    {
+      "id": "frontend_src_pages_driver_driverbookings_sorts",
+      "label": "SORTS",
+      "_origin": "ast",
+      "community": 78,
+      "community_name": "Skeleton.jsx",
+      "file_type": "code",
+      "norm_label": "sorts",
+      "source_file": "frontend/src/Pages/driver/DriverBookings.jsx",
+      "source_location": "L21"
     },
     {
       "id": "frontend_src_pages_driver_driverhistory",
@@ -31893,22 +31794,121 @@
       "source_location": "L28"
     },
     {
+      "id": "backend_src_controllers_dispatch_controller",
+      "label": "dispatch.controller.js",
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "dispatch.controller.js",
+      "source_file": "backend/src/controllers/dispatch.controller.js",
+      "source_location": "L1"
+    },
+    {
       "id": "backend_src_controllers_invoice_controller",
       "label": "invoice.controller.js",
       "_origin": "ast",
       "community": 81,
-      "community_name": "invoice.service.js",
+      "community_name": "vehicle.routes.js",
       "file_type": "code",
       "norm_label": "invoice.controller.js",
       "source_file": "backend/src/controllers/invoice.controller.js",
       "source_location": "L1"
     },
     {
+      "id": "backend_src_controllers_vehicle_controller",
+      "label": "vehicle.controller.js",
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "vehicle.controller.js",
+      "source_file": "backend/src/controllers/vehicle.controller.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_middleware_role_middleware",
+      "label": "role.middleware.js",
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "role.middleware.js",
+      "source_file": "backend/src/middleware/role.middleware.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_routes_dispatch_routes",
+      "label": "dispatch.routes.js",
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "dispatch.routes.js",
+      "source_file": "backend/src/routes/dispatch.routes.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_routes_dispatch_routes_router",
+      "label": "router",
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "router",
+      "source_file": "backend/src/routes/dispatch.routes.js",
+      "source_location": "L16"
+    },
+    {
+      "id": "backend_src_routes_invoice_routes",
+      "label": "invoice.routes.js",
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "invoice.routes.js",
+      "source_file": "backend/src/routes/invoice.routes.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_routes_invoice_routes_router",
+      "label": "router",
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "router",
+      "source_file": "backend/src/routes/invoice.routes.js",
+      "source_location": "L8"
+    },
+    {
+      "id": "backend_src_routes_vehicle_routes",
+      "label": "vehicle.routes.js",
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "vehicle.routes.js",
+      "source_file": "backend/src/routes/vehicle.routes.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_routes_vehicle_routes_router",
+      "label": "router",
+      "_origin": "ast",
+      "community": 81,
+      "community_name": "vehicle.routes.js",
+      "file_type": "code",
+      "norm_label": "router",
+      "source_file": "backend/src/routes/vehicle.routes.js",
+      "source_location": "L19"
+    },
+    {
       "id": "backend_src_services_invoice_service",
       "label": "invoice.service.js",
       "_origin": "ast",
       "community": 81,
-      "community_name": "invoice.service.js",
+      "community_name": "vehicle.routes.js",
       "file_type": "code",
       "norm_label": "invoice.service.js",
       "source_file": "backend/src/services/invoice.service.js",
@@ -31919,7 +31919,7 @@
       "label": "__dirname",
       "_origin": "ast",
       "community": 81,
-      "community_name": "invoice.service.js",
+      "community_name": "vehicle.routes.js",
       "file_type": "code",
       "norm_label": "__dirname",
       "source_file": "backend/src/services/invoice.service.js",
@@ -31930,7 +31930,7 @@
       "label": "__filename",
       "_origin": "ast",
       "community": 81,
-      "community_name": "invoice.service.js",
+      "community_name": "vehicle.routes.js",
       "file_type": "code",
       "norm_label": "__filename",
       "source_file": "backend/src/services/invoice.service.js",
@@ -31941,7 +31941,7 @@
       "label": "LOGO_PATH",
       "_origin": "ast",
       "community": 81,
-      "community_name": "invoice.service.js",
+      "community_name": "vehicle.routes.js",
       "file_type": "code",
       "norm_label": "logo_path",
       "source_file": "backend/src/services/invoice.service.js",
@@ -32135,17 +32135,6 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_src_controllers_dispatch_controller",
-      "label": "dispatch.controller.js",
-      "_origin": "ast",
-      "community": 90,
-      "community_name": "auth.middleware.js",
-      "file_type": "code",
-      "norm_label": "dispatch.controller.js",
-      "source_file": "backend/src/controllers/dispatch.controller.js",
-      "source_location": "L1"
-    },
-    {
       "id": "backend_src_controllers_driverstatus_controller",
       "label": "driverStatus.controller.js",
       "_origin": "ast",
@@ -32188,28 +32177,6 @@
       "norm_label": "router",
       "source_file": "backend/src/routes/aiAssistant.routes.js",
       "source_location": "L5"
-    },
-    {
-      "id": "backend_src_routes_dispatch_routes",
-      "label": "dispatch.routes.js",
-      "_origin": "ast",
-      "community": 90,
-      "community_name": "auth.middleware.js",
-      "file_type": "code",
-      "norm_label": "dispatch.routes.js",
-      "source_file": "backend/src/routes/dispatch.routes.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_routes_dispatch_routes_router",
-      "label": "router",
-      "_origin": "ast",
-      "community": 90,
-      "community_name": "auth.middleware.js",
-      "file_type": "code",
-      "norm_label": "router",
-      "source_file": "backend/src/routes/dispatch.routes.js",
-      "source_location": "L16"
     },
     {
       "id": "backend_src_routes_driverstatus_routes",
@@ -32331,28 +32298,6 @@
       "norm_label": "mapoptions",
       "source_file": "frontend/src/components/customer/RideMap.jsx",
       "source_location": "L60"
-    },
-    {
-      "id": "frontend_src_components_shared_farenotes",
-      "label": "FareNotes.jsx",
-      "_origin": "ast",
-      "community": 95,
-      "community_name": "BookRide.jsx",
-      "file_type": "code",
-      "norm_label": "farenotes.jsx",
-      "source_file": "frontend/src/components/shared/FareNotes.jsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "frontend_src_components_shared_farenotes_notes",
-      "label": "NOTES",
-      "_origin": "ast",
-      "community": 95,
-      "community_name": "BookRide.jsx",
-      "file_type": "code",
-      "norm_label": "notes",
-      "source_file": "frontend/src/components/shared/FareNotes.jsx",
-      "source_location": "L4"
     },
     {
       "id": "frontend_src_pages_customer_bookride",
@@ -32485,6 +32430,61 @@
       "norm_label": "@playwright/test",
       "source_file": "package.json",
       "source_location": "L3"
+    },
+    {
+      "id": "backend_package_scripts",
+      "label": "scripts",
+      "_origin": "ast",
+      "community": 99,
+      "community_name": "scripts",
+      "file_type": "code",
+      "norm_label": "scripts",
+      "source_file": "backend/package.json",
+      "source_location": "L6"
+    },
+    {
+      "id": "backend_package_scripts_dev",
+      "label": "dev",
+      "_origin": "ast",
+      "community": 99,
+      "community_name": "scripts",
+      "file_type": "code",
+      "norm_label": "dev",
+      "source_file": "backend/package.json",
+      "source_location": "L9"
+    },
+    {
+      "id": "backend_package_scripts_start",
+      "label": "start",
+      "_origin": "ast",
+      "community": 99,
+      "community_name": "scripts",
+      "file_type": "code",
+      "norm_label": "start",
+      "source_file": "backend/package.json",
+      "source_location": "L10"
+    },
+    {
+      "id": "backend_package_scripts_test",
+      "label": "test",
+      "_origin": "ast",
+      "community": 99,
+      "community_name": "scripts",
+      "file_type": "code",
+      "norm_label": "test",
+      "source_file": "backend/package.json",
+      "source_location": "L7"
+    },
+    {
+      "id": "backend_package_scripts_test_ci",
+      "label": "test:ci",
+      "_origin": "ast",
+      "community": 99,
+      "community_name": "scripts",
+      "file_type": "code",
+      "norm_label": "test:ci",
+      "source_file": "backend/package.json",
+      "source_location": "L8"
     }
   ],
   "links": [
@@ -109184,7 +109184,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/Context/SocketContext.jsx",
-      "source_location": "L61",
+      "source_location": "L63",
       "weight": 1.0
     },
     {
@@ -141348,5 +141348,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6a8e4162be86aa4081e4df97654b3e247782d99b"
+  "built_at_commit": "65fb736e1c65815fc9d5b259d587b42113bbfdec"
 }
