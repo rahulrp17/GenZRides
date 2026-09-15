@@ -60,9 +60,9 @@
     "semantic_hash": ""
   },
   "backend/src/app.js": {
-    "mtime": 1789060808.8602352,
-    "seen": 1789211551.1843324,
-    "ast_hash": "0d6ebe08e8dc9f03b0cc02948434f027",
+    "mtime": 1789458442.7516396,
+    "seen": 1789462266.5268254,
+    "ast_hash": "9fe65514f6f6d9597af02e9f0c5f30b2",
     "semantic_hash": ""
   },
   "backend/src/config/cloudinary.js": {
@@ -216,9 +216,9 @@
     "semantic_hash": ""
   },
   "backend/src/middleware/auth.middleware.js": {
-    "mtime": 1789059789.2607067,
-    "seen": 1789211551.1843324,
-    "ast_hash": "2147d72d908a7fcd73718f6a133efcfb",
+    "mtime": 1789458413.7185216,
+    "seen": 1789462266.5268254,
+    "ast_hash": "f18600e185214799306f3dfeb971dc0b",
     "semantic_hash": ""
   },
   "backend/src/middleware/role.middleware.js": {
@@ -792,9 +792,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/Home/Home.jsx": {
-    "mtime": 1788665768.4977493,
-    "seen": 1788665952.0396855,
-    "ast_hash": "deeed5affe1a5b9ca8d5f939f516190c",
+    "mtime": 1789458664.155014,
+    "seen": 1789462266.5268254,
+    "ast_hash": "5fdff2b4a6b273633adc6d62f6d87d45",
     "semantic_hash": ""
   },
   "frontend/src/Pages/Tariff_Chart/TariffChart.jsx": {
@@ -816,9 +816,9 @@
     "semantic_hash": "495c3284868f483bcdb0a249138d145c"
   },
   "frontend/src/assets/images/index.js": {
-    "mtime": 1789215821.3357131,
-    "seen": 1789316387.7956905,
-    "ast_hash": "624c26a4f43812015b006ccea5e0adad",
+    "mtime": 1789456957.5926116,
+    "seen": 1789462266.5268254,
+    "ast_hash": "97d8fe8082684fbad862de5585dd91a7",
     "semantic_hash": ""
   },
   "frontend/src/main.jsx": {
@@ -1332,9 +1332,9 @@
     "semantic_hash": ""
   },
   "frontend/src/services/endpoints.js": {
-    "mtime": 1789186556.0836623,
-    "seen": 1789211551.185514,
-    "ast_hash": "5193dba5158c4307a1ffe46118660bdd",
+    "mtime": 1789458492.5312867,
+    "seen": 1789462266.5268254,
+    "ast_hash": "37d8d188998ee26d580caf58ae5a4728",
     "semantic_hash": ""
   },
   "frontend/src/Pages/driver-auth/DriverContinue.jsx": {
@@ -1530,15 +1530,15 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/AirportDetail/AirportDetail.jsx": {
-    "mtime": 1789184518.2116475,
-    "seen": 1789211551.185514,
-    "ast_hash": "35a252bf25ae30a9d300846f9753a941",
+    "mtime": 1789457457.1275632,
+    "seen": 1789462266.5268254,
+    "ast_hash": "45b81f22cc12c8218e99747ca1b61bba",
     "semantic_hash": ""
   },
   "frontend/src/Pages/AirportTransfers/AirportTransfers.jsx": {
-    "mtime": 1789184440.6786897,
-    "seen": 1789211551.185514,
-    "ast_hash": "8b81c080a3915e1ac1573e8b27268690",
+    "mtime": 1789457047.3058908,
+    "seen": 1789462266.5268254,
+    "ast_hash": "7abe2b2351bc16d5980becae39f7f825",
     "semantic_hash": ""
   },
   "frontend/src/Pages/InfoDetail/InfoDetail.jsx": {
@@ -1758,9 +1758,9 @@
     "semantic_hash": ""
   },
   "frontend/src/assets/images/ChennaiAirport.jpg": {
-    "mtime": 1788842971.0315363,
-    "seen": 1789211551.185514,
-    "ast_hash": "4543945f99d0cb8270c2018df5c18e5b",
+    "mtime": 1789456716.3311574,
+    "seen": 1789462266.5278325,
+    "ast_hash": "76e8c5b1609962e9038fa80b11f82597",
     "semantic_hash": ""
   },
   "frontend/src/assets/images/ChennaiBangalore.jpg": {
@@ -3309,6 +3309,36 @@
     "mtime": 1789451864.8824556,
     "seen": 1789452933.4568505,
     "ast_hash": "c316cdbf6b66275a46accbcfc501c575",
+    "semantic_hash": ""
+  },
+  "backend/src/controllers/aiAssistant.controller.js": {
+    "mtime": 1789458348.1518579,
+    "seen": 1789462266.5268254,
+    "ast_hash": "3fcd04a70aa388e442147064600df6a6",
+    "semantic_hash": ""
+  },
+  "backend/src/routes/aiAssistant.routes.js": {
+    "mtime": 1789458363.4841318,
+    "seen": 1789462266.5268254,
+    "ast_hash": "39e2b2f47b9d2e74b1134a8f93fa3a2c",
+    "semantic_hash": ""
+  },
+  "backend/src/services/aiAssistant.service.js": {
+    "mtime": 1789459931.1318133,
+    "seen": 1789462266.5268254,
+    "ast_hash": "4869f36fb649033542e4a58c22ee1843",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ai/AIAssistant.jsx": {
+    "mtime": 1789460708.5083122,
+    "seen": 1789462266.5268254,
+    "ast_hash": "eef8c17bd00901ad1978a0c75cc0ee2a",
+    "semantic_hash": ""
+  },
+  "frontend/src/assets/images/BangaloreAirport.jpg": {
+    "mtime": 1789456719.7057488,
+    "seen": 1789462266.5278325,
+    "ast_hash": "37f5c8ddec036e80f092299f806b7d2b",
     "semantic_hash": ""
   }
 }
