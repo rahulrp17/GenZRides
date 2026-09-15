@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Polyline } from '@react-google-maps/api';
+import AdvancedMarker from '../../components/maps/AdvancedMarker';
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import {
@@ -102,8 +103,10 @@ const CurrentRide = () => {
   const [liveStatus, setLiveStatus] = useState(null);
   const lastFetchDriverRef = useRef(0);
 
+  const [mapInstance, setMapInstance] = useState(null);
   const { isLoaded: mapLoaded, loadError: mapLoadError } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_KEY,
+    libraries: ['marker'],
   });
 
   const { data: currentBooking, isLoading, isError: rideError, error: rideErr } = useQuery({
@@ -688,9 +691,10 @@ const CurrentRide = () => {
                     center={mapCenterPropDriver}
                     zoom={pickupCoords ? 14 : 12}
                     options={mapOptions}
-                    onLoad={(map) => {
-                      mapRef.current = map;
-                      if (map && window.google && booking && !initialFitDoneRef.current) {
+                     onLoad={(map) => {
+                       mapRef.current = map;
+                       setMapInstance(map);
+                       if (map && window.google && booking && !initialFitDoneRef.current) {
                         initialFitDoneRef.current = true;
                         const bounds = new window.google.maps.LatLngBounds();
                         let has = false;
@@ -704,9 +708,9 @@ const CurrentRide = () => {
                     onDragStart={() => { hasInteractedRef.current = true; }}
                     onZoomChanged={() => { hasInteractedRef.current = true; }}
                   >
-                    {pickupCoords && <Marker position={pickupCoords} icon={GREEN_MARKER} title={booking.pickup?.address || "Pickup"} />}
-                    {dropCoords && <Marker position={dropCoords} icon={RED_MARKER} title={booking.drop?.address || "Drop"} />}
-                    {selfLocation && <Marker position={selfLocation} icon={DRIVER_MARKER} title="You" />}
+                    {pickupCoords && <AdvancedMarker position={pickupCoords} icon={GREEN_MARKER} title={booking.pickup?.address || "Pickup"} map={mapInstance} />}
+                    {dropCoords && <AdvancedMarker position={dropCoords} icon={RED_MARKER} title={booking.drop?.address || "Drop"} map={mapInstance} />}
+                    {selfLocation && <AdvancedMarker position={selfLocation} icon={DRIVER_MARKER} title="You" map={mapInstance} />}
                     {(livePathDriver || (pickupCoords && dropCoords && booking.routePolyline)) && (
                       <Polyline
                         path={livePathDriver || decodePolyline(booking.routePolyline)}

@@ -1182,9 +1182,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/driver/CurrentRide.jsx": {
-    "mtime": 1789497512.9495118,
-    "seen": 1789497623.8498075,
-    "ast_hash": "aad03b8bbf192bfb87916020f15027c9",
+    "mtime": 1789495884.3063202,
+    "seen": 1789496426.546785,
+    "ast_hash": "0759a7879c70666e8960614d0fc0156d",
     "semantic_hash": ""
   },
   "frontend/src/Pages/driver/DriverDashboard.jsx": {
@@ -1398,9 +1398,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CurrentRideCustomer.jsx": {
-    "mtime": 1789497392.175487,
-    "seen": 1789497623.8498075,
-    "ast_hash": "e2ae34ba7090b4e76b66b24889321e8c",
+    "mtime": 1789496235.7238677,
+    "seen": 1789496426.5466034,
+    "ast_hash": "3873b2727afcdb8d19de63cad5c3e73f",
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CustomerBookings.jsx": {
@@ -3261,12 +3261,6 @@
     "mtime": 1789447714.5342026,
     "seen": 1789491696.4843574,
     "ast_hash": "3a2e616a4c02faa220f078f403535bfa",
-    "semantic_hash": ""
-  },
-  "frontend/src/components/maps/AdvancedMarker.jsx": {
-    "mtime": 1789497554.9820855,
-    "seen": 1789497623.8498075,
-    "ast_hash": "9b1fea6b0dc84d8f5dfae5ab18a37e4e",
     "semantic_hash": ""
   }
 }

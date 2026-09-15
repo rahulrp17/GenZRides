@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
-import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Polyline } from '@react-google-maps/api';
+import AdvancedMarker from '../../components/maps/AdvancedMarker';
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { MapPin, Navigation, Car, Clock, Phone, User, CheckCircle, X, Download, Star, RefreshCw } from 'lucide-react';
@@ -149,8 +150,10 @@ const CurrentRideCustomer = () => {
     },
   });
 
+  const [mapInstance, setMapInstance] = useState(null);
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_KEY,
+    libraries: ['marker'],
   });
 
   const { data, isLoading, isError, error } = useQuery({
@@ -246,6 +249,7 @@ const CurrentRideCustomer = () => {
 
   const onMapLoad = useCallback((map) => {
     mapRef.current = map;
+    setMapInstance(map);
     if (!map || !window.google || !booking) return;
     if (initialFitDoneRef.current) return;
     initialFitDoneRef.current = true;
@@ -647,9 +651,9 @@ const CurrentRideCustomer = () => {
                     onDragStart={onMapDragStart}
                     onZoomChanged={() => { hasInteractedRef.current = true; }}
                   >
-                    {pickupCoords && <Marker position={pickupCoords} icon={GREEN_MARKER} title={booking.pickup?.address || "Pickup"} />}
-                    {dropCoords && <Marker position={dropCoords} icon={RED_MARKER} title={booking.drop?.address || "Drop"} />}
-                    {driverLocation && !isCompleted && !isCancelled && <Marker position={driverLocation} icon={DRIVER_MARKER} title="Driver — live" />}
+                    {pickupCoords && <AdvancedMarker position={pickupCoords} icon={GREEN_MARKER} title={booking.pickup?.address || "Pickup"} map={mapInstance} />}
+                    {dropCoords && <AdvancedMarker position={dropCoords} icon={RED_MARKER} title={booking.drop?.address || "Drop"} map={mapInstance} />}
+                    {driverLocation && !isCompleted && !isCancelled && <AdvancedMarker position={driverLocation} icon={DRIVER_MARKER} title="Driver — live" map={mapInstance} />}
                     {(livePath || (pickupCoords && dropCoords && booking.routePolyline)) && (
                       <Polyline
                         path={livePath || decodePolyline(booking.routePolyline)}
