@@ -5,11 +5,18 @@ const AdvancedMarker = ({ position, icon, title, map, zIndex }) => {
 
   useEffect(() => {
     if (!map || !position?.lat || !position?.lng) return;
+    const content = icon ? document.createElement('img') : undefined;
+    if (content) {
+      content.src = icon;
+      content.style.width = '32px';
+      content.style.height = '42px';
+      content.style.objectFit = 'contain';
+    }
     const m = new window.google.maps.marker.AdvancedMarkerElement({
       position: { lat: position.lat, lng: position.lng },
       map,
       title: title || '',
-      icon: icon ? { url: icon } : undefined,
+      content,
       zIndex,
     });
     markerRef.current = m;
