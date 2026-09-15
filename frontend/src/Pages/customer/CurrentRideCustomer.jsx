@@ -646,6 +646,7 @@ const CurrentRideCustomer = () => {
                     mapContainerStyle={mapContainerStyle}
                     center={mapCenterProp}
                     zoom={13}
+                    mapId="genzrides_customer"
                     options={mapOptions}
                     onLoad={onMapLoad}
                     onDragStart={onMapDragStart}

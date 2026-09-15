@@ -686,11 +686,12 @@ const CurrentRide = () => {
                     <div className="w-8 h-8 border-4 border-white/20 border-t-indigo-500 rounded-full animate-spin" />
                   </div>
                 ) : (
-                  <GoogleMap
-                    mapContainerStyle={mapContainerStyle}
-                    center={mapCenterPropDriver}
-                    zoom={pickupCoords ? 14 : 12}
-                    options={mapOptions}
+                   <GoogleMap
+                     mapContainerStyle={mapContainerStyle}
+                     center={mapCenterPropDriver}
+                     zoom={pickupCoords ? 14 : 12}
+                     mapId="genzrides_driver"
+                     options={mapOptions}
                      onLoad={(map) => {
                        mapRef.current = map;
                        setMapInstance(map);
