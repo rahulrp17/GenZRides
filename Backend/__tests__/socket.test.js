@@ -211,6 +211,7 @@ describe("Socket.IO driver live location broadcast", () => {
     }
 
     expect(received.length).toBeGreaterThan(0);
+    expect(received[0].bookingId).toBe(bookingId);
     expect(received[0].latitude).toBeCloseTo(9.9412, 4);
     expect(received[0].longitude).toBeCloseTo(78.1294, 4);
 

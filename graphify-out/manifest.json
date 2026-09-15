@@ -594,9 +594,9 @@
     "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "backend/src/socket/index.js": {
-    "mtime": 1789488563.5112474,
-    "seen": 1789489559.3411305,
-    "ast_hash": "22b45410f8a0a6d7a1beee6aea8ab88e",
+    "mtime": 1789491509.8484788,
+    "seen": 1789491696.4833586,
+    "ast_hash": "fdf5966042161a6fdacf252e1db658fe",
     "semantic_hash": ""
   },
   "backend/src/socket/users.js": {
@@ -1038,9 +1038,9 @@
     "semantic_hash": ""
   },
   "backend/__tests__/socket.test.js": {
-    "mtime": 1789488811.507916,
-    "seen": 1789489559.3411305,
-    "ast_hash": "74989b2d20c732ba516afdc372a8e5d7",
+    "mtime": 1789491545.3861735,
+    "seen": 1789491696.4833586,
+    "ast_hash": "bd1766a9c60bc5bc2048845020bc2b23",
     "semantic_hash": ""
   },
   "backend/__tests__/webhook.test.js": {
@@ -1398,9 +1398,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CurrentRideCustomer.jsx": {
-    "mtime": 1789488996.0517063,
-    "seen": 1789489559.3411305,
-    "ast_hash": "b5cbb133383a72921e7add520e187a8c",
+    "mtime": 1789491529.8430643,
+    "seen": 1789491696.4833586,
+    "ast_hash": "39dc3dbe659df7378ed2f58e44a2619f",
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CustomerBookings.jsx": {
@@ -3084,9 +3084,9 @@
     "semantic_hash": ""
   },
   "e2e-results/.last-run.json": {
-    "mtime": 1789451881.6040282,
-    "seen": 1789452933.4548483,
-    "ast_hash": "f196824657d8858bc7fa44eecbba38b1",
+    "mtime": 1789490113.0328815,
+    "seen": 1789491696.4833586,
+    "ast_hash": "462efd27aef32972af6c34acdd9f3fe9",
     "semantic_hash": ""
   },
   "e2e/ride-flow.spec.js": {
@@ -3105,210 +3105,6 @@
     "mtime": 1789447913.2042148,
     "seen": 1789452933.4558477,
     "ast_hash": "d2cdd18813138e9abd43725867c2d1f9",
-    "semantic_hash": ""
-  },
-  "e2e-results/01-customer-dash.png": {
-    "mtime": 1789451641.331321,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7c7cf517fbb63fa1dcccf1b654c2f152",
-    "semantic_hash": ""
-  },
-  "e2e-results/02-book-ride.png": {
-    "mtime": 1789451651.3089044,
-    "seen": 1789452933.4558477,
-    "ast_hash": "fe48f6dd65fd4ba77159cba6f697a5d2",
-    "semantic_hash": ""
-  },
-  "e2e-results/03-pickup.png": {
-    "mtime": 1789451658.1977396,
-    "seen": 1789452933.4558477,
-    "ast_hash": "f3860b65e2d010dd860994c24476e688",
-    "semantic_hash": ""
-  },
-  "e2e-results/04-drop.png": {
-    "mtime": 1789451665.1969454,
-    "seen": 1789452933.4558477,
-    "ast_hash": "2bc93a66adf4e57e04f9ff3ab4dafdb4",
-    "semantic_hash": ""
-  },
-  "e2e-results/05-suv.png": {
-    "mtime": 1789451670.4855766,
-    "seen": 1789452933.4558477,
-    "ast_hash": "9952541c5e7dd064694aa6baf2a888cc",
-    "semantic_hash": ""
-  },
-  "e2e-results/06-fare.png": {
-    "mtime": 1789451674.6952562,
-    "seen": 1789452933.4558477,
-    "ast_hash": "1dcbb71dbfe8b93d00c1525e586289fe",
-    "semantic_hash": ""
-  },
-  "e2e-results/07-clicked.png": {
-    "mtime": 1789451678.022222,
-    "seen": 1789452933.4558477,
-    "ast_hash": "186e1c61ca2336f9fe0f6f8317ec0783",
-    "semantic_hash": ""
-  },
-  "e2e-results/08-confirmed.png": {
-    "mtime": 1789451683.2748814,
-    "seen": 1789452933.4558477,
-    "ast_hash": "82dd826c2d9466c396618b1af7267af0",
-    "semantic_hash": ""
-  },
-  "e2e-results/09-waiting.png": {
-    "mtime": 1789451688.4595983,
-    "seen": 1789452933.4558477,
-    "ast_hash": "e2c86d8cd1a8b4fe867a15d0270e46cf",
-    "semantic_hash": ""
-  },
-  "e2e-results/10-customer-ride.png": {
-    "mtime": 1789451693.766124,
-    "seen": 1789452933.4558477,
-    "ast_hash": "79d70b0fdf72d258bc726a188ec923d0",
-    "semantic_hash": ""
-  },
-  "e2e-results/12-driver-dash.png": {
-    "mtime": 1789451720.5710487,
-    "seen": 1789452933.4558477,
-    "ast_hash": "d8fe1062591e8c25c0b2bd0b7a25d665",
-    "semantic_hash": ""
-  },
-  "e2e-results/13-driver-bookings.png": {
-    "mtime": 1789451731.789564,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7ca11719af255b8eefc18125909007ca",
-    "semantic_hash": ""
-  },
-  "e2e-results/14-accept.png": {
-    "mtime": 1789451744.7318563,
-    "seen": 1789452933.4558477,
-    "ast_hash": "52c2708860917ee93a3a72cdfcbcf949",
-    "semantic_hash": ""
-  },
-  "e2e-results/14a-booking-details.png": {
-    "mtime": 1789451737.1893487,
-    "seen": 1789452933.4558477,
-    "ast_hash": "d576efeb197b4aaa07ac9a343ac686c6",
-    "semantic_hash": ""
-  },
-  "e2e-results/15-driver-ride.png": {
-    "mtime": 1789451762.1678433,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7a644189e82a7954e9fdf40c678412fa",
-    "semantic_hash": ""
-  },
-  "e2e-results/16-customer.png": {
-    "mtime": 1789451771.720003,
-    "seen": 1789452933.4558477,
-    "ast_hash": "9951ceec568b32b950136a244debc297",
-    "semantic_hash": ""
-  },
-  "e2e-results/17-customer.png": {
-    "mtime": 1789451781.2229905,
-    "seen": 1789452933.4558477,
-    "ast_hash": "87900da238a166c506f135f79c8b7575",
-    "semantic_hash": ""
-  },
-  "e2e-results/18-customer.png": {
-    "mtime": 1789451790.930987,
-    "seen": 1789452933.4558477,
-    "ast_hash": "4869f9e02d78a2da71235244a87565dd",
-    "semantic_hash": ""
-  },
-  "e2e-results/19-customer.png": {
-    "mtime": 1789451800.858035,
-    "seen": 1789452933.4558477,
-    "ast_hash": "f422729409707859294e266892586017",
-    "semantic_hash": ""
-  },
-  "e2e-results/20-paid.png": {
-    "mtime": 1789451805.3975372,
-    "seen": 1789452933.4558477,
-    "ast_hash": "ced634b4e9f79ee599b07d1115756616",
-    "semantic_hash": ""
-  },
-  "e2e-results/21-customer-done.png": {
-    "mtime": 1789451815.7793746,
-    "seen": 1789452933.4558477,
-    "ast_hash": "e37df96621e78c2ae8e1d08b8274abe0",
-    "semantic_hash": ""
-  },
-  "e2e-results/23-history.png": {
-    "mtime": 1789451824.4233007,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7a22e909de8044ef3f8678e08894e489",
-    "semantic_hash": ""
-  },
-  "e2e-results/24-driver-history.png": {
-    "mtime": 1789451831.6669378,
-    "seen": 1789452933.4558477,
-    "ast_hash": "62702d227b7dce1114f4cbaca67e3ffc",
-    "semantic_hash": ""
-  },
-  "e2e-results/25-admin.png": {
-    "mtime": 1789451848.3825123,
-    "seen": 1789452933.4558477,
-    "ast_hash": "cfd9aca021f679c7dbbfc972d10a5455",
-    "semantic_hash": ""
-  },
-  "e2e-results/26-persistence.png": {
-    "mtime": 1789451857.0618706,
-    "seen": 1789452933.4558477,
-    "ast_hash": "af036121eaa7566f0a531ba7d4edddbc",
-    "semantic_hash": ""
-  },
-  "e2e-results/____Arrived.png": {
-    "mtime": 1789451777.9439893,
-    "seen": 1789452933.4558477,
-    "ast_hash": "ad0c8a84062f4fda506c62883d5aace5",
-    "semantic_hash": ""
-  },
-  "e2e-results/____Complete_Ride.png": {
-    "mtime": 1789451812.403885,
-    "seen": 1789452933.4558477,
-    "ast_hash": "afdf55bcfd521eb8073a02f993b17c19",
-    "semantic_hash": ""
-  },
-  "e2e-results/____On_The_Way.png": {
-    "mtime": 1789451768.529881,
-    "seen": 1789452933.4558477,
-    "ast_hash": "fdc627b4d481a3effc2faa930032b448",
-    "semantic_hash": ""
-  },
-  "e2e-results/____Reached_Destination.png": {
-    "mtime": 1789451797.5034711,
-    "seen": 1789452933.4558477,
-    "ast_hash": "48a8406a9058a391be3132c76eb6a65f",
-    "semantic_hash": ""
-  },
-  "e2e-results/____Start_Ride.png": {
-    "mtime": 1789451787.597258,
-    "seen": 1789452933.4558477,
-    "ast_hash": "4fa8e4c13f5b189895e4b566f28decae",
-    "semantic_hash": ""
-  },
-  "e2e-results/ride-flow-Complete-Ride-Flow-E2E-chromium/test-finished-1.png": {
-    "mtime": 1789451860.2368865,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7c4efbf957e99239799e550df5e23fb4",
-    "semantic_hash": ""
-  },
-  "e2e-results/ride-flow-Complete-Ride-Flow-E2E-chromium/test-finished-2.png": {
-    "mtime": 1789451849.0384295,
-    "seen": 1789452933.4558477,
-    "ast_hash": "cfd9aca021f679c7dbbfc972d10a5455",
-    "semantic_hash": ""
-  },
-  "e2e-results/ride-flow-Complete-Ride-Flow-E2E-chromium/test-finished-3.png": {
-    "mtime": 1789451860.051408,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7a22e909de8044ef3f8678e08894e489",
-    "semantic_hash": ""
-  },
-  "e2e-results/ride-flow-Complete-Ride-Flow-E2E-chromium/video.webm": {
-    "mtime": 1789451864.8824556,
-    "seen": 1789452933.4568505,
-    "ast_hash": "c316cdbf6b66275a46accbcfc501c575",
     "semantic_hash": ""
   },
   "backend/src/controllers/aiAssistant.controller.js": {
@@ -3342,9 +3138,129 @@
     "semantic_hash": ""
   },
   "e2e/live-location.spec.js": {
-    "mtime": 1789489499.269048,
-    "seen": 1789489559.3411305,
-    "ast_hash": "413a9b68320fd2ba6161a59f49a6d392",
+    "mtime": 1789490001.0837903,
+    "seen": 1789491696.4833586,
+    "ast_hash": "5750b04bfebf31bd2142765dbd344e56",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/assets/codeMirrorModule-BbkfBe3n.js": {
+    "mtime": 1789447714.2204678,
+    "seen": 1789491696.4843574,
+    "ast_hash": "ee69b897642c19822b5a608e7025b82b",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/assets/defaultSettingsView-Ds6CBOo0.js": {
+    "mtime": 1789447714.2584875,
+    "seen": 1789491696.4843574,
+    "ast_hash": "e347e643e31bed705d11058535f08ac6",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/assets/urlMatch-L3liM589.js": {
+    "mtime": 1789447714.391331,
+    "seen": 1789491696.4843574,
+    "ast_hash": "4c975b44cc9ac0b3c4fdcbb02f1d9729",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/index.B4cLoZK3.js": {
+    "mtime": 1789447714.2762208,
+    "seen": 1789491696.4843574,
+    "ast_hash": "c43c072cad0a6b853f2d6de662fe43e7",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/snapshot.B_Jk1wbt.js": {
+    "mtime": 1789447714.3309064,
+    "seen": 1789491696.4843574,
+    "ast_hash": "7155833d2731a46b63e7bc38dfec0b48",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/sw.bundle.js": {
+    "mtime": 1789447714.3863325,
+    "seen": 1789491696.4843574,
+    "ast_hash": "349f1d9b56d0426ab43063df5a3f64ad",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/uiMode.CU5KtEkS.js": {
+    "mtime": 1789447714.389332,
+    "seen": 1789491696.4843574,
+    "ast_hash": "c5bd045b2649390f76d031a5aa379ce5",
+    "semantic_hash": ""
+  },
+  "e2e-results/live-location-Live-Driver-Location-E2E-chromium/error-context.md": {
+    "mtime": 1789490109.27823,
+    "seen": 1789491696.4843574,
+    "ast_hash": "18d5895439c1062364c6f9981ed641a5",
+    "semantic_hash": ""
+  },
+  "playwright-report/data/feda50cb721f19ae14fb62cd5058fe0647f8a34d.md": {
+    "mtime": 1789490112.6596804,
+    "seen": 1789491696.4843574,
+    "ast_hash": "18d5895439c1062364c6f9981ed641a5",
+    "semantic_hash": ""
+  },
+  "playwright-report/index.html": {
+    "mtime": 1789490113.0318775,
+    "seen": 1789491696.4843574,
+    "ast_hash": "c74178d330dfe33342d4c049182a30ff",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/index.html": {
+    "mtime": 1789447714.2054367,
+    "seen": 1789491696.4843574,
+    "ast_hash": "723f3406f165f1f1ea157f44535ed0a7",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/snapshot.html": {
+    "mtime": 1789447714.206341,
+    "seen": 1789491696.4843574,
+    "ast_hash": "7518ae5d0dfe02a23d581da77f08643e",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/uiMode.html": {
+    "mtime": 1789447714.208344,
+    "seen": 1789491696.4843574,
+    "ast_hash": "5f0ba974c58ddd4ff526010f5d8bf199",
+    "semantic_hash": ""
+  },
+  "e2e-results/live-customer-chip.png": {
+    "mtime": 1789490098.43182,
+    "seen": 1789491696.4843574,
+    "ast_hash": "c6c8a70b53f075ed278668499bc3385a",
+    "semantic_hash": ""
+  },
+  "e2e-results/live-driver-ride.png": {
+    "mtime": 1789490098.1308062,
+    "seen": 1789491696.4843574,
+    "ast_hash": "59c17b7ae7f4d86d86167b33be1e25b3",
+    "semantic_hash": ""
+  },
+  "e2e-results/live-location-Live-Driver-Location-E2E-chromium/test-failed-1.png": {
+    "mtime": 1789490108.6149395,
+    "seen": 1789491696.4843574,
+    "ast_hash": "6eb3765307ba7ea642bf199ab3cf2f2b",
+    "semantic_hash": ""
+  },
+  "e2e-results/live-location-Live-Driver-Location-E2E-chromium/test-failed-2.png": {
+    "mtime": 1789490109.225973,
+    "seen": 1789491696.4843574,
+    "ast_hash": "929aaaffa1e2eec95a9daf89bc68173b",
+    "semantic_hash": ""
+  },
+  "playwright-report/data/3a2c4580b246438f7067a2b989f6fc7d6996ba5a.png": {
+    "mtime": 1789490112.6580548,
+    "seen": 1789491696.4843574,
+    "ast_hash": "6eb3765307ba7ea642bf199ab3cf2f2b",
+    "semantic_hash": ""
+  },
+  "playwright-report/data/e69682eb873c3b4481e1a5cfb72103d90fc85eea.png": {
+    "mtime": 1789490112.6570566,
+    "seen": 1789491696.4843574,
+    "ast_hash": "929aaaffa1e2eec95a9daf89bc68173b",
+    "semantic_hash": ""
+  },
+  "playwright-report/trace/playwright-logo.svg": {
+    "mtime": 1789447714.5342026,
+    "seen": 1789491696.4843574,
+    "ast_hash": "3a2e616a4c02faa220f078f403535bfa",
     "semantic_hash": ""
   }
 }

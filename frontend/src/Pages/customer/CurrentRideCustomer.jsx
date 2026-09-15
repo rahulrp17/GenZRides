@@ -335,6 +335,7 @@ const CurrentRideCustomer = () => {
     };
 
     const handleDriverLocation = (data) => {
+      if (data.bookingId && String(data.bookingId) !== String(booking._id)) return;
       setDriverLocation({ lat: data.latitude, lng: data.longitude });
       if (data.eta) setDriverEta(data.eta);
       setLastLocUpdateAt(Date.now());
@@ -382,12 +383,11 @@ const CurrentRideCustomer = () => {
   useEffect(() => {
     if (activeBooking) {
       setLiveStatus(activeBooking);
-      const coords = activeBooking.driver?.currentLocation?.coordinates;
-      const restored =
-        coords && typeof coords[0] === 'number' && typeof coords[1] === 'number'
-          ? { lat: coords[1], lng: coords[0] }
-          : null;
-      setDriverLocation(restored);
+      // Do NOT seed the marker from driver.currentLocation — that field keeps the
+      // driver's last GPS point across rides, so a fresh trip would briefly show
+      // the previous trip's location. The marker must only appear once a live
+      // `driver-location-updated` event for THIS booking arrives.
+      setDriverLocation(null);
       setDriverEta(null);
       setLastLocUpdateAt(null);
       setNowTick(Date.now());

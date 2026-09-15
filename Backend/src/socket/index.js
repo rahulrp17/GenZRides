@@ -242,7 +242,11 @@ export const initializeSocket = (server) => {
         // 1. Emit the raw location IMMEDIATELY — it must never be gated behind
         //    the Google ETA call (a failure/there/timeout there used to swallow
         //    the whole update, so the customer never saw the driver).
-        io.to(bookingId).emit("driver-location-updated", { latitude, longitude });
+        io.to(bookingId).emit("driver-location-updated", {
+          bookingId,
+          latitude,
+          longitude,
+        });
 
         // 2. Best-effort ETA follow-up (non-blocking). Failure only drops ETA.
         const destination = booking.bookingStatus === "Started" ? booking.drop : booking.pickup;
@@ -254,6 +258,7 @@ export const initializeSocket = (server) => {
             const distanceKm = (eta.distance / 1000).toFixed(1);
             const durationMin = Math.ceil(eta.duration / 60);
             io.to(bookingId).emit("driver-location-updated", {
+              bookingId,
               latitude,
               longitude,
               eta: {

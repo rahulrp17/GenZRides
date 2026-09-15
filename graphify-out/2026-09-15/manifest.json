@@ -594,9 +594,9 @@
     "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "backend/src/socket/index.js": {
-    "mtime": 1789060310.358909,
-    "seen": 1789211551.1853275,
-    "ast_hash": "d1f6834aad14efa2caf87c6a23beeeec",
+    "mtime": 1789488563.5112474,
+    "seen": 1789489559.3411305,
+    "ast_hash": "22b45410f8a0a6d7a1beee6aea8ab88e",
     "semantic_hash": ""
   },
   "backend/src/socket/users.js": {
@@ -714,9 +714,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Component/Hero/Hero.jsx": {
-    "mtime": 1789399894.150448,
-    "seen": 1789402176.7842813,
-    "ast_hash": "3ce2f96614b19777fa72acf70d461a8e",
+    "mtime": 1789489130.294214,
+    "seen": 1789489559.3411305,
+    "ast_hash": "e053092626e1642f53d921edabae8060",
     "semantic_hash": ""
   },
   "frontend/src/Component/Loader.jsx": {
@@ -816,9 +816,9 @@
     "semantic_hash": "495c3284868f483bcdb0a249138d145c"
   },
   "frontend/src/assets/images/index.js": {
-    "mtime": 1789456957.5926116,
-    "seen": 1789462266.5268254,
-    "ast_hash": "97d8fe8082684fbad862de5585dd91a7",
+    "mtime": 1789488838.2619586,
+    "seen": 1789489559.3411305,
+    "ast_hash": "60469cec4689d42c3bdd4227dd7ba288",
     "semantic_hash": ""
   },
   "frontend/src/main.jsx": {
@@ -1038,9 +1038,9 @@
     "semantic_hash": ""
   },
   "backend/__tests__/socket.test.js": {
-    "mtime": 1787940054.7290387,
-    "seen": 1788178625.9036546,
-    "ast_hash": "7c4535cb294e72abbcaf131b747a4542",
+    "mtime": 1789488811.507916,
+    "seen": 1789489559.3411305,
+    "ast_hash": "74989b2d20c732ba516afdc372a8e5d7",
     "semantic_hash": ""
   },
   "backend/__tests__/webhook.test.js": {
@@ -1398,9 +1398,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CurrentRideCustomer.jsx": {
-    "mtime": 1789446379.8973968,
-    "seen": 1789452933.4548483,
-    "ast_hash": "63ee6782c0c4a57ad86a52b927376030",
+    "mtime": 1789488996.0517063,
+    "seen": 1789489559.3411305,
+    "ast_hash": "b5cbb133383a72921e7add520e187a8c",
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CustomerBookings.jsx": {
@@ -3339,6 +3339,12 @@
     "mtime": 1789456719.7057488,
     "seen": 1789462266.5278325,
     "ast_hash": "37f5c8ddec036e80f092299f806b7d2b",
+    "semantic_hash": ""
+  },
+  "e2e/live-location.spec.js": {
+    "mtime": 1789489499.269048,
+    "seen": 1789489559.3411305,
+    "ast_hash": "413a9b68320fd2ba6161a59f49a6d392",
     "semantic_hash": ""
   }
 }
