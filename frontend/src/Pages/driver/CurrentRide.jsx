@@ -9,7 +9,7 @@ import {
   User, IndianRupee, CreditCard, CircleDot, X, Flag,
   Banknote,
 } from 'lucide-react';
-import { driverAPI, bookingAPI } from '../../services/endpoints';
+import { driverAPI, bookingAPI, mapsAPI } from '../../services/endpoints';
 import { CardSkeleton } from '../../components/shared/Skeleton';
 import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
@@ -99,6 +99,7 @@ const CurrentRide = () => {
   const initialFitDoneRef = useRef(false);
   const [selfLocation, setSelfLocation] = useState(null);
   const [livePathDriver, setLivePathDriver] = useState(null);
+  const [liveStatus, setLiveStatus] = useState(null);
   const lastFetchDriverRef = useRef(0);
 
   const { isLoaded: mapLoaded, loadError: mapLoadError } = useJsApiLoader({
@@ -139,6 +140,7 @@ const CurrentRide = () => {
   useEffect(() => {
     initialFitDoneRef.current = false;
     hasInteractedRef.current = false;
+    setLiveStatus(null);
   }, [booking?._id]);
 
   const statusMutation = useMutation({
@@ -343,6 +345,9 @@ const CurrentRide = () => {
     socket.on('connect', join);
 
     const handleRideStatusUpdated = (data) => {
+      if (data?._id === booking?._id) {
+        setLiveStatus((prev) => ({ ...(prev || {}), ...data }));
+      }
       queryClient.invalidateQueries({ queryKey: ['currentRide'] });
       queryClient.invalidateQueries({ queryKey: ['driverDashboard'] });
       queryClient.invalidateQueries({ queryKey: ['driverAvailableBookings'] });
@@ -350,7 +355,10 @@ const CurrentRide = () => {
         toast.success(`Ride ${data.bookingStatus.toLowerCase()}`);
       }
     };
-    const handleBookingUpdated = () => {
+    const handleBookingUpdated = (data) => {
+      if (data?._id === booking?._id) {
+        setLiveStatus((prev) => ({ ...(prev || {}), ...data }));
+      }
       queryClient.invalidateQueries({ queryKey: ['currentRide'] });
     };
 
@@ -363,34 +371,38 @@ const CurrentRide = () => {
     };
   }, [socket, booking?._id, queryClient]);
 
-  // Live route for driver: Accepted/On The Way -> self -> pickup ; Started -> pickup -> drop
+  // Live route for driver: Accepted/On The Way -> self -> pickup ; Arrived/Started -> pickup -> drop
   useEffect(() => {
-    if (!mapLoaded || !window.google || !booking) { setLivePathDriver(null); return; }
+    if (!mapLoaded || !booking) { setLivePathDriver(null); return; }
     const pickup = booking.pickup?.latitude && booking.pickup?.longitude ? { lat: booking.pickup.latitude, lng: booking.pickup.longitude } : null;
     const drop = booking.drop?.latitude && booking.drop?.longitude ? { lat: booking.drop.latitude, lng: booking.drop.longitude } : null;
-    const status = booking.bookingStatus;
-    if (['Accepted', 'On The Way'].includes(status) && selfLocation && pickup) {
+    const activeStatus = liveStatus?.bookingStatus || booking.bookingStatus;
+
+    if (['Accepted', 'On The Way'].includes(activeStatus) && selfLocation && pickup) {
       const now = Date.now();
       if (now - lastFetchDriverRef.current < 5000) return;
       lastFetchDriverRef.current = now;
-      try {
-        const svc = new window.google.maps.DirectionsService();
-        svc.route(
-          { origin: selfLocation, destination: pickup, travelMode: window.google.maps.TravelMode.DRIVING },
-          (res, st) => {
-            if (st === 'OK' && res?.routes?.[0]?.overview_path) {
-              setLivePathDriver(res.routes[0].overview_path.map((p) => ({ lat: p.lat(), lng: p.lng() })));
-            }
+      const fetchRoute = async () => {
+        try {
+          const { data } = await mapsAPI.getRoute({
+            origin: { latitude: selfLocation.lat, longitude: selfLocation.lng },
+            destination: { latitude: pickup.lat, longitude: pickup.lng },
+          });
+          if (data?.data?.polyline) {
+            setLivePathDriver(decodePolyline(data.data.polyline));
           }
-        );
-      } catch { /* ignore */ }
-    } else if (['Started', 'Reached', 'Completed', 'Arrived'].includes(status) && pickup && drop) {
+        } catch (err) {
+          console.error('Route fetch failed:', err);
+        }
+      };
+      fetchRoute();
+    } else if (['Arrived', 'Started', 'Reached', 'Completed'].includes(activeStatus) && pickup && drop) {
       if (booking.routePolyline) setLivePathDriver(decodePolyline(booking.routePolyline));
       else setLivePathDriver(null);
     } else {
       setLivePathDriver(null);
     }
-  }, [mapLoaded, booking, selfLocation]);
+  }, [mapLoaded, booking, selfLocation, liveStatus?.bookingStatus]);
 
   if (rideError) return <ErrorState message={rideErr?.message || 'Failed to load current ride'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['currentRide'] })} />;
 
@@ -417,6 +429,7 @@ const CurrentRide = () => {
   const dropCoords = booking?.drop?.latitude && booking?.drop?.longitude
     ? { lat: booking.drop.latitude, lng: booking.drop.longitude }
     : null;
+  const activeStatus = liveStatus?.bookingStatus || booking?.bookingStatus;
   const currentStatusIndex = STATUS_FLOW.findIndex((s) => s.key === booking?.bookingStatus);
   const driverMapCenter = pickupCoords || { lat: 13.0827, lng: 80.2707 };
   const mapCenterPropDriver = hasInteractedRef.current ? undefined : driverMapCenter;
@@ -697,7 +710,7 @@ const CurrentRide = () => {
                       <Polyline
                         path={livePathDriver || decodePolyline(booking.routePolyline)}
                         options={{
-                          strokeColor: livePathDriver && ['Accepted','On The Way'].includes(booking.bookingStatus) ? '#16a34a' : '#6366f1',
+                          strokeColor: livePathDriver && ['Accepted','On The Way'].includes(activeStatus) ? '#16a34a' : '#6366f1',
                           strokeWeight: 4,
                           strokeOpacity: 0.7,
                           geodesic: true,

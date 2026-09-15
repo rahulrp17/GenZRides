@@ -5,7 +5,7 @@ import { GoogleMap, useJsApiLoader, Marker, Polyline } from '@react-google-maps/
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { MapPin, Navigation, Car, Clock, Phone, User, CheckCircle, X, Download, Star } from 'lucide-react';
-import { bookingAPI, invoiceAPI, reviewAPI } from '../../services/endpoints';
+import { bookingAPI, invoiceAPI, reviewAPI, mapsAPI } from '../../services/endpoints';
 import { useSocket } from '../../Context/SocketContext';
 import { CardSkeleton } from '../../components/shared/Skeleton';
 import ErrorState from '../../components/shared/ErrorState';
@@ -206,32 +206,39 @@ const CurrentRideCustomer = () => {
     }
   }, [booking?._id, booking?.rating, booking?.review, isCompleted]);
 
-  // Live route: Accepted/On The Way -> driver -> pickup ; Started/Reached -> pickup -> drop (car moving)
+  // Live route via backend API (throttled to once per 5 s)
   useEffect(() => {
-    if (!isLoaded || !window.google || !booking) { setLivePath(null); return; }
-    const status = booking.bookingStatus;
-    if (['Accepted', 'On The Way'].includes(status) && driverLocation && pickupCoordsEarly) {
+    const activeBooking = liveStatus || booking;
+    const activeStatus = activeBooking?.bookingStatus;
+
+    if (!isLoaded || !window.google || !activeBooking) { setLivePath(null); return; }
+
+    if (['Accepted', 'On The Way'].includes(activeStatus) && driverLocation && pickupCoordsEarly) {
       const now = Date.now();
       if (now - lastFetchRef.current < 5000) return;
       lastFetchRef.current = now;
-      try {
-        const svc = new window.google.maps.DirectionsService();
-        svc.route(
-          { origin: driverLocation, destination: pickupCoordsEarly, travelMode: window.google.maps.TravelMode.DRIVING },
-          (res, st) => {
-            if (st === 'OK' && res?.routes?.[0]?.overview_path) {
-              setLivePath(res.routes[0].overview_path.map((p) => ({ lat: p.lat(), lng: p.lng() })));
-            }
+
+      const fetchRoute = async () => {
+        try {
+          const { data } = await mapsAPI.getRoute({
+            origin: { latitude: driverLocation.lat, longitude: driverLocation.lng },
+            destination: { latitude: pickupCoordsEarly.lat, longitude: pickupCoordsEarly.lng },
+          });
+          if (data?.data?.polyline) {
+            setLivePath(decodePolyline(data.data.polyline));
           }
-        );
-      } catch { /* ignore */ }
-    } else if (['Started', 'Reached', 'Completed', 'Arrived'].includes(status) && pickupCoordsEarly && dropCoordsEarly) {
-      if (booking.routePolyline) setLivePath(decodePolyline(booking.routePolyline));
+        } catch (err) {
+          console.error('Route fetch failed:', err);
+        }
+      };
+      fetchRoute();
+    } else if (['Arrived', 'Started', 'Reached', 'Completed'].includes(activeStatus)) {
+      if (activeBooking.routePolyline) setLivePath(decodePolyline(activeBooking.routePolyline));
       else setLivePath(null);
     } else {
       setLivePath(null);
     }
-  }, [isLoaded, booking?.bookingStatus, booking?.routePolyline, driverLocation, pickupCoordsEarly, dropCoordsEarly]);
+  }, [isLoaded, liveStatus?.bookingStatus, liveStatus?.routePolyline, booking?.bookingStatus, booking?.routePolyline, driverLocation, pickupCoordsEarly, dropCoordsEarly]);
 
   const onMapLoad = useCallback((map) => {
     mapRef.current = map;
@@ -265,7 +272,9 @@ const CurrentRideCustomer = () => {
     socket.on('connect', join);
 
     const handleBookingUpdated = (data) => {
-      setLiveStatus((prev) => ({ ...(prev || {}), ...data, _id: data._id || prev?._id }));
+      if (data?._id === booking?._id) {
+        setLiveStatus((prev) => ({ ...(prev || {}), ...data, _id: data._id || prev?._id }));
+      }
       queryClient.invalidateQueries({ queryKey: ['currentRideCustomer'] });
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
       if (data?.bookingStatus) toast.success(`Ride status updated to ${data.bookingStatus}`);
@@ -277,7 +286,9 @@ const CurrentRideCustomer = () => {
     };
 
     const handleRideStatusUpdated = (data) => {
-      setLiveStatus((prev) => ({ ...(prev || {}), ...data }));
+      if (data?._id === booking?._id) {
+        setLiveStatus((prev) => ({ ...(prev || {}), ...data }));
+      }
       queryClient.invalidateQueries({ queryKey: ['currentRideCustomer'] });
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
     };
@@ -571,7 +582,7 @@ const CurrentRideCustomer = () => {
                       <Polyline
                         path={livePath || decodePolyline(booking.routePolyline)}
                         options={{
-                          strokeColor: '#2513c2',
+                          strokeColor: ['Accepted', 'On The Way'].includes(booking.bookingStatus) ? '#16a34a' : '#6366f1',
                           strokeWeight: 4,
                           strokeOpacity: 0.6,
                           geodesic: true,
