@@ -35,6 +35,7 @@ import notificationRoutes from "./routes/notification.routes.js";
 import googleMapsRoutes from "./routes/googleMaps.routes.js";
 import webhookRoutes from "./routes/webhook.routes.js";
 import dispatchRoutes from "./routes/dispatch.routes.js";
+import aiAssistantRoutes from "./routes/aiAssistant.routes.js";
 import { sanitizeInput, requestTimeout } from "./middleware/security.middleware.js";
 
 const app = express();
@@ -192,6 +193,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/dispatch", dispatchLimiter, dispatchRoutes);
 app.use("/api/maps", googleMapsRoutes);
+app.use("/api/ai", aiAssistantRoutes);
 
 /* ===========================================================
    ROOT

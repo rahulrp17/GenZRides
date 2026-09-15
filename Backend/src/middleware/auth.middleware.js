@@ -90,3 +90,25 @@ export const authenticate = async (
     });
   }
 };
+
+/* ===========================================================
+   AUTHENTICATE OPTIONAL — sets req.user if token present
+   but never blocks the request
+=========================================================== */
+
+export const authenticateOptional = async (req, _res, next) => {
+  try {
+    let token;
+    if (req.headers.authorization?.startsWith("Bearer ")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+    if (token) {
+      const decoded = verifyToken(token);
+      const user = await getCachedUser(decoded.id);
+      if (user && !user.isBlocked) req.user = user;
+    }
+  } catch {
+    // silently ignore — guest request
+  }
+  next();
+};

@@ -229,3 +229,8 @@ export const uploadAPI = {
     });
   },
 };
+
+// ==================== AI ASSISTANT ====================
+export const aiAPI = {
+  chat: (message) => api.post('/ai/chat', { message }),
+};

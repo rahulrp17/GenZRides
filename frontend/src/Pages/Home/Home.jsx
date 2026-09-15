@@ -1,6 +1,7 @@
 import React from 'react'
 import Hero from '../../Component/Hero/Hero'
 import FloatingIcons from './FloatingIcons'
+import AIAssistant from '../../components/ai/AIAssistant'
 import { PopularRoutes, Services } from '../../Component/Landing/RouteServices'
 import VehicleShowcase from '../../Component/Landing/VehicleShowcase'
 import { WhyChooseUs, AboutSection, HowItWorks } from '../../Component/Landing/StorySections'
@@ -25,6 +26,7 @@ const Home = () => {
         }}
       />
       <FloatingIcons />
+      <AIAssistant />
       <Hero />
       <PopularRoutes />
       <Services />
