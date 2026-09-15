@@ -43,7 +43,7 @@ async function freshLogin(page, email, password, role) {
 async function api(page, method, path, body) {
   return page.evaluate(async ({ apiBase, method, path, body }) => {
     const tokens = JSON.parse(localStorage.getItem('authTokens') || '{}');
-    const token = tokens?.accessToken;
+    const token = localStorage.getItem('accessToken') || tokens?.accessToken;
     if (!token) return { error: 'no token' };
     const res = await fetch(`${apiBase}${path}`, {
       method,
@@ -57,8 +57,8 @@ async function api(page, method, path, body) {
 
 async function pickVehicle(page) {
   return page.evaluate(async (apiBase) => {
-    const tokens = JSON.parse(localStorage.getItem('authTokens') || '{}');
-    const res = await fetch(`${apiBase}/vehicles`, { headers: { Authorization: `Bearer ${tokens?.accessToken}` } });
+    const token = localStorage.getItem('accessToken') || JSON.parse(localStorage.getItem('authTokens') || '{}')?.accessToken;
+    const res = await fetch(`${apiBase}/vehicles`, { headers: { Authorization: `Bearer ${token}` } });
     const json = await res.json();
     const list = json?.data?.vehicles || json?.vehicles || json?.data || [];
     const v = list.find((x) => (x.vehicleType || '').toLowerCase() === 'sedan') || list[0];

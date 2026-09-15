@@ -137,8 +137,8 @@ const DriverLayout = () => {
       >
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-white/5">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent">
-              GenZRides
+            <h1 className="text-xl font-bold bg-gradient-to-r  bg-clip-text text-white">
+              Gens <span className="text-green-400">Z</span> Rides
             </h1>
             <p className="text-xs text-gray-400 mt-1">Driver Dashboard</p>
           </div>

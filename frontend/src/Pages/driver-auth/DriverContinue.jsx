@@ -58,7 +58,7 @@ const DriverContinue = () => {
           >
             <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-full px-4 py-1.5 mb-6">
               <Car size={16} className="text-green-400" />
-              <span className="text-green-300 text-sm font-medium">Drive with Let&apos;s Go</span>
+              <span className="text-green-300 text-sm font-medium">Drive with GenZRides</span>
             </div>
 
             <h1 className="font-editorial text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">

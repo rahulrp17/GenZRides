@@ -4,6 +4,7 @@ import hero2 from "./hero2.jpg"; //2
 import hero4 from "./hero4.jpg"; //4
 import hero8 from "./hero8.webp";
 import hero10 from "./hero10.webp";
+import hero9 from "./hero9.webp";
 import hero11 from "./hero11.webp";
 import sedan from "./sedan.webp";
 import innova from "./innova.webp";
@@ -26,15 +27,18 @@ import MaduraiTrichy from "./MaduraiTrichy.webp";
 import TrichyAirport from "./TrichyAirport.jpg";
 import MaduraiAirport from "./MaduraiAirport.jpg";
 import CoimbatoreAirport from "./CoimbatoreAirport.jpg";
-
-
+import ChennaiAirport from "./ChennaiAirport.jpg";
+import BangaloreAirport from "./BangaloreAirport.jpg";
+import about2 from "./about2.jpg";
 
 export {
   hero2,
   hero4,
   hero8,
   hero10,
+  hero9,
   hero11,
+  about2,
   sedan,
   innova,
   logo5,
@@ -55,5 +59,7 @@ export {
   MaduraiTrichy,
   TrichyAirport,
   MaduraiAirport,
+  ChennaiAirport,
+  BangaloreAirport,
   CoimbatoreAirport
 };

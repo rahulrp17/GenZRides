@@ -6,20 +6,20 @@ import { Plane, ArrowRight, Radar, Luggage, Clock3, BadgeCheck } from "lucide-re
 import PageHero from "../../Component/Landing/PageHero";
 import { Reveal, SectionHeading, GlowBlobs } from "../../Component/Landing/Reveal";
 import { cardHover } from "../../Component/Landing/motion";
-import { CoimbatoreAirport, TrichyAirport, MaduraiAirport, hero4, hero10,  } from "../../assets/images";
+import { CoimbatoreAirport, TrichyAirport, MaduraiAirport,  hero10, ChennaiAirport, BangaloreAirport } from "../../assets/images";
 
 const AIRPORTS = [
   {
     city: "Chennai",
     code: "MAA",
-    img: hero10,
+    img: ChennaiAirport,
     tag: "Busiest Hub",
     desc: "Flight-tracked pickups with meet-and-greet service at both terminals, day and night.",
   },
   {
     city: "Bangalore",
     code: "BLR",
-    img: hero4,
+    img: BangaloreAirport,
     tag: "Tech Corridor",
     desc: "KIAB transfers timed to your landing — your chauffeur waits, even when flights don't.",
   },

@@ -3,7 +3,7 @@ import { motion as Motion, useInView, animate } from "framer-motion";
 import { ArrowRight, ShieldCheck, Star, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import GuestBookingForm from "../../Pages/guest/GuestBookingForm";
-import { hero2 } from "../../assets/images";
+import {about2} from "../../assets/images";
 
 const Counter = ({ to, decimals = 0, suffix = "", prefix = "", duration = 2 }) => {
   const ref = useRef(null);
@@ -39,7 +39,7 @@ const Hero = () => {
       {/* Cinematic background */}
       <div className="absolute inset-0">
         <img
-          src={hero2}
+          src={about2}
           alt="Premium cab journey on an open road"
           className="w-full h-full object-cover"
           fetchPriority="high"

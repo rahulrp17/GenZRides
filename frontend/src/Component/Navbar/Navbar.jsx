@@ -2,7 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion as Motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ArrowRight, LogOut, LayoutDashboard, Bell, User, ChevronDown, MapPin, Plane } from "lucide-react";
+import {
+  Menu,
+  X,
+  ArrowRight,
+  LogOut,
+  LayoutDashboard,
+  Bell,
+  User,
+  ChevronDown,
+  MapPin,
+  Plane,
+} from "lucide-react";
 import { GenZRides } from "../../assets/images";
 import useAuth from "../../hooks/useAuth";
 import { useSocket } from "../../Context/SocketContext";
@@ -80,7 +91,8 @@ const Navbar = () => {
   useEffect(() => {
     if (!transportOpen) return;
     const handle = (e) => {
-      if (transportRef.current && !transportRef.current.contains(e.target)) setTransportOpen(false);
+      if (transportRef.current && !transportRef.current.contains(e.target))
+        setTransportOpen(false);
     };
     document.addEventListener("mousedown", handle);
     document.addEventListener("touchstart", handle, { passive: true });
@@ -114,8 +126,18 @@ const Navbar = () => {
   ];
 
   const transportItems = [
-    { path: "/popular-routes", label: "Popular Routes", icon: MapPin, desc: "Trending intercity routes" },
-    { path: "/airport-transfers", label: "Airport Transfers", icon: Plane, desc: "Chennai • Bangalore • Trichy" },
+    {
+      path: "/popular-routes",
+      label: "Popular Routes",
+      icon: MapPin,
+      desc: "Trending intercity routes",
+    },
+    {
+      path: "/airport-transfers",
+      label: "Airport Transfers",
+      icon: Plane,
+      desc: "Chennai • Bangalore • Trichy",
+    },
   ];
 
   const handleLogout = async () => {
@@ -125,9 +147,15 @@ const Navbar = () => {
     navigate("/");
   };
 
-  const dashboardPath = user ? DASHBOARD_ROUTES[user.role] || "/customer" : null;
-  const profilePath = user ? PROFILE_ROUTES[user.role] || "/customer/profile" : null;
-  const notifPath = user ? NOTIF_ROUTES[user.role] || "/customer/notifications" : null;
+  const dashboardPath = user
+    ? DASHBOARD_ROUTES[user.role] || "/customer"
+    : null;
+  const profilePath = user
+    ? PROFILE_ROUTES[user.role] || "/customer/profile"
+    : null;
+  const notifPath = user
+    ? NOTIF_ROUTES[user.role] || "/customer/notifications"
+    : null;
 
   const { data: notifData } = useQuery({
     queryKey: ["unreadCount"],
@@ -166,7 +194,6 @@ const Navbar = () => {
     >
       <div className="bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_40px_rgba(0,0,0,0.45)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3 lg:gap-4">
-
           {/* LEFT — Logo */}
           <div
             onClick={() => navigate("/")}
@@ -218,11 +245,21 @@ const Navbar = () => {
             <div className="relative" ref={transportRef}>
               <button
                 onClick={() => setTransportOpen((v) => !v)}
-                className={`relative flex items-center cursor-pointer gap-1.5 transition-all duration-300 ${transportOpen || transportItems.some((t)=> window.location.pathname.startsWith(t.path)) ? "text-green-400" : "text-gray-300 hover:text-green-400"}`}
+                className={`relative flex items-center cursor-pointer gap-1.5 transition-all duration-300 ${transportOpen || transportItems.some((t) => window.location.pathname.startsWith(t.path)) ? "text-green-400" : "text-gray-300 hover:text-green-400"}`}
               >
-                Transport <ChevronDown size={14} className={`transition-transform ${transportOpen ? "rotate-180" : ""}`} />
-                {(transportOpen || transportItems.some((t)=> window.location.pathname.startsWith(t.path))) && (
-                  <Motion.div layoutId="activeNav" className="absolute -bottom-2 left-0 right-0 h-0.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 shadow-[0_0_12px_rgba(34,197,94,0.8)]" />
+                Transport{" "}
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform ${transportOpen ? "rotate-180" : ""}`}
+                />
+                {(transportOpen ||
+                  transportItems.some((t) =>
+                    window.location.pathname.startsWith(t.path),
+                  )) && (
+                  <Motion.div
+                    layoutId="activeNav"
+                    className="absolute -bottom-2 left-0 right-0 h-0.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 shadow-[0_0_12px_rgba(34,197,94,0.8)]"
+                  />
                 )}
               </button>
               <AnimatePresence>
@@ -237,14 +274,19 @@ const Navbar = () => {
                     {transportItems.map((t) => (
                       <button
                         key={t.path}
-                        onClick={() => { setTransportOpen(false); navigate(t.path); }}
-                        className="flex items-center gap-3 w-full px-4 py-3 rounded-xl hover:bg-white/10 text-left transition group"
+                        onClick={() => {
+                          setTransportOpen(false);
+                          navigate(t.path);
+                        }}
+                        className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 rounded-xl hover:bg-white/10 text-left transition group"
                       >
                         <span className="w-9 h-9 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center group-hover:bg-green-500/20 transition">
                           <t.icon size={16} className="text-green-400" />
                         </span>
                         <div>
-                          <p className="text-sm font-semibold text-white">{t.label}</p>
+                          <p className="text-sm font-semibold text-white">
+                            {t.label}
+                          </p>
                           <p className="text-xs text-gray-400">{t.desc}</p>
                         </div>
                       </button>
@@ -261,7 +303,7 @@ const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/booking")}
-              className="flex items-center gap-1.5 text-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 xl:px-5 py-2 xl:py-2.5 rounded-full font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all whitespace-nowrap"
+              className="flex items-center cursor-pointer  gap-1.5 text-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 xl:px-5 py-2 xl:py-2.5 rounded-full font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all whitespace-nowrap"
             >
               Book <ArrowRight size={16} />
             </Motion.button>
@@ -273,7 +315,7 @@ const Navbar = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => navigate("/driver/continue")}
-                    className="hidden xl:flex items-center gap-1.5 text-sm border border-green-500/50 text-green-400 hover:bg-green-500/10 px-4 py-2.5 rounded-full font-semibold transition-all whitespace-nowrap"
+                    className="hidden xl:flex cursor-pointer items-center gap-1.5 text-sm border border-green-500/50 text-green-400 hover:bg-green-500/10 px-4 py-2.5 rounded-full font-semibold transition-all whitespace-nowrap"
                   >
                     Drive With Us
                   </Motion.button>
@@ -281,7 +323,7 @@ const Navbar = () => {
 
                 <button
                   onClick={() => navigate(notifPath)}
-                  className="relative p-2.5 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-all"
+                  className="relative p-2.5 rounded-full text-gray-300 cursor-pointer hover:text-white hover:bg-white/10 transition-all"
                   aria-label="Notifications"
                 >
                   <Bell size={19} />
@@ -295,7 +337,7 @@ const Navbar = () => {
                 <div className="relative" ref={profileRef}>
                   <button
                     onClick={() => setProfileOpen((v) => !v)}
-                    className="flex items-center gap-1.5 p-1 pr-1.5 rounded-full hover:bg-white/10 transition-all"
+                    className="flex items-center cursor-pointer gap-1.5 p-1 pr-1.5 rounded-full hover:bg-white/10 transition-all"
                     aria-label="Profile menu"
                   >
                     {user?.profileImage ? (
@@ -322,18 +364,28 @@ const Navbar = () => {
                         className="absolute right-0 top-full mt-2 w-52 bg-[#0a0f0d]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl py-2 overflow-hidden"
                       >
                         <div className="px-4 py-3 border-b border-white/10">
-                          <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
-                          <p className="text-xs text-green-400 capitalize">{user?.role}</p>
+                          <p className="text-sm font-semibold text-white truncate">
+                            {user?.name}
+                          </p>
+                          <p className="text-xs text-green-400 capitalize">
+                            {user?.role}
+                          </p>
                         </div>
                         <button
-                          onClick={() => { setProfileOpen(false); navigate(profilePath); }}
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white w-full transition"
+                          onClick={() => {
+                            setProfileOpen(false);
+                            navigate(profilePath);
+                          }}
+                          className="flex cursor-pointer items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white w-full transition"
                         >
                           <User size={16} /> My Profile
                         </button>
                         <button
-                          onClick={() => { setProfileOpen(false); navigate(dashboardPath); }}
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white w-full transition"
+                          onClick={() => {
+                            setProfileOpen(false);
+                            navigate(dashboardPath);
+                          }}
+                          className="flex items-center cursor-pointer gap-2.5 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white w-full transition"
                         >
                           <LayoutDashboard size={16} /> Dashboard
                         </button>
@@ -425,8 +477,12 @@ const Navbar = () => {
                       </span>
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
-                      <p className="text-xs text-green-400 capitalize">{user?.role}</p>
+                      <p className="text-sm font-semibold text-white truncate">
+                        {user?.name}
+                      </p>
+                      <p className="text-xs text-green-400 capitalize">
+                        {user?.role}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -451,7 +507,10 @@ const Navbar = () => {
                   className="flex items-center justify-between w-full text-base py-2 text-gray-300"
                 >
                   <span>Transport</span>
-                  <ChevronDown size={16} className={`transition-transform ${mobileTransportOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform ${mobileTransportOpen ? "rotate-180" : ""}`}
+                  />
                 </button>
                 <AnimatePresence>
                   {mobileTransportOpen && (
@@ -464,13 +523,19 @@ const Navbar = () => {
                       {transportItems.map((t) => (
                         <button
                           key={t.path}
-                          onClick={() => { setIsOpen(false); setMobileTransportOpen(false); navigate(t.path); }}
+                          onClick={() => {
+                            setIsOpen(false);
+                            setMobileTransportOpen(false);
+                            navigate(t.path);
+                          }}
                           className="flex items-center gap-3 w-full py-2.5 text-left"
                         >
                           <span className="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
                             <t.icon size={14} className="text-green-400" />
                           </span>
-                          <span className="text-sm text-gray-300">{t.label}</span>
+                          <span className="text-sm text-gray-300">
+                            {t.label}
+                          </span>
                         </button>
                       ))}
                     </Motion.div>
@@ -478,7 +543,10 @@ const Navbar = () => {
                 </AnimatePresence>
 
                 <button
-                  onClick={() => { navigate("/booking"); setIsOpen(false); }}
+                  onClick={() => {
+                    navigate("/booking");
+                    setIsOpen(false);
+                  }}
                   className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full py-3 mt-3 font-semibold"
                 >
                   Book a Ride <ArrowRight size={18} />
@@ -487,20 +555,29 @@ const Navbar = () => {
                 {user ? (
                   <>
                     <button
-                      onClick={() => { navigate(profilePath); setIsOpen(false); }}
+                      onClick={() => {
+                        navigate(profilePath);
+                        setIsOpen(false);
+                      }}
                       className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white rounded-full py-3 mt-2 font-semibold"
                     >
                       <User size={18} /> My Profile
                     </button>
                     <button
-                      onClick={() => { navigate(dashboardPath); setIsOpen(false); }}
+                      onClick={() => {
+                        navigate(dashboardPath);
+                        setIsOpen(false);
+                      }}
                       className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white rounded-full py-3 mt-2 font-semibold"
                     >
                       <LayoutDashboard size={18} /> Dashboard
                     </button>
                     {user.role === "customer" && (
                       <button
-                        onClick={() => { navigate("/driver/continue"); setIsOpen(false); }}
+                        onClick={() => {
+                          navigate("/driver/continue");
+                          setIsOpen(false);
+                        }}
                         className="border border-green-500/50 text-green-400 rounded-full py-3 mt-2 font-semibold"
                       >
                         Drive With Us
@@ -516,13 +593,19 @@ const Navbar = () => {
                 ) : (
                   <>
                     <button
-                      onClick={() => { navigate("/driver/continue"); setIsOpen(false); }}
+                      onClick={() => {
+                        navigate("/driver/continue");
+                        setIsOpen(false);
+                      }}
                       className="border border-green-500/50 text-green-400 rounded-full py-3 mt-2 font-semibold"
                     >
                       Drive With Us
                     </button>
                     <button
-                      onClick={() => { navigate("/signup"); setIsOpen(false); }}
+                      onClick={() => {
+                        navigate("/signup");
+                        setIsOpen(false);
+                      }}
                       className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full py-3 mt-2 font-semibold"
                     >
                       Sign Up

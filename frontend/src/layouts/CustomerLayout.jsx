@@ -82,8 +82,8 @@ const CustomerLayout = () => {
       >
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-white/5">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent">
-              GenZRides
+           <h1 className="text-xl font-bold bg-gradient-to-r text-white bg-clip-text ">
+              Gen <span className="text-green-400">Z</span>Rides
             </h1>
             <p className="text-xs text-gray-400 mt-1">Customer Dashboard</p>
           </div>

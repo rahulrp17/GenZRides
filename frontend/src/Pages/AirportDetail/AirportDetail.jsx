@@ -15,13 +15,13 @@ import {
 import PageHero from "../../Component/Landing/PageHero";
 import { Reveal, SectionHeading, GlowBlobs } from "../../Component/Landing/Reveal";
 import { cardHover } from "../../Component/Landing/motion";
-import { hero2, hero4, hero8, hero10, hero11 } from "../../assets/images";
+import { CoimbatoreAirport, TrichyAirport, MaduraiAirport,  ChennaiAirport, BangaloreAirport } from "../../assets/images";
 
 const AIRPORTS = {
   chennai: {
     city: "Chennai",
     code: "MAA",
-    img: hero10,
+    img: ChennaiAirport,
     tag: "Busiest Hub",
     desc: "Flight-tracked pickups with meet-and-greet service at both terminals, day and night.",
     points: ["Flight delay auto-tracking", "Meet & greet at arrivals", "45 min free waiting", "Sedan to SUV fleet"],
@@ -29,7 +29,7 @@ const AIRPORTS = {
   bangalore: {
     city: "Bangalore",
     code: "BLR",
-    img: hero4,
+    img: BangaloreAirport,
     tag: "Tech Corridor",
     desc: "KIAB transfers timed to your landing — your chauffeur waits, even when flights don't.",
     points: ["KIAB terminal expertise", "Red-eye arrival specialists", "Corporate billing", "Extra luggage room"],
@@ -37,7 +37,7 @@ const AIRPORTS = {
   coimbatore: {
     city: "Coimbatore",
     code: "CJB",
-    img: hero8,
+    img: CoimbatoreAirport,
     tag: "On-Time Promise",
     desc: "Early-morning and late-night CJB runs with buffer-planned routing and terminal drop-off.",
     points: ["Buffer-planned routing", "4 AM departure ready", "Fixed drop fares", "Quiet work cabins"],
@@ -45,7 +45,7 @@ const AIRPORTS = {
   trichy: {
     city: "Trichy",
     code: "TRZ",
-    img: hero2,
+    img: TrichyAirport,
     tag: "Home Base",
     desc: "Our home airport — the fastest airport pickups in the city, guaranteed.",
     points: ["Fastest city pickups", "Local chauffeurs", "Temple-town onward trips", "24×7 dispatch"],
@@ -53,7 +53,7 @@ const AIRPORTS = {
   madurai: {
     city: "Madurai",
     code: "IXM",
-    img: hero11,
+    img: MaduraiAirport,
     tag: "Temple Gateway",
     desc: "Land and glide straight to the temple city or onward to Rameshwaram.",
     points: ["Onward pilgrim trips", "Family & group cabs", "Patient temple-halt drivers", "Upfront fares"],
@@ -98,7 +98,7 @@ const AirportDetail = () => {
             <ArrowLeft size={16} /> All airport transfers
           </Link>
 
-          <div className="grid lg:grid-cols-2 gap-5 md:gap-6 items-stretch">
+          <div className="grid lg:grid-cols-2 gap-5 md:gap-6 mb-7 items-stretch">
             <Reveal>
               <Motion.div
                 {...cardHover}
@@ -168,7 +168,7 @@ const AirportDetail = () => {
             eyebrow="Every Transfer"
             title="The airport standard"
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 -mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6 gap-4 md:gap-5 -mt-4">
             {PERKS.map((p, i) => (
               <Reveal key={p.title} delay={i * 0.07}>
                 <div className="bg-white/5 backdrop-blur-lg rounded-[24px] border border-white/10 p-5 sm:p-6 h-full hover:border-green-500/40 transition-colors">
