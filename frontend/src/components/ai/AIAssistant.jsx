@@ -56,6 +56,13 @@ export default function AIAssistant() {
     }
   }, [isOpen]);
 
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    setMessages([]);
+    setError(null);
+    setInput("");
+  }, []);
+
   const sendMessage = useCallback(async (text) => {
     const msg = text.trim();
     if (!msg || loading) return;
@@ -99,7 +106,13 @@ export default function AIAssistant() {
     <>
       {/* Floating Button */}
       <Motion.button
-        onClick={() => setIsOpen((o) => !o)}
+        onClick={() => {
+          if (isOpen) {
+            handleClose();
+          } else {
+            setIsOpen(true);
+          }
+        }}
         className="fixed bottom-[4.5rem] right-2 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-shadow"
         style={{
           background: "linear-gradient(135deg, rgba(16,185,129,0.9), rgba(59,130,246,0.9))",
@@ -144,7 +157,7 @@ export default function AIAssistant() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
+              onClick={handleClose}
             />
 
             {/* Panel */}
@@ -174,7 +187,7 @@ export default function AIAssistant() {
                   <h3 className="text-sm font-bold text-white tracking-tight">GenZRides Assistant</h3>
                   <p className="text-[10px] text-gray-400">AI-powered ride helper</p>
                 </div>
-                <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition md:hidden">
+                <button               onClick={handleClose} className="p-1.5 hover:bg-white/10 rounded-lg transition md:hidden">
                   <X size={18} className="text-gray-400" />
                 </button>
               </div>
