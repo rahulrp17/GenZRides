@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "backend/package.json": {
-    "mtime": 1789452676.867275,
-    "seen": 1789452933.4548483,
-    "ast_hash": "7182d325c60b045d7c4810072fb879c5",
+    "mtime": 1788754788.187454,
+    "seen": 1789211551.1843324,
+    "ast_hash": "3cf2a2669d3bcf7d3d564b626ef4377a",
     "semantic_hash": ""
   },
   "backend/src/app.js": {
@@ -1182,9 +1182,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/driver/CurrentRide.jsx": {
-    "mtime": 1789446407.830212,
-    "seen": 1789452933.4548483,
-    "ast_hash": "3b0d13e0ac438c4ffea3c1f358c181a0",
+    "mtime": 1789361029.50901,
+    "seen": 1789370299.5260868,
+    "ast_hash": "ddaf97f840595382b4406cc52186f8ec",
     "semantic_hash": ""
   },
   "frontend/src/Pages/driver/DriverDashboard.jsx": {
@@ -1314,9 +1314,9 @@
     "semantic_hash": ""
   },
   "frontend/src/layouts/DriverLayout.jsx": {
-    "mtime": 1789445175.7174504,
-    "seen": 1789452933.4558477,
-    "ast_hash": "4c6a511ec45b94dce776b26c75659450",
+    "mtime": 1789442717.9653296,
+    "seen": 1789444851.2009559,
+    "ast_hash": "db28789bbfea501a45d3085f060b4041",
     "semantic_hash": ""
   },
   "frontend/src/providers/QueryProvider.jsx": {
@@ -1398,9 +1398,9 @@
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CurrentRideCustomer.jsx": {
-    "mtime": 1789446379.8973968,
-    "seen": 1789452933.4548483,
-    "ast_hash": "63ee6782c0c4a57ad86a52b927376030",
+    "mtime": 1789364194.685479,
+    "seen": 1789370299.5260868,
+    "ast_hash": "b60aafb8204e277cff0918c85589e418",
     "semantic_hash": ""
   },
   "frontend/src/Pages/customer/CustomerBookings.jsx": {
@@ -3081,234 +3081,6 @@
     "mtime": 1789402123.2574954,
     "seen": 1789402176.7852824,
     "ast_hash": "190d4a8e32bb9efc567b63fe514a47ea",
-    "semantic_hash": ""
-  },
-  "e2e-results/.last-run.json": {
-    "mtime": 1789451881.6040282,
-    "seen": 1789452933.4548483,
-    "ast_hash": "f196824657d8858bc7fa44eecbba38b1",
-    "semantic_hash": ""
-  },
-  "e2e/ride-flow.spec.js": {
-    "mtime": 1789451593.979187,
-    "seen": 1789452933.4548483,
-    "ast_hash": "4b0cb691ccebcbad0cb8cc83ea5eebaf",
-    "semantic_hash": ""
-  },
-  "package.json": {
-    "mtime": 1789447714.5821157,
-    "seen": 1789452933.4558477,
-    "ast_hash": "3ef834017af63972070becf026c8ffc8",
-    "semantic_hash": ""
-  },
-  "playwright.config.js": {
-    "mtime": 1789447913.2042148,
-    "seen": 1789452933.4558477,
-    "ast_hash": "d2cdd18813138e9abd43725867c2d1f9",
-    "semantic_hash": ""
-  },
-  "e2e-results/01-customer-dash.png": {
-    "mtime": 1789451641.331321,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7c7cf517fbb63fa1dcccf1b654c2f152",
-    "semantic_hash": ""
-  },
-  "e2e-results/02-book-ride.png": {
-    "mtime": 1789451651.3089044,
-    "seen": 1789452933.4558477,
-    "ast_hash": "fe48f6dd65fd4ba77159cba6f697a5d2",
-    "semantic_hash": ""
-  },
-  "e2e-results/03-pickup.png": {
-    "mtime": 1789451658.1977396,
-    "seen": 1789452933.4558477,
-    "ast_hash": "f3860b65e2d010dd860994c24476e688",
-    "semantic_hash": ""
-  },
-  "e2e-results/04-drop.png": {
-    "mtime": 1789451665.1969454,
-    "seen": 1789452933.4558477,
-    "ast_hash": "2bc93a66adf4e57e04f9ff3ab4dafdb4",
-    "semantic_hash": ""
-  },
-  "e2e-results/05-suv.png": {
-    "mtime": 1789451670.4855766,
-    "seen": 1789452933.4558477,
-    "ast_hash": "9952541c5e7dd064694aa6baf2a888cc",
-    "semantic_hash": ""
-  },
-  "e2e-results/06-fare.png": {
-    "mtime": 1789451674.6952562,
-    "seen": 1789452933.4558477,
-    "ast_hash": "1dcbb71dbfe8b93d00c1525e586289fe",
-    "semantic_hash": ""
-  },
-  "e2e-results/07-clicked.png": {
-    "mtime": 1789451678.022222,
-    "seen": 1789452933.4558477,
-    "ast_hash": "186e1c61ca2336f9fe0f6f8317ec0783",
-    "semantic_hash": ""
-  },
-  "e2e-results/08-confirmed.png": {
-    "mtime": 1789451683.2748814,
-    "seen": 1789452933.4558477,
-    "ast_hash": "82dd826c2d9466c396618b1af7267af0",
-    "semantic_hash": ""
-  },
-  "e2e-results/09-waiting.png": {
-    "mtime": 1789451688.4595983,
-    "seen": 1789452933.4558477,
-    "ast_hash": "e2c86d8cd1a8b4fe867a15d0270e46cf",
-    "semantic_hash": ""
-  },
-  "e2e-results/10-customer-ride.png": {
-    "mtime": 1789451693.766124,
-    "seen": 1789452933.4558477,
-    "ast_hash": "79d70b0fdf72d258bc726a188ec923d0",
-    "semantic_hash": ""
-  },
-  "e2e-results/12-driver-dash.png": {
-    "mtime": 1789451720.5710487,
-    "seen": 1789452933.4558477,
-    "ast_hash": "d8fe1062591e8c25c0b2bd0b7a25d665",
-    "semantic_hash": ""
-  },
-  "e2e-results/13-driver-bookings.png": {
-    "mtime": 1789451731.789564,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7ca11719af255b8eefc18125909007ca",
-    "semantic_hash": ""
-  },
-  "e2e-results/14-accept.png": {
-    "mtime": 1789451744.7318563,
-    "seen": 1789452933.4558477,
-    "ast_hash": "52c2708860917ee93a3a72cdfcbcf949",
-    "semantic_hash": ""
-  },
-  "e2e-results/14a-booking-details.png": {
-    "mtime": 1789451737.1893487,
-    "seen": 1789452933.4558477,
-    "ast_hash": "d576efeb197b4aaa07ac9a343ac686c6",
-    "semantic_hash": ""
-  },
-  "e2e-results/15-driver-ride.png": {
-    "mtime": 1789451762.1678433,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7a644189e82a7954e9fdf40c678412fa",
-    "semantic_hash": ""
-  },
-  "e2e-results/16-customer.png": {
-    "mtime": 1789451771.720003,
-    "seen": 1789452933.4558477,
-    "ast_hash": "9951ceec568b32b950136a244debc297",
-    "semantic_hash": ""
-  },
-  "e2e-results/17-customer.png": {
-    "mtime": 1789451781.2229905,
-    "seen": 1789452933.4558477,
-    "ast_hash": "87900da238a166c506f135f79c8b7575",
-    "semantic_hash": ""
-  },
-  "e2e-results/18-customer.png": {
-    "mtime": 1789451790.930987,
-    "seen": 1789452933.4558477,
-    "ast_hash": "4869f9e02d78a2da71235244a87565dd",
-    "semantic_hash": ""
-  },
-  "e2e-results/19-customer.png": {
-    "mtime": 1789451800.858035,
-    "seen": 1789452933.4558477,
-    "ast_hash": "f422729409707859294e266892586017",
-    "semantic_hash": ""
-  },
-  "e2e-results/20-paid.png": {
-    "mtime": 1789451805.3975372,
-    "seen": 1789452933.4558477,
-    "ast_hash": "ced634b4e9f79ee599b07d1115756616",
-    "semantic_hash": ""
-  },
-  "e2e-results/21-customer-done.png": {
-    "mtime": 1789451815.7793746,
-    "seen": 1789452933.4558477,
-    "ast_hash": "e37df96621e78c2ae8e1d08b8274abe0",
-    "semantic_hash": ""
-  },
-  "e2e-results/23-history.png": {
-    "mtime": 1789451824.4233007,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7a22e909de8044ef3f8678e08894e489",
-    "semantic_hash": ""
-  },
-  "e2e-results/24-driver-history.png": {
-    "mtime": 1789451831.6669378,
-    "seen": 1789452933.4558477,
-    "ast_hash": "62702d227b7dce1114f4cbaca67e3ffc",
-    "semantic_hash": ""
-  },
-  "e2e-results/25-admin.png": {
-    "mtime": 1789451848.3825123,
-    "seen": 1789452933.4558477,
-    "ast_hash": "cfd9aca021f679c7dbbfc972d10a5455",
-    "semantic_hash": ""
-  },
-  "e2e-results/26-persistence.png": {
-    "mtime": 1789451857.0618706,
-    "seen": 1789452933.4558477,
-    "ast_hash": "af036121eaa7566f0a531ba7d4edddbc",
-    "semantic_hash": ""
-  },
-  "e2e-results/____Arrived.png": {
-    "mtime": 1789451777.9439893,
-    "seen": 1789452933.4558477,
-    "ast_hash": "ad0c8a84062f4fda506c62883d5aace5",
-    "semantic_hash": ""
-  },
-  "e2e-results/____Complete_Ride.png": {
-    "mtime": 1789451812.403885,
-    "seen": 1789452933.4558477,
-    "ast_hash": "afdf55bcfd521eb8073a02f993b17c19",
-    "semantic_hash": ""
-  },
-  "e2e-results/____On_The_Way.png": {
-    "mtime": 1789451768.529881,
-    "seen": 1789452933.4558477,
-    "ast_hash": "fdc627b4d481a3effc2faa930032b448",
-    "semantic_hash": ""
-  },
-  "e2e-results/____Reached_Destination.png": {
-    "mtime": 1789451797.5034711,
-    "seen": 1789452933.4558477,
-    "ast_hash": "48a8406a9058a391be3132c76eb6a65f",
-    "semantic_hash": ""
-  },
-  "e2e-results/____Start_Ride.png": {
-    "mtime": 1789451787.597258,
-    "seen": 1789452933.4558477,
-    "ast_hash": "4fa8e4c13f5b189895e4b566f28decae",
-    "semantic_hash": ""
-  },
-  "e2e-results/ride-flow-Complete-Ride-Flow-E2E-chromium/test-finished-1.png": {
-    "mtime": 1789451860.2368865,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7c4efbf957e99239799e550df5e23fb4",
-    "semantic_hash": ""
-  },
-  "e2e-results/ride-flow-Complete-Ride-Flow-E2E-chromium/test-finished-2.png": {
-    "mtime": 1789451849.0384295,
-    "seen": 1789452933.4558477,
-    "ast_hash": "cfd9aca021f679c7dbbfc972d10a5455",
-    "semantic_hash": ""
-  },
-  "e2e-results/ride-flow-Complete-Ride-Flow-E2E-chromium/test-finished-3.png": {
-    "mtime": 1789451860.051408,
-    "seen": 1789452933.4558477,
-    "ast_hash": "7a22e909de8044ef3f8678e08894e489",
-    "semantic_hash": ""
-  },
-  "e2e-results/ride-flow-Complete-Ride-Flow-E2E-chromium/video.webm": {
-    "mtime": 1789451864.8824556,
-    "seen": 1789452933.4568505,
-    "ast_hash": "c316cdbf6b66275a46accbcfc501c575",
     "semantic_hash": ""
   }
 }

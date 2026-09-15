@@ -1,101 +1,119 @@
-# Graph Report - Cab Booking App  (2026-09-14)
+# Graph Report - Cab Booking App  (2026-09-15)
 
 ## Corpus Check
-- 265 files · ~3,248,393 words
+- 269 files · ~3,562,913 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1364 nodes · 3090 edges · 96 communities (78 shown, 18 thin omitted)
+- 1380 nodes · 3113 edges · 115 communities (88 shown, 27 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 154 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `aa47fa91`
+- Built from commit: `8198a7a4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- googleMaps.routes.js
+- redisRateLimiter.js
 - Reveal.jsx
-- review.service.js
+- invoice.service.js
 - admin.routes.js
 - dependencies
-- endpoints.js
+- DriverProfilePage.jsx
 - admin.service.js
 - devDependencies
 - devDependencies
-- auth.routes.js
+- moduleFileExtensions
 - payment.routes.js
 - driver.routes.js
 - dependencies
 - driverUpload.routes.js
 - favoriteLocation.service.js
 - booking.service.js
-- validate.middleware.js
+- AutoPushSync.jsx
 - booking.routes.js
 - favoriteLocation.routes.js
-- DriverDocuments.jsx
+- endpoints.js
 - jest
-- Booking.js
+- socket/index.js
 - googleMaps.service.js
-- Skeleton.jsx
+- useAuth
 - CurrentRideCustomer.jsx
 - notification.routes.js
 - React + Vite
-- email.service.js
+- auth.routes.js
 - AGENTS.md
 - driver.service.js
 - ConfirmPage.jsx
 - QueryProvider.jsx
 - user.routes.js
-- testMatch
-- useAuth
+- googleMaps.routes.js
+- DriverLayout.jsx
 - backend/package.json
 - common.validator.js
 - app.js
 - dispatch.routes.js
-- SEO.jsx
-- useSocket
+- DriverRegister.jsx
+- Skeleton.jsx
 - Home.jsx
-- BookingDetailsPage.jsx
+- useSocket
 - App.jsx
-- push.service.js
+- auth.middleware.js
 - scripts
 - server.js
 - Vehicles.jsx
-- moduleFileExtensions
+- AdminCharts.jsx
 - theme.js
 - main.jsx
-- BookRide.jsx
+- LocationPicker.jsx
 - Testiminols.jsx
 - api.js
 - ErrorState.jsx
 - vehicle.routes.js
 - frontend/package.json
 - whatsapp.service.js
-- auth.middleware.js
-- invalidateCache
+- driverStatus.routes.js
+- email.service.js
 - playwright
-- AdminCharts.jsx
-- validateParams
-- react-router-dom
+- DriverDashboard.jsx
+- validate
+- ride-flow.spec.js
 - react-hot-toast
-- DriverProfile.js
+- VehicleSelector.jsx
 - ManageDrivers.jsx
 - swiper
 - tailwindcss
 - TariffChart.jsx
 - webhook.controller.js
-- payment.service.js
+- About.jsx
 - fare.service.js
-- lucide-react
+- RouteServices.jsx
 - socket.io-client
-- Info.jsx
+- SEO.jsx
 - vercel.json
-- review.routes.js
+- validate.middleware.js
 - RouteErrorBoundary
-- WithdrawalRequest.js
-- @react-google-maps/api
+- react-hook-form
+- RideMap.jsx
+- push.service.js
+- collectCoverageFrom
+- devDependencies
+- lucide-react
+- axios
+- connect-redis
+- cookie-parser
+- dotenv
+- express
+- express-validator
+- helmet
+- ioredis
+- mongoose
+- morgan
+- multer
+- razorpay
+- zod
+- react
 
 ## God Nodes (most connected - your core abstractions)
 1. `useAuth()` - 39 edges
@@ -110,57 +128,61 @@
 10. `Modal()` - 19 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `getDashboardStats()` --calls--> `withCache()`  [EXTRACTED]
-  backend/src/services/admin.service.js → backend/src/config/redis.js
-- `getVehicles()` --calls--> `withCache()`  [EXTRACTED]
-  backend/src/services/admin.service.js → backend/src/config/redis.js
-- `getVehicles()` --calls--> `withCache()`  [EXTRACTED]
-  backend/src/services/vehicle.service.js → backend/src/config/redis.js
 - `cancelBooking()` --calls--> `notifyUser()`  [EXTRACTED]
   backend/src/services/admin.service.js → backend/src/services/notification.service.js
 - `createDriverProfile()` --calls--> `notifyUser()`  [EXTRACTED]
   backend/src/services/driver.service.js → backend/src/services/notification.service.js
+- `DriverBookings()` --calls--> `useSocket()`  [EXTRACTED]
+  frontend/src/Pages/driver/DriverBookings.jsx → frontend/src/Context/SocketContext.jsx
+- `AdminProfile()` --calls--> `useAuth()`  [EXTRACTED]
+  frontend/src/Pages/admin/AdminProfile.jsx → frontend/src/hooks/useAuth.js
+- `Profile()` --calls--> `useAuth()`  [EXTRACTED]
+  frontend/src/Pages/customer/Profile.jsx → frontend/src/hooks/useAuth.js
 
 ## Import Cycles
 - 3-file cycle: `backend/src/services/dispatch.service.js -> backend/src/services/notification.service.js -> backend/src/socket/index.js -> backend/src/services/dispatch.service.js`
 
-## Communities (96 total, 18 thin omitted)
+## Communities (115 total, 27 thin omitted)
 
-### Community 0 - "googleMaps.routes.js"
-Cohesion: 0.09
-Nodes (23): getRedisClient(), authLimiter, createLimiter(), dispatchLimiter, generalLimiter, getRedisStore(), guestBookingLimiter, guestSearchLimiter (+15 more)
+### Community 0 - "redisRateLimiter.js"
+Cohesion: 0.16
+Nodes (11): getRedisClient(), authLimiter, createLimiter(), dispatchLimiter, generalLimiter, getRedisStore(), guestBookingLimiter, IORedisRateLimitStore (+3 more)
 
 ### Community 1 - "Reveal.jsx"
-Cohesion: 0.08
-Nodes (34): About, AirportDetail, AirportTransfers, ContactUs, InfoDetail, PopularRoutes, RouteDetail, Services (+26 more)
+Cohesion: 0.12
+Nodes (20): AirportDetail, AirportTransfers, PopularRoutes, RouteDetail, Services, cardHover, GlowBlobs(), Reveal() (+12 more)
+
+### Community 2 - "invoice.service.js"
+Cohesion: 0.38
+Nodes (5): downloadInvoice(), __dirname, __filename, generateInvoice(), LOGO_PATH
 
 ### Community 3 - "admin.routes.js"
-Cohesion: 0.06
-Nodes (54): approveDriver(), approveWithdrawal(), assignDriver(), blockCustomer(), blockDriver(), cancelBooking(), completeBooking(), createVehicle() (+46 more)
+Cohesion: 0.07
+Nodes (49): approveDriver(), approveWithdrawal(), assignDriver(), blockCustomer(), blockDriver(), cancelBooking(), completeBooking(), createVehicle() (+41 more)
 
 ### Community 4 - "dependencies"
-Cohesion: 0.04
-Nodes (49): dependencies, axios, bcryptjs, cloudinary, compression, connect-redis, cookie-parser, cors (+41 more)
+Cohesion: 0.09
+Nodes (23): dependencies, bcryptjs, cloudinary, compression, cors, express-rate-limit, jsonwebtoken, nodemailer (+15 more)
 
-### Community 5 - "endpoints.js"
-Cohesion: 0.13
-Nodes (9): AdminDashboard, ConfirmDialog(), ListSkeleton(), ACCEPTED_IMAGE_TYPES, VehicleCard, adminAPI, dispatchAPI, driverStatusAPI (+1 more)
+### Community 5 - "DriverProfilePage.jsx"
+Cohesion: 0.14
+Nodes (17): AdminProfile, DriverProfilePage, Profile, ACCENT_BTN, ACCENT_RING, EditProfileModal(), ACCENTS, ProfileCard() (+9 more)
 
 ### Community 6 - "admin.service.js"
-Cohesion: 0.07
-Nodes (4): assignDriver(), cancelBooking(), getDashboardStats(), getVehicles()
+Cohesion: 0.06
+Nodes (19): invalidateCache(), isRedisConnected(), memCache, memCacheExpiry, memGet(), memSet(), withCache(), cancelBooking() (+11 more)
 
 ### Community 7 - "devDependencies"
-Cohesion: 0.12
-Nodes (17): @babel/core, babel-jest, @babel/preset-env, devDependencies, @babel/core, babel-jest, @babel/preset-env, jest (+9 more)
+Cohesion: 0.11
+Nodes (19): @babel/core, babel-jest, @babel/preset-env, devDependencies, @babel/core, babel-jest, @babel/preset-env, cross-env (+11 more)
 
 ### Community 8 - "devDependencies"
 Cohesion: 0.10
 Nodes (21): eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, devDependencies, eslint, @eslint/js, eslint-plugin-react-hooks (+13 more)
 
-### Community 9 - "auth.routes.js"
-Cohesion: 0.15
-Nodes (19): forgotPassword(), getProfile(), login(), logout(), logoutAll(), refreshToken(), register(), registerDriver() (+11 more)
+### Community 9 - "moduleFileExtensions"
+Cohesion: 0.50
+Nodes (4): moduleFileExtensions, js, json, mjs
 
 ### Community 10 - "payment.routes.js"
 Cohesion: 0.27
@@ -172,7 +194,7 @@ Nodes (23): createProfile(), getCurrentBooking(), getDashboard(), getEarnings(),
 
 ### Community 12 - "dependencies"
 Cohesion: 0.11
-Nodes (19): framer-motion, dependencies, axios, framer-motion, react, react-dom, react-hook-form, react-icons (+11 more)
+Nodes (19): framer-motion, dependencies, axios, framer-motion, react-dom, @react-google-maps/api, react-icons, react-router-dom (+11 more)
 
 ### Community 13 - "driverUpload.routes.js"
 Cohesion: 0.26
@@ -183,12 +205,12 @@ Cohesion: 0.28
 Nodes (4): favoriteLocationSchema, createLocation(), toGeoJSON(), updateLocation()
 
 ### Community 15 - "booking.service.js"
-Cohesion: 0.14
-Nodes (22): supportsTransactions(), withTransaction(), completeBooking(), addDriverTip(), cancelBooking(), completeRide(), createBooking(), createGuestBooking() (+14 more)
+Cohesion: 0.13
+Nodes (23): supportsTransactions(), withTransaction(), withdrawalRequestSchema, completeBooking(), addDriverTip(), cancelBooking(), completeRide(), createBooking() (+15 more)
 
-### Community 16 - "validate.middleware.js"
-Cohesion: 0.32
-Nodes (3): getRideHistory(), validateQuery(), router
+### Community 16 - "AutoPushSync.jsx"
+Cohesion: 0.43
+Nodes (13): AutoPushSync(), PushToggle(), getExistingSubscription(), getPushPermission(), getReadyRegistration(), isPushApiSupported(), isPushSupported(), registerServiceWorker() (+5 more)
 
 ### Community 17 - "booking.routes.js"
 Cohesion: 0.08
@@ -198,97 +220,97 @@ Nodes (40): acceptBooking(), addDriverTip(), cancelBooking(), completeRide(), cr
 Cohesion: 0.29
 Nodes (7): createLocation(), deleteLocation(), getLocations(), updateLocation(), router, createLocationSchema, updateLocationSchema
 
-### Community 19 - "DriverDocuments.jsx"
-Cohesion: 0.33
-Nodes (6): DriverDocuments, ACCEPTED_IMAGE_TYPES, documentTypes, DriverDocuments(), validateFile(), driverUploadAPI
+### Community 19 - "endpoints.js"
+Cohesion: 0.16
+Nodes (11): DriverDocuments, ACCEPTED_IMAGE_TYPES, documentTypes, DriverDocuments(), validateFile(), dispatchAPI, driverAPI, driverStatusAPI (+3 more)
 
 ### Community 20 - "jest"
-Cohesion: 0.15
-Nodes (13): jest, collectCoverageFrom, coverageDirectory, setupFiles, testEnvironment, transform, transformIgnorePatterns, ^.+\\.js$ (+5 more)
+Cohesion: 0.17
+Nodes (12): jest, coverageDirectory, setupFiles, testEnvironment, testMatch, transform, transformIgnorePatterns, ^.+\\.js$ (+4 more)
 
-### Community 21 - "Booking.js"
-Cohesion: 0.12
-Nodes (21): bookingSchema, locationSchema, getAvailableBookings(), acceptBooking(), dispatchBooking(), findNearbyDrivers(), getCurrentDriver(), handleDriverTimeout() (+13 more)
+### Community 21 - "socket/index.js"
+Cohesion: 0.13
+Nodes (20): assignDriver(), getAvailableBookings(), acceptBooking(), dispatchBooking(), findNearbyDrivers(), getCurrentDriver(), handleDriverTimeout(), rejectBooking() (+12 more)
 
 ### Community 22 - "googleMaps.service.js"
 Cohesion: 0.36
 Nodes (4): calculateDistance(), getRoute(), headers(), requestRoute()
 
-### Community 23 - "Skeleton.jsx"
-Cohesion: 0.15
-Nodes (10): EmptyState(), Pagination(), TableSkeleton(), getInvoiceAmount(), Invoices(), STATUS_COLORS, driverAPI, invoiceAPI (+2 more)
+### Community 23 - "useAuth"
+Cohesion: 0.12
+Nodes (17): DriverContinue, DriverLogin, DASHBOARD_ROUTES, NOTIF_ROUTES, PROFILE_ROUTES, ProtectedRoute(), AuthContext, useAuth() (+9 more)
 
 ### Community 24 - "CurrentRideCustomer.jsx"
-Cohesion: 0.15
-Nodes (17): formatTime(), RideTimeline(), STAGES, formatElapsed(), getRideTimeInfo(), toMs(), useRideTime(), CurrentRideCustomer() (+9 more)
+Cohesion: 0.13
+Nodes (20): CurrentRide, CurrentRideCustomer, formatTime(), RideTimeline(), STAGES, formatElapsed(), getRideTimeInfo(), toMs() (+12 more)
 
 ### Community 26 - "notification.routes.js"
 Cohesion: 0.33
 Nodes (9): deleteNotification(), getNotifications(), getUnreadCount(), getVapidPublicKey(), markAllAsRead(), markAsRead(), removePushSubscription(), savePushSubscription() (+1 more)
 
-### Community 28 - "email.service.js"
+### Community 28 - "auth.routes.js"
 Cohesion: 0.09
-Nodes (30): emailLogSchema, loginUser(), logoutUser(), registerCustomer(), registerDriver(), requestPasswordReset(), rotateRefreshToken(), tokenMatches() (+22 more)
+Nodes (32): forgotPassword(), getProfile(), login(), logout(), logoutAll(), refreshToken(), register(), registerDriver() (+24 more)
 
 ### Community 39 - "driver.service.js"
 Cohesion: 0.09
 Nodes (6): driverWalletSchema, transactionSchema, walletTransactionSchema, createDriverProfile(), getWalletSummary(), getWalletTransactions()
 
 ### Community 40 - "ConfirmPage.jsx"
-Cohesion: 0.09
-Nodes (24): CarTypePage, ConfirmPage, GuestBookingPage, WaitingPage, Footer(), Hero(), DASHBOARD_ROUTES, Navbar() (+16 more)
+Cohesion: 0.13
+Nodes (19): CarTypePage, ConfirmPage, GuestBookingPage, WaitingPage, Footer(), PageHero(), Navbar(), CarTypePage() (+11 more)
 
 ### Community 42 - "user.routes.js"
-Cohesion: 0.18
-Nodes (7): changePassword(), getAllUsers(), updateProfile(), router, paginationQuerySchema, changePasswordSchema, updateProfileSchema
+Cohesion: 0.20
+Nodes (6): changePassword(), getAllUsers(), updateProfile(), router, changePasswordSchema, updateProfileSchema
 
-### Community 43 - "testMatch"
-Cohesion: 0.67
-Nodes (3): testMatch, **/*.test.js, **/__tests__/**/*.test.js
+### Community 43 - "googleMaps.routes.js"
+Cohesion: 0.24
+Nodes (11): autocomplete(), getETA(), getPlaceDetails(), getRoute(), reverseGeocode(), router, autocompleteSchema, getRouteSchema (+3 more)
 
-### Community 44 - "useAuth"
-Cohesion: 0.07
-Nodes (49): AdminLayout, AdminProfile, CustomerLayout, DriverLayout, DriverProfilePage, Profile, AutoPushSync(), ACCENT_BTN (+41 more)
+### Community 44 - "DriverLayout.jsx"
+Cohesion: 0.16
+Nodes (13): AdminLayout, CustomerLayout, DriverLayout, bookingIdOf(), detailsUrlFor(), PushListener(), routeSummary(), AdminLayout() (+5 more)
 
 ### Community 45 - "backend/package.json"
 Cohesion: 0.18
 Nodes (10): author, babel, presets, description, keywords, license, main, name (+2 more)
 
 ### Community 47 - "common.validator.js"
-Cohesion: 0.17
-Nodes (9): estimateFare(), rateDriver(), validate(), router, router, bookingIdParamSchema, fareEstimateSchema, objectId (+1 more)
+Cohesion: 0.32
+Nodes (5): guestSearchLimiter, estimateFare(), router, fareEstimateSchema, objectId
 
 ### Community 48 - "app.js"
-Cohesion: 0.18
-Nodes (5): app, configuredOrigins, paymentSchema, userSchema, vehicleSchema
+Cohesion: 0.16
+Nodes (6): app, configuredOrigins, driverProfileSchema, paymentSchema, userSchema, vehicleSchema
 
 ### Community 49 - "dispatch.routes.js"
 Cohesion: 0.43
 Nodes (6): acceptBooking(), dispatchBooking(), handleDriverTimeout(), rejectBooking(), sendToNextDriver(), router
 
-### Community 50 - "SEO.jsx"
-Cohesion: 0.10
-Nodes (19): DriverContinue, AUTH_SLIDES, AuthSplit(), getAuthErrorMessage(), Login(), getOrigin(), SEO(), upsertJsonLd() (+11 more)
+### Community 50 - "DriverRegister.jsx"
+Cohesion: 0.11
+Nodes (15): DriverRegister, ForgotPassword, Login, NewPassword, OtpVerification, ResetPassword, AUTH_SLIDES, AuthSplit() (+7 more)
 
-### Community 51 - "useSocket"
-Cohesion: 0.15
-Nodes (16): SocketContext, useSocket(), AdminNotifications(), bookingIdOf(), ManageBookings(), bookingIdOf(), Notifications(), RideHistory() (+8 more)
+### Community 51 - "Skeleton.jsx"
+Cohesion: 0.09
+Nodes (26): AdminNotifications, CustomerReviews, DriverBookings, DriverHistory, DriverNotifications, DriverReviews, DriverWallet, Notifications (+18 more)
 
 ### Community 52 - "Home.jsx"
-Cohesion: 0.11
-Nodes (16): Home, BookingTariff(), RULES, TABS, FarePricing(), rows, PopularRoutes(), SERVICES (+8 more)
+Cohesion: 0.10
+Nodes (17): Home, BookingTariff(), RULES, TABS, FarePricing(), rows, Hero(), DriverCTA() (+9 more)
 
-### Community 53 - "BookingDetailsPage.jsx"
-Cohesion: 0.17
-Nodes (19): AssignDriverDialog(), CancelReasonDialog(), DEFAULT_REASONS, Modal(), AdminBookingRequests(), STATUSES, BookingDetailsPage(), formatDateTime() (+11 more)
+### Community 53 - "useSocket"
+Cohesion: 0.12
+Nodes (31): AdminBookingRequests, DriverBookingDetail, AssignDriverDialog(), CancelReasonDialog(), DEFAULT_REASONS, Modal(), SocketContext, useSocket() (+23 more)
 
 ### Community 54 - "App.jsx"
-Cohesion: 0.05
-Nodes (38): AdminBookingRequests, AdminNotifications, BookingDetailsPage, CurrentRide, CurrentRideCustomer, CustomerBookings, CustomerDashboard, CustomerReviews (+30 more)
+Cohesion: 0.14
+Nodes (11): BookingDetailsPage, BookRide, CustomerBookings, Invoices, ManageBookings, RideHistory, ScrollProgress(), ScrollToTopHandler() (+3 more)
 
-### Community 55 - "push.service.js"
-Cohesion: 0.27
-Nodes (5): pushSubscriptionSchema, detailsUrlFor(), initPush(), isPushEnabled(), sendPushToUser()
+### Community 55 - "auth.middleware.js"
+Cohesion: 0.21
+Nodes (8): authenticate(), getCachedUser(), allowedMimeTypes, storage, upload, uploadSingle(), router, verifyToken()
 
 ### Community 56 - "scripts"
 Cohesion: 0.40
@@ -299,36 +321,36 @@ Cohesion: 0.23
 Nodes (9): connectDB(), fixBookingAlertIndexes(), closeRedis(), envValidator(), requestTimeout(), sanitizeInput(), gracefulShutdown(), io (+1 more)
 
 ### Community 59 - "Vehicles.jsx"
-Cohesion: 0.20
-Nodes (8): AttachVehicle, imageFor(), VehicleShowcase(), AttachVehicle(), cardVariants, imageForVehicle(), vehicles, vehicleAPI
+Cohesion: 0.29
+Nodes (6): AttachVehicle, AttachVehicle(), cardVariants, imageForVehicle(), vehicles, vehicleAPI
 
-### Community 60 - "moduleFileExtensions"
-Cohesion: 0.50
-Nodes (4): moduleFileExtensions, js, json, mjs
+### Community 60 - "AdminCharts.jsx"
+Cohesion: 0.25
+Nodes (3): BAR_COLORS, COLORS, AdminCharts
 
 ### Community 61 - "theme.js"
 Cohesion: 0.40
 Nodes (3): btn, glass, glow
 
 ### Community 62 - "main.jsx"
-Cohesion: 0.20
-Nodes (8): App(), AuthContext, AuthProvider(), AppContext, AppProvider(), NOTE: no mount-time profile fetch here on purpose — AuthContext, SocketProvider(), queryClient
+Cohesion: 0.22
+Nodes (7): App(), AuthProvider(), AppContext, AppProvider(), NOTE: no mount-time profile fetch here on purpose — AuthContext, SocketProvider(), queryClient
 
-### Community 63 - "BookRide.jsx"
-Cohesion: 0.10
-Nodes (27): BookRide, addRecentSearch(), CHENNAI_AIRPORT, loadRecentSearches(), loadSavedPlaces(), LocationPicker(), saveRecentSearches(), saveSavedPlaces() (+19 more)
+### Community 63 - "LocationPicker.jsx"
+Cohesion: 0.42
+Nodes (7): addRecentSearch(), CHENNAI_AIRPORT, loadRecentSearches(), loadSavedPlaces(), LocationPicker(), saveRecentSearches(), saveSavedPlaces()
 
 ### Community 65 - "api.js"
 Cohesion: 0.25
 Nodes (5): api, AUTH_PATHS, failedQueue, isAuthPage(), redirectToLoginIfNeeded()
 
 ### Community 66 - "ErrorState.jsx"
-Cohesion: 0.32
-Nodes (5): DriverDashboard, ErrorState(), CardSkeleton(), StatsCard(), STATUS_BADGE
+Cohesion: 0.16
+Nodes (10): AdminDashboard, CustomerDashboard, Earnings, ManageWithdrawals, ErrorState(), CardSkeleton(), StatsCard(), STATUS_BADGE (+2 more)
 
 ### Community 67 - "vehicle.routes.js"
-Cohesion: 0.21
-Nodes (10): getDriverPerformance(), toggleOnlineStatus(), createVehicle(), deleteVehicle(), getVehicles(), updateVehicle(), authorize(), router (+2 more)
+Cohesion: 0.39
+Nodes (6): createVehicle(), deleteVehicle(), getVehicles(), updateVehicle(), router, idParamSchema
 
 ### Community 68 - "frontend/package.json"
 Cohesion: 0.20
@@ -338,29 +360,37 @@ Nodes (9): name, private, scripts, build, dev, lint, preview, type (+1 more)
 Cohesion: 0.24
 Nodes (14): whatsappLogSchema, buildBookingAlert(), buildBookingTemplateParams(), getBookingAlertFields(), getConfig(), markAlertSent(), maskPhone(), metaPost() (+6 more)
 
-### Community 70 - "auth.middleware.js"
-Cohesion: 0.31
-Nodes (9): isRedisConnected(), memCache, memCacheExpiry, memGet(), memSet(), withCache(), authenticate(), getCachedUser() (+1 more)
+### Community 70 - "driverStatus.routes.js"
+Cohesion: 0.24
+Nodes (3): getDriverPerformance(), toggleOnlineStatus(), router
 
-### Community 71 - "invalidateCache"
-Cohesion: 0.21
-Nodes (10): invalidateCache(), createVehicle(), deleteVehicle(), disableVehicle(), enableVehicle(), updateVehicle(), createVehicle(), deleteVehicle() (+2 more)
+### Community 71 - "email.service.js"
+Cohesion: 0.07
+Nodes (22): razorpay, bookingSchema, locationSchema, emailLogSchema, reviewSchema, buildBookingEmailHtml(), buildBookingEmailText(), combineNameAddress() (+14 more)
 
 ### Community 72 - "playwright"
 Cohesion: 0.17
 Nodes (11): BROWSER, mcp, playwright, command, enabled, environment, type, $schema (+3 more)
 
-### Community 73 - "AdminCharts.jsx"
-Cohesion: 0.12
-Nodes (8): BAR_COLORS, COLORS, COLORS, DriverCharts, DriverPie, AdminCharts, DriverCharts, DriverPie
+### Community 73 - "DriverDashboard.jsx"
+Cohesion: 0.18
+Nodes (7): DriverDashboard, COLORS, DriverCharts, DriverPie, DriverCharts, DriverDashboard(), DriverPie
 
-### Community 74 - "validateParams"
+### Community 74 - "validate"
+Cohesion: 0.32
+Nodes (4): rateDriver(), validate(), router, rateDriverSchema
+
+### Community 75 - "ride-flow.spec.js"
 Cohesion: 0.27
-Nodes (7): downloadInvoice(), validateParams(), router, __dirname, __filename, generateInvoice(), LOGO_PATH
+Nodes (8): ADMIN, clickRideAction(), CUSTOMER, dismissActiveRide(), DRIVER, RESULTS, shot(), step()
+
+### Community 77 - "VehicleSelector.jsx"
+Cohesion: 0.32
+Nodes (5): cardVariants, containerVariants, formatCurrency(), vehicleImageFor(), VehicleSelector()
 
 ### Community 78 - "ManageDrivers.jsx"
-Cohesion: 0.33
-Nodes (4): Badge(), SearchBar(), ManageDrivers(), normalizeDriver()
+Cohesion: 0.11
+Nodes (13): FavoriteLocations, ManageCustomers, ManageDrivers, ManageReviews, ManageVehicles, Badge(), ConfirmDialog(), SearchBar() (+5 more)
 
 ### Community 81 - "TariffChart.jsx"
 Cohesion: 0.33
@@ -370,33 +400,57 @@ Nodes (6): TariffChart, imageForVehicle(), notes, PACKAGES, TariffChart(), tarif
 Cohesion: 0.39
 Nodes (7): checkIdempotency(), handlePaymentCaptured(), handlePaymentFailed(), handleRazorpayWebhook(), handleRefundCreated(), verifyWebhookSignature(), router
 
-### Community 87 - "Info.jsx"
-Cohesion: 0.33
-Nodes (4): Info, faqJsonLd, FAQS, SECTIONS
+### Community 83 - "About.jsx"
+Cohesion: 0.29
+Nodes (5): About, features, pillars, stats, values
 
-### Community 90 - "review.routes.js"
+### Community 85 - "RouteServices.jsx"
 Cohesion: 0.33
-Nodes (5): createReview(), getDriverReviews(), getMyReviews(), router, createReviewSchema
+Nodes (5): PopularRoutes(), ROUTES, SERVICES, FareNotes(), NOTES
+
+### Community 87 - "SEO.jsx"
+Cohesion: 0.10
+Nodes (17): ContactUs, Info, InfoDetail, NotFound, getOrigin(), SEO(), upsertJsonLd(), upsertLink() (+9 more)
+
+### Community 90 - "validate.middleware.js"
+Cohesion: 0.15
+Nodes (13): getRideHistory(), createReview(), getDriverReviews(), getMyReviews(), authorize(), validateParams(), validateQuery(), router (+5 more)
+
+### Community 95 - "RideMap.jsx"
+Cohesion: 0.33
+Nodes (6): CHENNAI_CENTER, decodePolyline(), mapContainerStyle, mapOptions, RideMap(), RideMap
+
+### Community 96 - "push.service.js"
+Cohesion: 0.27
+Nodes (5): pushSubscriptionSchema, detailsUrlFor(), initPush(), isPushEnabled(), sendPushToUser()
+
+### Community 97 - "collectCoverageFrom"
+Cohesion: 0.50
+Nodes (4): collectCoverageFrom, !src/config/**, src/**/*.js, !src/seeds/**
+
+### Community 98 - "devDependencies"
+Cohesion: 0.50
+Nodes (3): devDependencies, @playwright/test, @playwright/test
 
 ## Knowledge Gaps
-- **240 isolated node(s):** `point`, `savedEnv`, `point`, `name`, `version` (+235 more)
+- **246 isolated node(s):** `point`, `savedEnv`, `point`, `name`, `version` (+241 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **27 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `notifyUser()` connect `booking.service.js` to `admin.service.js`, `driver.service.js`, `booking.routes.js`, `webhook.controller.js`, `payment.service.js`, `Booking.js`, `push.service.js`?**
+- **Why does `notifyUser()` connect `booking.service.js` to `push.service.js`, `admin.service.js`, `driver.service.js`, `email.service.js`, `booking.routes.js`, `webhook.controller.js`, `socket/index.js`?**
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `authenticate()` connect `auth.middleware.js` to `googleMaps.routes.js`, `admin.routes.js`, `vehicle.routes.js`, `review.routes.js`, `auth.routes.js`, `validateParams`, `driver.routes.js`, `payment.routes.js`, `driverUpload.routes.js`, `user.routes.js`, `common.validator.js`, `validate.middleware.js`, `booking.routes.js`, `dispatch.routes.js`, `favoriteLocation.routes.js`, `notification.routes.js`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
-- **Why does `useAuth()` connect `useAuth` to `ErrorState.jsx`, `ConfirmPage.jsx`, `SEO.jsx`, `useSocket`, `BookingDetailsPage.jsx`, `main.jsx`?**
+- **Why does `getRedisClient()` connect `redisRateLimiter.js` to `webhook.controller.js`, `server.js`, `admin.service.js`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `authenticate()` connect `auth.middleware.js` to `admin.routes.js`, `notification.routes.js`, `vehicle.routes.js`, `driverStatus.routes.js`, `payment.routes.js`, `driver.routes.js`, `googleMaps.routes.js`, `driverUpload.routes.js`, `validate`, `common.validator.js`, `user.routes.js`, `booking.routes.js`, `dispatch.routes.js`, `favoriteLocation.routes.js`, `validate.middleware.js`, `auth.routes.js`?**
   _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **What connects `point`, `savedEnv`, `point` to the rest of the system?**
-  _240 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `googleMaps.routes.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.09206349206349207 - nodes in this community are weakly interconnected._
+  _246 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Reveal.jsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.07896575821104122 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11742424242424243 - nodes in this community are weakly interconnected._
 - **Should `admin.routes.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.05888376856118792 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07127882599580712 - nodes in this community are weakly interconnected._
+- **Should `dependencies` be split into smaller, more focused modules?**
+  _Cohesion score 0.08695652173913043 - nodes in this community are weakly interconnected._

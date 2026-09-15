@@ -867,7 +867,7 @@
       "file_type": "code",
       "norm_label": "completebooking()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L840"
+      "source_location": "L853"
     },
     {
       "id": "backend_src_services_booking_service_adddrivertip",
@@ -879,7 +879,7 @@
       "file_type": "code",
       "norm_label": "adddrivertip()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1381"
+      "source_location": "L1396"
     },
     {
       "id": "backend_src_services_booking_service_cancelbooking",
@@ -891,7 +891,7 @@
       "file_type": "code",
       "norm_label": "cancelbooking()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L496"
+      "source_location": "L511"
     },
     {
       "id": "backend_src_services_booking_service_completeride",
@@ -903,7 +903,7 @@
       "file_type": "code",
       "norm_label": "completeride()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1137"
+      "source_location": "L1152"
     },
     {
       "id": "backend_src_services_booking_service_createbooking",
@@ -927,7 +927,7 @@
       "file_type": "code",
       "norm_label": "createguestbooking()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L228"
+      "source_location": "L243"
     },
     {
       "id": "backend_src_services_booking_service_drivercancelbooking",
@@ -939,7 +939,19 @@
       "file_type": "code",
       "norm_label": "drivercancelbooking()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L640"
+      "source_location": "L655"
+    },
+    {
+      "id": "backend_src_services_booking_service_getavailablebookings",
+      "label": "getAvailableBookings()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "booking.service.js",
+      "file_type": "code",
+      "norm_label": "getavailablebookings()",
+      "source_file": "backend/src/services/booking.service.js",
+      "source_location": "L1353"
     },
     {
       "id": "backend_src_services_booking_service_getbookingbyid",
@@ -951,7 +963,7 @@
       "file_type": "code",
       "norm_label": "getbookingbyid()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L429"
+      "source_location": "L444"
     },
     {
       "id": "backend_src_services_booking_service_getmybookings",
@@ -963,7 +975,7 @@
       "file_type": "code",
       "norm_label": "getmybookings()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L383"
+      "source_location": "L398"
     },
     {
       "id": "backend_src_services_booking_service_markarrived",
@@ -975,7 +987,7 @@
       "file_type": "code",
       "norm_label": "markarrived()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L865"
+      "source_location": "L880"
     },
     {
       "id": "backend_src_services_booking_service_reachdestination",
@@ -987,7 +999,7 @@
       "file_type": "code",
       "norm_label": "reachdestination()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L998"
+      "source_location": "L1013"
     },
     {
       "id": "backend_src_services_booking_service_reachpickup",
@@ -999,7 +1011,7 @@
       "file_type": "code",
       "norm_label": "reachpickup()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L803"
+      "source_location": "L818"
     },
     {
       "id": "backend_src_services_booking_service_startride",
@@ -1011,7 +1023,7 @@
       "file_type": "code",
       "norm_label": "startride()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L927"
+      "source_location": "L942"
     },
     {
       "id": "backend_src_services_booking_service_tryautodispatch",
@@ -1035,7 +1047,7 @@
       "file_type": "code",
       "norm_label": "updatepaymentstatus()",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1061"
+      "source_location": "L1076"
     },
     {
       "id": "backend_src_services_driverstatus_service_updatedriverstats",
@@ -1132,18 +1144,6 @@
       "norm_label": "tipdriver()",
       "source_file": "backend/src/services/wallet.service.js",
       "source_location": "L92"
-    },
-    {
-      "id": "backend_tests_security2_test_login",
-      "label": "login()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 15,
-      "community_name": "booking.service.js",
-      "file_type": "code",
-      "norm_label": "login()",
-      "source_file": "backend/__tests__/security2.test.js",
-      "source_location": "L18"
     },
     {
       "id": "frontend_src_components_autopushsync_autopushsync",
@@ -1482,66 +1482,6 @@
       "source_location": "L334"
     },
     {
-      "id": "backend_src_services_notification_service_bookingaccepted",
-      "label": "bookingAccepted()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "bookingaccepted()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L143"
-    },
-    {
-      "id": "backend_src_services_notification_service_bookingcancelled",
-      "label": "bookingCancelled()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "bookingcancelled()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L158"
-    },
-    {
-      "id": "backend_src_services_notification_service_createnotification",
-      "label": "createNotification()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "createnotification()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L249"
-    },
-    {
-      "id": "backend_src_services_notification_service_deletenotification",
-      "label": "deleteNotification()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "deletenotification()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L461"
-    },
-    {
-      "id": "backend_src_services_notification_service_driverarrived",
-      "label": "driverArrived()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "driverarrived()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L173"
-    },
-    {
       "id": "backend_src_services_notification_service_emittoadmins",
       "label": "emitToAdmins()",
       "_callable": true,
@@ -1554,150 +1494,6 @@
       "source_location": "L304"
     },
     {
-      "id": "backend_src_services_notification_service_getnotifications",
-      "label": "getNotifications()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "getnotifications()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L377"
-    },
-    {
-      "id": "backend_src_services_notification_service_getunreadcount",
-      "label": "getUnreadCount()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "getunreadcount()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L406"
-    },
-    {
-      "id": "backend_src_services_notification_service_markallasread",
-      "label": "markAllAsRead()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "markallasread()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L441"
-    },
-    {
-      "id": "backend_src_services_notification_service_markasread",
-      "label": "markAsRead()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "markasread()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L419"
-    },
-    {
-      "id": "backend_src_services_notification_service_notifycustomer",
-      "label": "notifyCustomer()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "notifycustomer()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L57"
-    },
-    {
-      "id": "backend_src_services_notification_service_notifydriver",
-      "label": "notifyDriver()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "notifydriver()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L86"
-    },
-    {
-      "id": "backend_src_services_notification_service_paymentfailed",
-      "label": "paymentFailed()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "paymentfailed()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L233"
-    },
-    {
-      "id": "backend_src_services_notification_service_paymentsuccess",
-      "label": "paymentSuccess()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "paymentsuccess()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L218"
-    },
-    {
-      "id": "backend_src_services_notification_service_ridecompleted",
-      "label": "rideCompleted()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "ridecompleted()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L203"
-    },
-    {
-      "id": "backend_src_services_notification_service_ridestarted",
-      "label": "rideStarted()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "ridestarted()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L188"
-    },
-    {
-      "id": "backend_src_services_notification_service_senddriverlocation",
-      "label": "sendDriverLocation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "senddriverlocation()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L115"
-    },
-    {
-      "id": "backend_src_services_notification_service_sendrealtimenotification",
-      "label": "sendRealtimeNotification()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "sendrealtimenotification()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L273"
-    },
-    {
       "id": "backend_src_socket_index_getio",
       "label": "getIO()",
       "_callable": true,
@@ -1708,18 +1504,6 @@
       "norm_label": "getio()",
       "source_file": "backend/src/socket/index.js",
       "source_location": "L374"
-    },
-    {
-      "id": "backend_src_socket_users_getsocketid",
-      "label": "getSocketId()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "getsocketid()",
-      "source_file": "backend/src/socket/users.js",
-      "source_location": "L27"
     },
     {
       "id": "backend_src_validators_booking_validator_validate",
@@ -1854,6 +1638,18 @@
       "source_location": "L22"
     },
     {
+      "id": "backend_src_services_admin_service_assigndriver",
+      "label": "assignDriver()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Booking.js",
+      "file_type": "code",
+      "norm_label": "assigndriver()",
+      "source_file": "backend/src/services/admin.service.js",
+      "source_location": "L711"
+    },
+    {
       "id": "backend_src_services_history_service_getridehistory",
       "label": "getRideHistory()",
       "_callable": true,
@@ -1878,54 +1674,6 @@
       "source_location": "L4"
     },
     {
-      "id": "backend_src_services_review_service_createreview",
-      "label": "createReview()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Booking.js",
-      "file_type": "code",
-      "norm_label": "createreview()",
-      "source_file": "backend/src/services/review.service.js",
-      "source_location": "L9"
-    },
-    {
-      "id": "backend_src_services_review_service_getdriverreviews",
-      "label": "getDriverReviews()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Booking.js",
-      "file_type": "code",
-      "norm_label": "getdriverreviews()",
-      "source_file": "backend/src/services/review.service.js",
-      "source_location": "L129"
-    },
-    {
-      "id": "backend_src_services_review_service_getmyreviews",
-      "label": "getMyReviews()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Booking.js",
-      "file_type": "code",
-      "norm_label": "getmyreviews()",
-      "source_file": "backend/src/services/review.service.js",
-      "source_location": "L86"
-    },
-    {
-      "id": "backend_src_services_booking_service_getavailablebookings",
-      "label": "getAvailableBookings()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "getavailablebookings()",
-      "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1338"
-    },
-    {
       "id": "backend_src_services_dispatch_service_acceptbooking",
       "label": "acceptBooking()",
       "_callable": true,
@@ -1936,90 +1684,6 @@
       "norm_label": "acceptbooking()",
       "source_file": "backend/src/services/dispatch.service.js",
       "source_location": "L437"
-    },
-    {
-      "id": "backend_src_services_dispatch_service_dispatchbooking",
-      "label": "dispatchBooking()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "dispatchbooking()",
-      "source_file": "backend/src/services/dispatch.service.js",
-      "source_location": "L60"
-    },
-    {
-      "id": "backend_src_services_dispatch_service_findnearbydrivers",
-      "label": "findNearbyDrivers()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "findnearbydrivers()",
-      "source_file": "backend/src/services/dispatch.service.js",
-      "source_location": "L11"
-    },
-    {
-      "id": "backend_src_services_dispatch_service_getcurrentdriver",
-      "label": "getCurrentDriver()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "getcurrentdriver()",
-      "source_file": "backend/src/services/dispatch.service.js",
-      "source_location": "L177"
-    },
-    {
-      "id": "backend_src_services_dispatch_service_handledrivertimeout",
-      "label": "handleDriverTimeout()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "handledrivertimeout()",
-      "source_file": "backend/src/services/dispatch.service.js",
-      "source_location": "L377"
-    },
-    {
-      "id": "backend_src_services_dispatch_service_rejectbooking",
-      "label": "rejectBooking()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "rejectbooking()",
-      "source_file": "backend/src/services/dispatch.service.js",
-      "source_location": "L323"
-    },
-    {
-      "id": "backend_src_services_dispatch_service_sendtonextdriver",
-      "label": "sendToNextDriver()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "sendtonextdriver()",
-      "source_file": "backend/src/services/dispatch.service.js",
-      "source_location": "L205"
-    },
-    {
-      "id": "backend_src_services_notification_service_sendriderequest",
-      "label": "sendRideRequest()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "sendriderequest()",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L10"
     },
     {
       "id": "backend_src_services_ride_service_updateridestatus",
@@ -2080,18 +1744,6 @@
       "norm_label": "removeuser()",
       "source_file": "backend/src/socket/users.js",
       "source_location": "L13"
-    },
-    {
-      "id": "backend_tests_socket_test_connect",
-      "label": "connect()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "connect()",
-      "source_file": "backend/__tests__/socket.test.js",
-      "source_location": "L47"
     },
     {
       "id": "backend_src_services_googlemaps_service_calculatedistance",
@@ -2574,12 +2226,132 @@
       "source_location": "L35"
     },
     {
+      "id": "backend_src_controllers_auth_controller_forgotpassword",
+      "label": "forgotPassword()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "forgotpassword()",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L96"
+    },
+    {
+      "id": "backend_src_controllers_auth_controller_getprofile",
+      "label": "getProfile()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "getprofile()",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L36"
+    },
+    {
+      "id": "backend_src_controllers_auth_controller_login",
+      "label": "login()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "login()",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L25"
+    },
+    {
+      "id": "backend_src_controllers_auth_controller_logout",
+      "label": "logout()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "logout()",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L68"
+    },
+    {
+      "id": "backend_src_controllers_auth_controller_logoutall",
+      "label": "logoutAll()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "logoutall()",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L87"
+    },
+    {
+      "id": "backend_src_controllers_auth_controller_refreshtoken",
+      "label": "refreshToken()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "refreshtoken()",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L49"
+    },
+    {
+      "id": "backend_src_controllers_auth_controller_register",
+      "label": "register()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "register()",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L5"
+    },
+    {
+      "id": "backend_src_controllers_auth_controller_registerdriver",
+      "label": "registerDriver()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "registerdriver()",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L15"
+    },
+    {
+      "id": "backend_src_controllers_auth_controller_resetpassword",
+      "label": "resetPassword()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "resetpassword()",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L114"
+    },
+    {
+      "id": "backend_src_controllers_auth_controller_verifyotp",
+      "label": "verifyOtp()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "verifyotp()",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L105"
+    },
+    {
       "id": "backend_src_services_auth_service_loginuser",
       "label": "loginUser()",
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "loginuser()",
       "source_file": "backend/src/services/auth.service.js",
@@ -2591,7 +2363,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "logoutalldevices()",
       "source_file": "backend/src/services/auth.service.js",
@@ -2603,7 +2375,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "logoutuser()",
       "source_file": "backend/src/services/auth.service.js",
@@ -2615,7 +2387,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "registercustomer()",
       "source_file": "backend/src/services/auth.service.js",
@@ -2627,7 +2399,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "registerdriver()",
       "source_file": "backend/src/services/auth.service.js",
@@ -2639,7 +2411,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "requestpasswordreset()",
       "source_file": "backend/src/services/auth.service.js",
@@ -2651,7 +2423,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "resetpasswordwithotp()",
       "source_file": "backend/src/services/auth.service.js",
@@ -2663,7 +2435,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "rotaterefreshtoken()",
       "source_file": "backend/src/services/auth.service.js",
@@ -2675,7 +2447,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "tokenmatches()",
       "source_file": "backend/src/services/auth.service.js",
@@ -2687,203 +2459,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "verifyresetotp()",
       "source_file": "backend/src/services/auth.service.js",
       "source_location": "L346"
-    },
-    {
-      "id": "backend_src_services_email_service_buildbookingemailhtml",
-      "label": "buildBookingEmailHtml()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "buildbookingemailhtml()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L155"
-    },
-    {
-      "id": "backend_src_services_email_service_buildbookingemailtext",
-      "label": "buildBookingEmailText()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "buildbookingemailtext()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L231"
-    },
-    {
-      "id": "backend_src_services_email_service_combinenameaddress",
-      "label": "combineNameAddress()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "combinenameaddress()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L7"
-    },
-    {
-      "id": "backend_src_services_email_service_defaulttransportfactory",
-      "label": "defaultTransportFactory()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "defaulttransportfactory()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L268"
-    },
-    {
-      "id": "backend_src_services_email_service_escapehtml",
-      "label": "escapeHtml()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "escapehtml()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L51"
-    },
-    {
-      "id": "backend_src_services_email_service_formatdatetime",
-      "label": "formatDateTime()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "formatdatetime()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L58"
-    },
-    {
-      "id": "backend_src_services_email_service_getadminrecipients",
-      "label": "getAdminRecipients()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "getadminrecipients()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L385"
-    },
-    {
-      "id": "backend_src_services_email_service_getbookingemailfields",
-      "label": "getBookingEmailFields()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "getbookingemailfields()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L73"
-    },
-    {
-      "id": "backend_src_services_email_service_getconfig",
-      "label": "getConfig()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "getconfig()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L14"
-    },
-    {
-      "id": "backend_src_services_email_service_getemailconfig",
-      "label": "getEmailConfig()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "getemailconfig()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L12"
-    },
-    {
-      "id": "backend_src_services_email_service_markemailsent",
-      "label": "markEmailSent()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "markemailsent()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L419"
-    },
-    {
-      "id": "backend_src_services_email_service_maskemail",
-      "label": "maskEmail()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "maskemail()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L44"
-    },
-    {
-      "id": "backend_src_services_email_service_notifyadminofbookingemail",
-      "label": "notifyAdminOfBookingEmail()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "notifyadminofbookingemail()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L468"
-    },
-    {
-      "id": "backend_src_services_email_service_recordemailfailure",
-      "label": "recordEmailFailure()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "recordemailfailure()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L441"
-    },
-    {
-      "id": "backend_src_services_email_service_resendadminbookingemail",
-      "label": "resendAdminBookingEmail()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "resendadminbookingemail()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L616"
-    },
-    {
-      "id": "backend_src_services_email_service_sendviahttpapi",
-      "label": "sendViaHttpApi()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "sendviahttpapi()",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L310"
     },
     {
       "id": "backend_src_services_jwt_service_decodetoken",
@@ -2891,7 +2471,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "decodetoken()",
       "source_file": "backend/src/services/jwt.service.js",
@@ -2903,7 +2483,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "generaterefreshtoken()",
       "source_file": "backend/src/services/jwt.service.js",
@@ -2915,7 +2495,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "generatetoken()",
       "source_file": "backend/src/services/jwt.service.js",
@@ -2927,7 +2507,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "generatetokenpair()",
       "source_file": "backend/src/services/jwt.service.js",
@@ -2939,7 +2519,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "hashtoken()",
       "source_file": "backend/src/services/jwt.service.js",
@@ -2951,35 +2531,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "verifyrefreshtoken()",
       "source_file": "backend/src/services/jwt.service.js",
       "source_location": "L76"
     },
     {
-      "id": "backend_tests_email_test_restoremailenv",
-      "label": "restoreMailEnv()",
+      "id": "backend_src_validators_auth_validator_validate",
+      "label": "validate()",
       "_callable": true,
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
-      "norm_label": "restoremailenv()",
-      "source_file": "backend/__tests__/email.test.js",
-      "source_location": "L33"
-    },
-    {
-      "id": "backend_tests_email_test_setmailenv",
-      "label": "setMailEnv()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "setmailenv()",
-      "source_file": "backend/__tests__/email.test.js",
-      "source_location": "L20"
+      "norm_label": "validate()",
+      "source_file": "backend/src/validators/auth.validator.js",
+      "source_location": "L51"
     },
     {
       "id": "backend_src_controllers_admin_controller_approvedriver",
@@ -3015,7 +2583,7 @@
       "file_type": "code",
       "norm_label": "assigndriver()",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L708"
+      "source_location": "L710"
     },
     {
       "id": "backend_src_controllers_admin_controller_blockcustomer",
@@ -3051,7 +2619,7 @@
       "file_type": "code",
       "norm_label": "cancelbooking()",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L737"
+      "source_location": "L739"
     },
     {
       "id": "backend_src_controllers_admin_controller_completebooking",
@@ -3063,7 +2631,7 @@
       "file_type": "code",
       "norm_label": "completebooking()",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L766"
+      "source_location": "L768"
     },
     {
       "id": "backend_src_controllers_admin_controller_createvehicle",
@@ -3111,7 +2679,7 @@
       "file_type": "code",
       "norm_label": "deletereview()",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L913"
+      "source_location": "L915"
     },
     {
       "id": "backend_src_controllers_admin_controller_deletevehicle",
@@ -3159,7 +2727,7 @@
       "file_type": "code",
       "norm_label": "getallreviews()",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L818"
+      "source_location": "L820"
     },
     {
       "id": "backend_src_controllers_admin_controller_getapproveddrivers",
@@ -3183,7 +2751,7 @@
       "file_type": "code",
       "norm_label": "getbookingbyid()",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L689"
+      "source_location": "L691"
     },
     {
       "id": "backend_src_controllers_admin_controller_getbookings",
@@ -3327,7 +2895,7 @@
       "file_type": "code",
       "norm_label": "hidereview()",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L859"
+      "source_location": "L861"
     },
     {
       "id": "backend_src_controllers_admin_controller_rejectdriver",
@@ -3363,7 +2931,7 @@
       "file_type": "code",
       "norm_label": "resendbookingemail()",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L794"
+      "source_location": "L796"
     },
     {
       "id": "backend_src_controllers_admin_controller_unblockcustomer",
@@ -3399,7 +2967,7 @@
       "file_type": "code",
       "norm_label": "unhidereview()",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L886"
+      "source_location": "L888"
     },
     {
       "id": "backend_src_controllers_admin_controller_updatevehicle",
@@ -4290,40 +3858,28 @@
       "source_location": "L16"
     },
     {
-      "id": "backend_src_services_user_service_changepassword",
-      "label": "changePassword()",
+      "id": "backend_tests_security2_test_login",
+      "label": "login()",
       "_callable": true,
       "_origin": "ast",
       "community": 48,
       "community_name": "app.js",
       "file_type": "code",
-      "norm_label": "changepassword()",
-      "source_file": "backend/src/services/user.service.js",
-      "source_location": "L40"
+      "norm_label": "login()",
+      "source_file": "backend/__tests__/security2.test.js",
+      "source_location": "L18"
     },
     {
-      "id": "backend_src_services_user_service_getallusers",
-      "label": "getAllUsers()",
+      "id": "backend_tests_socket_test_connect",
+      "label": "connect()",
       "_callable": true,
       "_origin": "ast",
       "community": 48,
       "community_name": "app.js",
       "file_type": "code",
-      "norm_label": "getallusers()",
-      "source_file": "backend/src/services/user.service.js",
-      "source_location": "L69"
-    },
-    {
-      "id": "backend_src_services_user_service_updateprofile",
-      "label": "updateProfile()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "updateprofile()",
-      "source_file": "backend/src/services/user.service.js",
-      "source_location": "L7"
+      "norm_label": "connect()",
+      "source_file": "backend/__tests__/socket.test.js",
+      "source_location": "L47"
     },
     {
       "id": "backend_tests_webhook_test_sign",
@@ -5154,88 +4710,40 @@
       "source_location": "L5"
     },
     {
-      "id": "backend_src_services_push_service_detailsurlfor",
-      "label": "detailsUrlFor()",
+      "id": "backend_src_services_user_service_changepassword",
+      "label": "changePassword()",
       "_callable": true,
       "_origin": "ast",
       "community": 55,
-      "community_name": "push.service.js",
+      "community_name": "user.service.js",
       "file_type": "code",
-      "norm_label": "detailsurlfor()",
-      "source_file": "backend/src/services/push.service.js",
-      "source_location": "L103"
+      "norm_label": "changepassword()",
+      "source_file": "backend/src/services/user.service.js",
+      "source_location": "L40"
     },
     {
-      "id": "backend_src_services_push_service_getvapidpublickey",
-      "label": "getVapidPublicKey()",
+      "id": "backend_src_services_user_service_getallusers",
+      "label": "getAllUsers()",
       "_callable": true,
       "_origin": "ast",
       "community": 55,
-      "community_name": "push.service.js",
+      "community_name": "user.service.js",
       "file_type": "code",
-      "norm_label": "getvapidpublickey()",
-      "source_file": "backend/src/services/push.service.js",
-      "source_location": "L50"
+      "norm_label": "getallusers()",
+      "source_file": "backend/src/services/user.service.js",
+      "source_location": "L69"
     },
     {
-      "id": "backend_src_services_push_service_initpush",
-      "label": "initPush()",
+      "id": "backend_src_services_user_service_updateprofile",
+      "label": "updateProfile()",
       "_callable": true,
       "_origin": "ast",
       "community": 55,
-      "community_name": "push.service.js",
+      "community_name": "user.service.js",
       "file_type": "code",
-      "norm_label": "initpush()",
-      "source_file": "backend/src/services/push.service.js",
-      "source_location": "L17"
-    },
-    {
-      "id": "backend_src_services_push_service_ispushenabled",
-      "label": "isPushEnabled()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 55,
-      "community_name": "push.service.js",
-      "file_type": "code",
-      "norm_label": "ispushenabled()",
-      "source_file": "backend/src/services/push.service.js",
-      "source_location": "L42"
-    },
-    {
-      "id": "backend_src_services_push_service_removesubscription",
-      "label": "removeSubscription()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 55,
-      "community_name": "push.service.js",
-      "file_type": "code",
-      "norm_label": "removesubscription()",
-      "source_file": "backend/src/services/push.service.js",
-      "source_location": "L87"
-    },
-    {
-      "id": "backend_src_services_push_service_savesubscription",
-      "label": "saveSubscription()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 55,
-      "community_name": "push.service.js",
-      "file_type": "code",
-      "norm_label": "savesubscription()",
-      "source_file": "backend/src/services/push.service.js",
-      "source_location": "L57"
-    },
-    {
-      "id": "backend_src_services_push_service_sendpushtouser",
-      "label": "sendPushToUser()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 55,
-      "community_name": "push.service.js",
-      "file_type": "code",
-      "norm_label": "sendpushtouser()",
-      "source_file": "backend/src/services/push.service.js",
-      "source_location": "L119"
+      "norm_label": "updateprofile()",
+      "source_file": "backend/src/services/user.service.js",
+      "source_location": "L7"
     },
     {
       "id": "frontend_src_component_why_choose_us_whychooseus_animatedcard",
@@ -5382,18 +4890,6 @@
       "source_location": "L101"
     },
     {
-      "id": "backend_src_config_redis_invalidatecache",
-      "label": "invalidateCache()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "invalidatecache()",
-      "source_file": "backend/src/config/redis.js",
-      "source_location": "L126"
-    },
-    {
       "id": "backend_src_services_admin_service_approvedriver",
       "label": "approveDriver()",
       "_callable": true,
@@ -5415,19 +4911,7 @@
       "file_type": "code",
       "norm_label": "approvewithdrawal()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L948"
-    },
-    {
-      "id": "backend_src_services_admin_service_assigndriver",
-      "label": "assignDriver()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "assigndriver()",
-      "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L698"
+      "source_location": "L961"
     },
     {
       "id": "backend_src_services_admin_service_blockcustomer",
@@ -5451,7 +4935,7 @@
       "file_type": "code",
       "norm_label": "blockdriver()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L479"
+      "source_location": "L488"
     },
     {
       "id": "backend_src_services_admin_service_cancelbooking",
@@ -5463,19 +4947,7 @@
       "file_type": "code",
       "norm_label": "cancelbooking()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L784"
-    },
-    {
-      "id": "backend_src_services_admin_service_createvehicle",
-      "label": "createVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "createvehicle()",
-      "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L557"
+      "source_location": "L797"
     },
     {
       "id": "backend_src_services_admin_service_deletecustomer",
@@ -5499,7 +4971,7 @@
       "file_type": "code",
       "norm_label": "deletedriver()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L523"
+      "source_location": "L532"
     },
     {
       "id": "backend_src_services_admin_service_deletereview",
@@ -5511,43 +4983,7 @@
       "file_type": "code",
       "norm_label": "deletereview()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L1111"
-    },
-    {
-      "id": "backend_src_services_admin_service_deletevehicle",
-      "label": "deleteVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "deletevehicle()",
-      "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L624"
-    },
-    {
-      "id": "backend_src_services_admin_service_disablevehicle",
-      "label": "disableVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "disablevehicle()",
-      "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L605"
-    },
-    {
-      "id": "backend_src_services_admin_service_enablevehicle",
-      "label": "enableVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "enablevehicle()",
-      "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L586"
+      "source_location": "L1124"
     },
     {
       "id": "backend_src_services_admin_service_getallreviews",
@@ -5559,7 +4995,7 @@
       "file_type": "code",
       "norm_label": "getallreviews()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L1017"
+      "source_location": "L1030"
     },
     {
       "id": "backend_src_services_admin_service_getapproveddrivers",
@@ -5583,7 +5019,7 @@
       "file_type": "code",
       "norm_label": "getbookingbyid()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L674"
+      "source_location": "L687"
     },
     {
       "id": "backend_src_services_admin_service_getbookings",
@@ -5595,7 +5031,7 @@
       "file_type": "code",
       "norm_label": "getbookings()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L639"
+      "source_location": "L648"
     },
     {
       "id": "backend_src_services_admin_service_getcustomerbyid",
@@ -5691,7 +5127,7 @@
       "file_type": "code",
       "norm_label": "getvehiclebyid()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L547"
+      "source_location": "L556"
     },
     {
       "id": "backend_src_services_admin_service_getvehicles",
@@ -5703,7 +5139,7 @@
       "file_type": "code",
       "norm_label": "getvehicles()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L541"
+      "source_location": "L550"
     },
     {
       "id": "backend_src_services_admin_service_getwithdrawalrequests",
@@ -5715,7 +5151,7 @@
       "file_type": "code",
       "norm_label": "getwithdrawalrequests()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L929"
+      "source_location": "L942"
     },
     {
       "id": "backend_src_services_admin_service_hidereview",
@@ -5727,7 +5163,7 @@
       "file_type": "code",
       "norm_label": "hidereview()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L1070"
+      "source_location": "L1083"
     },
     {
       "id": "backend_src_services_admin_service_rejectdriver",
@@ -5739,7 +5175,7 @@
       "file_type": "code",
       "norm_label": "rejectdriver()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L453"
+      "source_location": "L462"
     },
     {
       "id": "backend_src_services_admin_service_rejectwithdrawalrequest",
@@ -5751,7 +5187,7 @@
       "file_type": "code",
       "norm_label": "rejectwithdrawalrequest()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L993"
+      "source_location": "L1006"
     },
     {
       "id": "backend_src_services_admin_service_unblockcustomer",
@@ -5775,7 +5211,7 @@
       "file_type": "code",
       "norm_label": "unblockdriver()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L501"
+      "source_location": "L510"
     },
     {
       "id": "backend_src_services_admin_service_unhidereview",
@@ -5787,79 +5223,7 @@
       "file_type": "code",
       "norm_label": "unhidereview()",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L1091"
-    },
-    {
-      "id": "backend_src_services_admin_service_updatevehicle",
-      "label": "updateVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "updatevehicle()",
-      "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L572"
-    },
-    {
-      "id": "backend_src_services_vehicle_service_createvehicle",
-      "label": "createVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "createvehicle()",
-      "source_file": "backend/src/services/vehicle.service.js",
-      "source_location": "L4"
-    },
-    {
-      "id": "backend_src_services_vehicle_service_deletevehicle",
-      "label": "deleteVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "deletevehicle()",
-      "source_file": "backend/src/services/vehicle.service.js",
-      "source_location": "L26"
-    },
-    {
-      "id": "backend_src_services_vehicle_service_getvehiclebyid",
-      "label": "getVehicleById()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "getvehiclebyid()",
-      "source_file": "backend/src/services/vehicle.service.js",
-      "source_location": "L16"
-    },
-    {
-      "id": "backend_src_services_vehicle_service_getvehicles",
-      "label": "getVehicles()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "getvehicles()",
-      "source_file": "backend/src/services/vehicle.service.js",
-      "source_location": "L10"
-    },
-    {
-      "id": "backend_src_services_vehicle_service_updatevehicle",
-      "label": "updateVehicle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "updatevehicle()",
-      "source_file": "backend/src/services/vehicle.service.js",
-      "source_location": "L20"
+      "source_location": "L1104"
     },
     {
       "id": "frontend_src_components_charts_admincharts_admincharts",
@@ -6267,7 +5631,7 @@
       "file_type": "code",
       "norm_label": "clearauthstate()",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L49"
+      "source_location": "L50"
     },
     {
       "id": "frontend_src_services_api_isauthendpoint",
@@ -6279,7 +5643,7 @@
       "file_type": "code",
       "norm_label": "isauthendpoint()",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L32"
+      "source_location": "L33"
     },
     {
       "id": "frontend_src_services_api_isauthpage",
@@ -6291,7 +5655,7 @@
       "file_type": "code",
       "norm_label": "isauthpage()",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L37"
+      "source_location": "L38"
     },
     {
       "id": "frontend_src_services_api_processqueue",
@@ -6315,7 +5679,7 @@
       "file_type": "code",
       "norm_label": "redirecttologinifneeded()",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L55"
+      "source_location": "L56"
     },
     {
       "id": "frontend_src_components_shared_errorstate_errorstate",
@@ -6774,6 +6138,222 @@
       "source_location": "L63"
     },
     {
+      "id": "backend_src_services_email_service_buildbookingemailhtml",
+      "label": "buildBookingEmailHtml()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "buildbookingemailhtml()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L155"
+    },
+    {
+      "id": "backend_src_services_email_service_buildbookingemailtext",
+      "label": "buildBookingEmailText()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "buildbookingemailtext()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L231"
+    },
+    {
+      "id": "backend_src_services_email_service_combinenameaddress",
+      "label": "combineNameAddress()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "combinenameaddress()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L7"
+    },
+    {
+      "id": "backend_src_services_email_service_defaulttransportfactory",
+      "label": "defaultTransportFactory()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "defaulttransportfactory()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L268"
+    },
+    {
+      "id": "backend_src_services_email_service_escapehtml",
+      "label": "escapeHtml()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "escapehtml()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L51"
+    },
+    {
+      "id": "backend_src_services_email_service_formatdatetime",
+      "label": "formatDateTime()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "formatdatetime()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L58"
+    },
+    {
+      "id": "backend_src_services_email_service_getadminrecipients",
+      "label": "getAdminRecipients()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "getadminrecipients()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L385"
+    },
+    {
+      "id": "backend_src_services_email_service_getbookingemailfields",
+      "label": "getBookingEmailFields()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "getbookingemailfields()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L73"
+    },
+    {
+      "id": "backend_src_services_email_service_getconfig",
+      "label": "getConfig()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "getconfig()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L14"
+    },
+    {
+      "id": "backend_src_services_email_service_getemailconfig",
+      "label": "getEmailConfig()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "getemailconfig()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L12"
+    },
+    {
+      "id": "backend_src_services_email_service_markemailsent",
+      "label": "markEmailSent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "markemailsent()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L419"
+    },
+    {
+      "id": "backend_src_services_email_service_maskemail",
+      "label": "maskEmail()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "maskemail()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L44"
+    },
+    {
+      "id": "backend_src_services_email_service_notifyadminofbookingemail",
+      "label": "notifyAdminOfBookingEmail()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "notifyadminofbookingemail()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L468"
+    },
+    {
+      "id": "backend_src_services_email_service_recordemailfailure",
+      "label": "recordEmailFailure()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "recordemailfailure()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L441"
+    },
+    {
+      "id": "backend_src_services_email_service_resendadminbookingemail",
+      "label": "resendAdminBookingEmail()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "resendadminbookingemail()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L616"
+    },
+    {
+      "id": "backend_src_services_email_service_sendviahttpapi",
+      "label": "sendViaHttpApi()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "sendviahttpapi()",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L310"
+    },
+    {
+      "id": "backend_tests_email_test_restoremailenv",
+      "label": "restoreMailEnv()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "restoremailenv()",
+      "source_file": "backend/__tests__/email.test.js",
+      "source_location": "L33"
+    },
+    {
+      "id": "backend_tests_email_test_setmailenv",
+      "label": "setMailEnv()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "setmailenv()",
+      "source_file": "backend/__tests__/email.test.js",
+      "source_location": "L20"
+    },
+    {
       "id": "frontend_src_components_charts_drivercharts_customtooltip",
       "label": "CustomTooltip()",
       "_callable": true,
@@ -7194,6 +6774,222 @@
       "source_location": "L12"
     },
     {
+      "id": "backend_src_services_notification_service_bookingaccepted",
+      "label": "bookingAccepted()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "bookingaccepted()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L143"
+    },
+    {
+      "id": "backend_src_services_notification_service_bookingcancelled",
+      "label": "bookingCancelled()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "bookingcancelled()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L158"
+    },
+    {
+      "id": "backend_src_services_notification_service_createnotification",
+      "label": "createNotification()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "createnotification()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L249"
+    },
+    {
+      "id": "backend_src_services_notification_service_deletenotification",
+      "label": "deleteNotification()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "deletenotification()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L461"
+    },
+    {
+      "id": "backend_src_services_notification_service_driverarrived",
+      "label": "driverArrived()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "driverarrived()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L173"
+    },
+    {
+      "id": "backend_src_services_notification_service_getnotifications",
+      "label": "getNotifications()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "getnotifications()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L377"
+    },
+    {
+      "id": "backend_src_services_notification_service_getunreadcount",
+      "label": "getUnreadCount()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "getunreadcount()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L406"
+    },
+    {
+      "id": "backend_src_services_notification_service_markallasread",
+      "label": "markAllAsRead()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "markallasread()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L441"
+    },
+    {
+      "id": "backend_src_services_notification_service_markasread",
+      "label": "markAsRead()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "markasread()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L419"
+    },
+    {
+      "id": "backend_src_services_notification_service_notifycustomer",
+      "label": "notifyCustomer()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "notifycustomer()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L57"
+    },
+    {
+      "id": "backend_src_services_notification_service_notifydriver",
+      "label": "notifyDriver()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "notifydriver()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L86"
+    },
+    {
+      "id": "backend_src_services_notification_service_paymentfailed",
+      "label": "paymentFailed()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "paymentfailed()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L233"
+    },
+    {
+      "id": "backend_src_services_notification_service_paymentsuccess",
+      "label": "paymentSuccess()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "paymentsuccess()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L218"
+    },
+    {
+      "id": "backend_src_services_notification_service_ridecompleted",
+      "label": "rideCompleted()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "ridecompleted()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L203"
+    },
+    {
+      "id": "backend_src_services_notification_service_ridestarted",
+      "label": "rideStarted()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "ridestarted()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L188"
+    },
+    {
+      "id": "backend_src_services_notification_service_senddriverlocation",
+      "label": "sendDriverLocation()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "senddriverlocation()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L115"
+    },
+    {
+      "id": "backend_src_services_notification_service_sendrealtimenotification",
+      "label": "sendRealtimeNotification()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "sendrealtimenotification()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L273"
+    },
+    {
+      "id": "backend_src_socket_users_getsocketid",
+      "label": "getSocketId()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "getsocketid()",
+      "source_file": "backend/src/socket/users.js",
+      "source_location": "L27"
+    },
+    {
       "id": "frontend_src_pages_info_info_info",
       "label": "Info()",
       "_callable": true,
@@ -7204,138 +7000,6 @@
       "norm_label": "info()",
       "source_file": "frontend/src/Pages/Info/Info.jsx",
       "source_location": "L102"
-    },
-    {
-      "id": "backend_src_controllers_auth_controller_forgotpassword",
-      "label": "forgotPassword()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "forgotpassword()",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L87"
-    },
-    {
-      "id": "backend_src_controllers_auth_controller_getprofile",
-      "label": "getProfile()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "getprofile()",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L35"
-    },
-    {
-      "id": "backend_src_controllers_auth_controller_login",
-      "label": "login()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "login()",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L24"
-    },
-    {
-      "id": "backend_src_controllers_auth_controller_logout",
-      "label": "logout()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "logout()",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L67"
-    },
-    {
-      "id": "backend_src_controllers_auth_controller_logoutall",
-      "label": "logoutAll()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "logoutall()",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L78"
-    },
-    {
-      "id": "backend_src_controllers_auth_controller_refreshtoken",
-      "label": "refreshToken()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "refreshtoken()",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L48"
-    },
-    {
-      "id": "backend_src_controllers_auth_controller_register",
-      "label": "register()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "register()",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L4"
-    },
-    {
-      "id": "backend_src_controllers_auth_controller_registerdriver",
-      "label": "registerDriver()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "registerdriver()",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L14"
-    },
-    {
-      "id": "backend_src_controllers_auth_controller_resetpassword",
-      "label": "resetPassword()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "resetpassword()",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L105"
-    },
-    {
-      "id": "backend_src_controllers_auth_controller_verifyotp",
-      "label": "verifyOtp()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "verifyotp()",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L96"
-    },
-    {
-      "id": "backend_src_validators_auth_validator_validate",
-      "label": "validate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "validate()",
-      "source_file": "backend/src/validators/auth.validator.js",
-      "source_location": "L51"
     },
     {
       "id": "backend_src_controllers_review_controller_createreview",
@@ -7420,6 +7084,342 @@
       "norm_label": ".render()",
       "source_file": "frontend/src/App.jsx",
       "source_location": "L92"
+    },
+    {
+      "id": "backend_src_config_redis_invalidatecache",
+      "label": "invalidateCache()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "invalidatecache()",
+      "source_file": "backend/src/config/redis.js",
+      "source_location": "L126"
+    },
+    {
+      "id": "backend_src_services_admin_service_createvehicle",
+      "label": "createVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "createvehicle()",
+      "source_file": "backend/src/services/admin.service.js",
+      "source_location": "L566"
+    },
+    {
+      "id": "backend_src_services_admin_service_deletevehicle",
+      "label": "deleteVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "deletevehicle()",
+      "source_file": "backend/src/services/admin.service.js",
+      "source_location": "L633"
+    },
+    {
+      "id": "backend_src_services_admin_service_disablevehicle",
+      "label": "disableVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "disablevehicle()",
+      "source_file": "backend/src/services/admin.service.js",
+      "source_location": "L614"
+    },
+    {
+      "id": "backend_src_services_admin_service_enablevehicle",
+      "label": "enableVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "enablevehicle()",
+      "source_file": "backend/src/services/admin.service.js",
+      "source_location": "L595"
+    },
+    {
+      "id": "backend_src_services_admin_service_updatevehicle",
+      "label": "updateVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "updatevehicle()",
+      "source_file": "backend/src/services/admin.service.js",
+      "source_location": "L581"
+    },
+    {
+      "id": "backend_src_services_vehicle_service_createvehicle",
+      "label": "createVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "createvehicle()",
+      "source_file": "backend/src/services/vehicle.service.js",
+      "source_location": "L4"
+    },
+    {
+      "id": "backend_src_services_vehicle_service_deletevehicle",
+      "label": "deleteVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "deletevehicle()",
+      "source_file": "backend/src/services/vehicle.service.js",
+      "source_location": "L26"
+    },
+    {
+      "id": "backend_src_services_vehicle_service_getvehiclebyid",
+      "label": "getVehicleById()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "getvehiclebyid()",
+      "source_file": "backend/src/services/vehicle.service.js",
+      "source_location": "L16"
+    },
+    {
+      "id": "backend_src_services_vehicle_service_getvehicles",
+      "label": "getVehicles()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "getvehicles()",
+      "source_file": "backend/src/services/vehicle.service.js",
+      "source_location": "L10"
+    },
+    {
+      "id": "backend_src_services_vehicle_service_updatevehicle",
+      "label": "updateVehicle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "updatevehicle()",
+      "source_file": "backend/src/services/vehicle.service.js",
+      "source_location": "L20"
+    },
+    {
+      "id": "backend_src_services_push_service_detailsurlfor",
+      "label": "detailsUrlFor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 96,
+      "community_name": "push.service.js",
+      "file_type": "code",
+      "norm_label": "detailsurlfor()",
+      "source_file": "backend/src/services/push.service.js",
+      "source_location": "L103"
+    },
+    {
+      "id": "backend_src_services_push_service_getvapidpublickey",
+      "label": "getVapidPublicKey()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 96,
+      "community_name": "push.service.js",
+      "file_type": "code",
+      "norm_label": "getvapidpublickey()",
+      "source_file": "backend/src/services/push.service.js",
+      "source_location": "L50"
+    },
+    {
+      "id": "backend_src_services_push_service_initpush",
+      "label": "initPush()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 96,
+      "community_name": "push.service.js",
+      "file_type": "code",
+      "norm_label": "initpush()",
+      "source_file": "backend/src/services/push.service.js",
+      "source_location": "L17"
+    },
+    {
+      "id": "backend_src_services_push_service_ispushenabled",
+      "label": "isPushEnabled()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 96,
+      "community_name": "push.service.js",
+      "file_type": "code",
+      "norm_label": "ispushenabled()",
+      "source_file": "backend/src/services/push.service.js",
+      "source_location": "L42"
+    },
+    {
+      "id": "backend_src_services_push_service_removesubscription",
+      "label": "removeSubscription()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 96,
+      "community_name": "push.service.js",
+      "file_type": "code",
+      "norm_label": "removesubscription()",
+      "source_file": "backend/src/services/push.service.js",
+      "source_location": "L87"
+    },
+    {
+      "id": "backend_src_services_push_service_savesubscription",
+      "label": "saveSubscription()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 96,
+      "community_name": "push.service.js",
+      "file_type": "code",
+      "norm_label": "savesubscription()",
+      "source_file": "backend/src/services/push.service.js",
+      "source_location": "L57"
+    },
+    {
+      "id": "backend_src_services_push_service_sendpushtouser",
+      "label": "sendPushToUser()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 96,
+      "community_name": "push.service.js",
+      "file_type": "code",
+      "norm_label": "sendpushtouser()",
+      "source_file": "backend/src/services/push.service.js",
+      "source_location": "L119"
+    },
+    {
+      "id": "backend_src_services_dispatch_service_dispatchbooking",
+      "label": "dispatchBooking()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 97,
+      "community_name": "dispatch.service.js",
+      "file_type": "code",
+      "norm_label": "dispatchbooking()",
+      "source_file": "backend/src/services/dispatch.service.js",
+      "source_location": "L60"
+    },
+    {
+      "id": "backend_src_services_dispatch_service_findnearbydrivers",
+      "label": "findNearbyDrivers()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 97,
+      "community_name": "dispatch.service.js",
+      "file_type": "code",
+      "norm_label": "findnearbydrivers()",
+      "source_file": "backend/src/services/dispatch.service.js",
+      "source_location": "L11"
+    },
+    {
+      "id": "backend_src_services_dispatch_service_getcurrentdriver",
+      "label": "getCurrentDriver()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 97,
+      "community_name": "dispatch.service.js",
+      "file_type": "code",
+      "norm_label": "getcurrentdriver()",
+      "source_file": "backend/src/services/dispatch.service.js",
+      "source_location": "L177"
+    },
+    {
+      "id": "backend_src_services_dispatch_service_handledrivertimeout",
+      "label": "handleDriverTimeout()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 97,
+      "community_name": "dispatch.service.js",
+      "file_type": "code",
+      "norm_label": "handledrivertimeout()",
+      "source_file": "backend/src/services/dispatch.service.js",
+      "source_location": "L377"
+    },
+    {
+      "id": "backend_src_services_dispatch_service_rejectbooking",
+      "label": "rejectBooking()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 97,
+      "community_name": "dispatch.service.js",
+      "file_type": "code",
+      "norm_label": "rejectbooking()",
+      "source_file": "backend/src/services/dispatch.service.js",
+      "source_location": "L323"
+    },
+    {
+      "id": "backend_src_services_dispatch_service_sendtonextdriver",
+      "label": "sendToNextDriver()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 97,
+      "community_name": "dispatch.service.js",
+      "file_type": "code",
+      "norm_label": "sendtonextdriver()",
+      "source_file": "backend/src/services/dispatch.service.js",
+      "source_location": "L205"
+    },
+    {
+      "id": "backend_src_services_notification_service_sendriderequest",
+      "label": "sendRideRequest()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 97,
+      "community_name": "dispatch.service.js",
+      "file_type": "code",
+      "norm_label": "sendriderequest()",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L10"
+    },
+    {
+      "id": "backend_src_services_review_service_createreview",
+      "label": "createReview()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "review.service.js",
+      "file_type": "code",
+      "norm_label": "createreview()",
+      "source_file": "backend/src/services/review.service.js",
+      "source_location": "L9"
+    },
+    {
+      "id": "backend_src_services_review_service_getdriverreviews",
+      "label": "getDriverReviews()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "review.service.js",
+      "file_type": "code",
+      "norm_label": "getdriverreviews()",
+      "source_file": "backend/src/services/review.service.js",
+      "source_location": "L129"
+    },
+    {
+      "id": "backend_src_services_review_service_getmyreviews",
+      "label": "getMyReviews()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "review.service.js",
+      "file_type": "code",
+      "norm_label": "getmyreviews()",
+      "source_file": "backend/src/services/review.service.js",
+      "source_location": "L86"
     },
     {
       "id": "backend_src_config_redisratelimiter",
@@ -8577,17 +8577,6 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_tests_security2_test",
-      "label": "security2.test.js",
-      "_origin": "ast",
-      "community": 15,
-      "community_name": "booking.service.js",
-      "file_type": "code",
-      "norm_label": "security2.test.js",
-      "source_file": "backend/__tests__/security2.test.js",
-      "source_location": "L1"
-    },
-    {
       "id": "frontend_src_components_autopushsync",
       "label": "AutoPushSync.jsx",
       "_origin": "ast",
@@ -8632,28 +8621,6 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_src_models_notification",
-      "label": "Notification.js",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "notification.js",
-      "source_file": "backend/src/models/Notification.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_models_notification_notificationschema",
-      "label": "notificationSchema",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "notificationschema",
-      "source_file": "backend/src/models/Notification.js",
-      "source_location": "L3"
-    },
-    {
       "id": "backend_src_routes_booking_routes",
       "label": "booking.routes.js",
       "_origin": "ast",
@@ -8674,17 +8641,6 @@
       "norm_label": "router",
       "source_file": "backend/src/routes/booking.routes.js",
       "source_location": "L34"
-    },
-    {
-      "id": "backend_src_services_notification_service",
-      "label": "notification.service.js",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "booking.routes.js",
-      "file_type": "code",
-      "norm_label": "notification.service.js",
-      "source_file": "backend/src/services/notification.service.js",
-      "source_location": "L1"
     },
     {
       "id": "backend_src_validators_booking_validator",
@@ -9061,28 +9017,6 @@
       "source_location": "L3"
     },
     {
-      "id": "backend_src_models_driverprofile",
-      "label": "DriverProfile.js",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Booking.js",
-      "file_type": "code",
-      "norm_label": "driverprofile.js",
-      "source_file": "backend/src/models/DriverProfile.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_models_driverprofile_driverprofileschema",
-      "label": "driverProfileSchema",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Booking.js",
-      "file_type": "code",
-      "norm_label": "driverprofileschema",
-      "source_file": "backend/src/models/DriverProfile.js",
-      "source_location": "L3"
-    },
-    {
       "id": "backend_src_services_history_service",
       "label": "history.service.js",
       "_origin": "ast",
@@ -9149,48 +9083,26 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_src_services_review_service",
-      "label": "review.service.js",
+      "id": "backend_tests_vehiclefilter_test",
+      "label": "vehicleFilter.test.js",
       "_origin": "ast",
       "community": 2,
       "community_name": "Booking.js",
       "file_type": "code",
-      "norm_label": "review.service.js",
-      "source_file": "backend/src/services/review.service.js",
+      "norm_label": "vehiclefilter.test.js",
+      "source_file": "backend/__tests__/vehicleFilter.test.js",
       "source_location": "L1"
     },
     {
-      "id": "backend_src_services_ride_service",
-      "label": "ride.service.js",
+      "id": "backend_tests_vehiclefilter_test_point",
+      "label": "point",
       "_origin": "ast",
       "community": 2,
       "community_name": "Booking.js",
       "file_type": "code",
-      "norm_label": "ride.service.js",
-      "source_file": "backend/src/services/ride.service.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_services_ride_service_status_transitions",
-      "label": "STATUS_TRANSITIONS",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Booking.js",
-      "file_type": "code",
-      "norm_label": "status_transitions",
-      "source_file": "backend/src/services/ride.service.js",
-      "source_location": "L7"
-    },
-    {
-      "id": "backend_src_services_ride_service_timestamp_field",
-      "label": "TIMESTAMP_FIELD",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Booking.js",
-      "file_type": "code",
-      "norm_label": "timestamp_field",
-      "source_file": "backend/src/services/ride.service.js",
-      "source_location": "L17"
+      "norm_label": "point",
+      "source_file": "backend/__tests__/vehicleFilter.test.js",
+      "source_location": "L23"
     },
     {
       "id": "backend_package_jest",
@@ -9204,6 +9116,17 @@
       "source_location": "L12"
     },
     {
+      "id": "backend_package_jest_collectcoveragefrom",
+      "label": "collectCoverageFrom",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "jest",
+      "file_type": "code",
+      "norm_label": "collectcoveragefrom",
+      "source_file": "backend/package.json",
+      "source_location": "L22"
+    },
+    {
       "id": "backend_package_jest_coveragedirectory",
       "label": "coverageDirectory",
       "_origin": "ast",
@@ -9213,17 +9136,6 @@
       "norm_label": "coveragedirectory",
       "source_file": "backend/package.json",
       "source_location": "L21"
-    },
-    {
-      "id": "backend_package_jest_modulefileextensions",
-      "label": "moduleFileExtensions",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "jest",
-      "file_type": "code",
-      "norm_label": "modulefileextensions",
-      "source_file": "backend/package.json",
-      "source_location": "L30"
     },
     {
       "id": "backend_package_jest_setupfiles",
@@ -9281,39 +9193,6 @@
       "source_location": "L28"
     },
     {
-      "id": "ref_js",
-      "label": "js",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "jest",
-      "file_type": "concept",
-      "norm_label": "js",
-      "source_file": "backend/package.json",
-      "source_location": "L30"
-    },
-    {
-      "id": "ref_json",
-      "label": "json",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "jest",
-      "file_type": "concept",
-      "norm_label": "json",
-      "source_file": "backend/package.json",
-      "source_location": "L30"
-    },
-    {
-      "id": "ref_mjs",
-      "label": "mjs",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "jest",
-      "file_type": "concept",
-      "norm_label": "mjs",
-      "source_file": "backend/package.json",
-      "source_location": "L30"
-    },
-    {
       "id": "ref_node_modules_axios_supertest",
       "label": "node_modules/(?!(axios|supertest)/)",
       "_origin": "ast",
@@ -9323,6 +9202,39 @@
       "norm_label": "node_modules/(?!(axios|supertest)/)",
       "source_file": "backend/package.json",
       "source_location": "L35"
+    },
+    {
+      "id": "ref_src_config",
+      "label": "!src/config/**",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "jest",
+      "file_type": "concept",
+      "norm_label": "!src/config/**",
+      "source_file": "backend/package.json",
+      "source_location": "L22"
+    },
+    {
+      "id": "ref_src_js",
+      "label": "src/**/*.js",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "jest",
+      "file_type": "concept",
+      "norm_label": "src/**/*.js",
+      "source_file": "backend/package.json",
+      "source_location": "L22"
+    },
+    {
+      "id": "ref_src_seeds",
+      "label": "!src/seeds/**",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "jest",
+      "file_type": "concept",
+      "norm_label": "!src/seeds/**",
+      "source_file": "backend/package.json",
+      "source_location": "L22"
     },
     {
       "id": "ref_tests_jest_env_js",
@@ -9347,15 +9259,37 @@
       "source_file": "@socket.io/redis-adapter"
     },
     {
-      "id": "backend_src_services_dispatch_service",
-      "label": "dispatch.service.js",
+      "id": "backend_src_services_ride_service",
+      "label": "ride.service.js",
       "_origin": "ast",
       "community": 21,
       "community_name": "socket/index.js",
       "file_type": "code",
-      "norm_label": "dispatch.service.js",
-      "source_file": "backend/src/services/dispatch.service.js",
+      "norm_label": "ride.service.js",
+      "source_file": "backend/src/services/ride.service.js",
       "source_location": "L1"
+    },
+    {
+      "id": "backend_src_services_ride_service_status_transitions",
+      "label": "STATUS_TRANSITIONS",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "socket/index.js",
+      "file_type": "code",
+      "norm_label": "status_transitions",
+      "source_file": "backend/src/services/ride.service.js",
+      "source_location": "L7"
+    },
+    {
+      "id": "backend_src_services_ride_service_timestamp_field",
+      "label": "TIMESTAMP_FIELD",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "socket/index.js",
+      "file_type": "code",
+      "norm_label": "timestamp_field",
+      "source_file": "backend/src/services/ride.service.js",
+      "source_location": "L17"
     },
     {
       "id": "backend_src_socket_index",
@@ -9400,39 +9334,6 @@
       "norm_label": "users",
       "source_file": "backend/src/socket/users.js",
       "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_socket_test",
-      "label": "socket.test.js",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "socket.test.js",
-      "source_file": "backend/__tests__/socket.test.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_vehiclefilter_test",
-      "label": "vehicleFilter.test.js",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "vehiclefilter.test.js",
-      "source_file": "backend/__tests__/vehicleFilter.test.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_tests_vehiclefilter_test_point",
-      "label": "point",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "socket/index.js",
-      "file_type": "code",
-      "norm_label": "point",
-      "source_file": "backend/__tests__/vehicleFilter.test.js",
-      "source_location": "L23"
     },
     {
       "id": "backend_src_services_googlemaps_service",
@@ -9867,47 +9768,47 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_src_models_emaillog",
-      "label": "EmailLog.js",
+      "id": "backend_src_controllers_auth_controller",
+      "label": "auth.controller.js",
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
-      "norm_label": "emaillog.js",
-      "source_file": "backend/src/models/EmailLog.js",
+      "norm_label": "auth.controller.js",
+      "source_file": "backend/src/controllers/auth.controller.js",
       "source_location": "L1"
     },
     {
-      "id": "backend_src_models_emaillog_emaillogschema",
-      "label": "emailLogSchema",
+      "id": "backend_src_routes_auth_routes",
+      "label": "auth.routes.js",
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
-      "norm_label": "emaillogschema",
-      "source_file": "backend/src/models/EmailLog.js",
-      "source_location": "L10"
+      "norm_label": "auth.routes.js",
+      "source_file": "backend/src/routes/auth.routes.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_routes_auth_routes_router",
+      "label": "router",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "router",
+      "source_file": "backend/src/routes/auth.routes.js",
+      "source_location": "L25"
     },
     {
       "id": "backend_src_services_auth_service",
       "label": "auth.service.js",
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "auth.service.js",
       "source_file": "backend/src/services/auth.service.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_services_email_service",
-      "label": "email.service.js",
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "code",
-      "norm_label": "email.service.js",
-      "source_file": "backend/src/services/email.service.js",
       "source_location": "L1"
     },
     {
@@ -9915,55 +9816,110 @@
       "label": "jwt.service.js",
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
       "norm_label": "jwt.service.js",
       "source_file": "backend/src/services/jwt.service.js",
       "source_location": "L1"
     },
     {
-      "id": "backend_tests_email_test",
-      "label": "email.test.js",
+      "id": "backend_src_validators_auth_validator",
+      "label": "auth.validator.js",
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
-      "norm_label": "email.test.js",
-      "source_file": "backend/__tests__/email.test.js",
+      "norm_label": "auth.validator.js",
+      "source_file": "backend/src/validators/auth.validator.js",
       "source_location": "L1"
     },
     {
-      "id": "backend_tests_email_test_point",
-      "label": "point",
+      "id": "backend_src_validators_auth_validator_changepasswordschema",
+      "label": "changePasswordSchema",
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
-      "norm_label": "point",
-      "source_file": "backend/__tests__/email.test.js",
-      "source_location": "L17"
+      "norm_label": "changepasswordschema",
+      "source_file": "backend/src/validators/auth.validator.js",
+      "source_location": "L29"
     },
     {
-      "id": "backend_tests_email_test_savedenv",
-      "label": "savedEnv",
+      "id": "backend_src_validators_auth_validator_forgotpasswordschema",
+      "label": "forgotPasswordSchema",
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
+      "community_name": "auth.routes.js",
       "file_type": "code",
-      "norm_label": "savedenv",
-      "source_file": "backend/__tests__/email.test.js",
-      "source_location": "L18"
+      "norm_label": "forgotpasswordschema",
+      "source_file": "backend/src/validators/auth.validator.js",
+      "source_location": "L67"
     },
     {
-      "id": "backend_src_services_email_service_rationale_313",
-      "label": "IMPORTANT: Resend requires the `from` domain to be verified at",
+      "id": "backend_src_validators_auth_validator_loginschema",
+      "label": "loginSchema",
       "_origin": "ast",
       "community": 28,
-      "community_name": "email.service.js",
-      "file_type": "rationale",
-      "norm_label": "important: resend requires the `from` domain to be verified at",
-      "source_file": "backend/src/services/email.service.js",
-      "source_location": "L313"
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "loginschema",
+      "source_file": "backend/src/validators/auth.validator.js",
+      "source_location": "L20"
+    },
+    {
+      "id": "backend_src_validators_auth_validator_refreshtokenschema",
+      "label": "refreshTokenSchema",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "refreshtokenschema",
+      "source_file": "backend/src/validators/auth.validator.js",
+      "source_location": "L25"
+    },
+    {
+      "id": "backend_src_validators_auth_validator_registerschema",
+      "label": "registerSchema",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "registerschema",
+      "source_file": "backend/src/validators/auth.validator.js",
+      "source_location": "L3"
+    },
+    {
+      "id": "backend_src_validators_auth_validator_resetpasswordschema",
+      "label": "resetPasswordSchema",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "resetpasswordschema",
+      "source_file": "backend/src/validators/auth.validator.js",
+      "source_location": "L76"
+    },
+    {
+      "id": "backend_src_validators_auth_validator_updateprofileschema",
+      "label": "updateProfileSchema",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "updateprofileschema",
+      "source_file": "backend/src/validators/auth.validator.js",
+      "source_location": "L42"
+    },
+    {
+      "id": "backend_src_validators_auth_validator_verifyotpschema",
+      "label": "verifyOtpSchema",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "auth.routes.js",
+      "file_type": "code",
+      "norm_label": "verifyotpschema",
+      "source_file": "backend/src/validators/auth.validator.js",
+      "source_location": "L71"
     },
     {
       "id": "agents",
@@ -11783,6 +11739,28 @@
       "source_location": "L71"
     },
     {
+      "id": "backend_src_models_driverprofile",
+      "label": "DriverProfile.js",
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "driverprofile.js",
+      "source_file": "backend/src/models/DriverProfile.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_models_driverprofile_driverprofileschema",
+      "label": "driverProfileSchema",
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "driverprofileschema",
+      "source_file": "backend/src/models/DriverProfile.js",
+      "source_location": "L3"
+    },
+    {
       "id": "backend_src_models_payment",
       "label": "Payment.js",
       "_origin": "ast",
@@ -11860,17 +11838,6 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_src_services_user_service",
-      "label": "user.service.js",
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "app.js",
-      "file_type": "code",
-      "norm_label": "user.service.js",
-      "source_file": "backend/src/services/user.service.js",
-      "source_location": "L1"
-    },
-    {
       "id": "backend_tests_admin_test",
       "label": "admin.test.js",
       "_origin": "ast",
@@ -11937,6 +11904,17 @@
       "source_location": "L1"
     },
     {
+      "id": "backend_tests_security2_test",
+      "label": "security2.test.js",
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "security2.test.js",
+      "source_file": "backend/__tests__/security2.test.js",
+      "source_location": "L1"
+    },
+    {
       "id": "backend_tests_security_test",
       "label": "security.test.js",
       "_origin": "ast",
@@ -11945,6 +11923,17 @@
       "file_type": "code",
       "norm_label": "security.test.js",
       "source_file": "backend/__tests__/security.test.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_tests_socket_test",
+      "label": "socket.test.js",
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "app.js",
+      "file_type": "code",
+      "norm_label": "socket.test.js",
+      "source_file": "backend/__tests__/socket.test.js",
       "source_location": "L1"
     },
     {
@@ -13114,36 +13103,14 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_src_models_pushsubscription",
-      "label": "PushSubscription.js",
+      "id": "backend_src_services_user_service",
+      "label": "user.service.js",
       "_origin": "ast",
       "community": 55,
-      "community_name": "push.service.js",
+      "community_name": "user.service.js",
       "file_type": "code",
-      "norm_label": "pushsubscription.js",
-      "source_file": "backend/src/models/PushSubscription.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_models_pushsubscription_pushsubscriptionschema",
-      "label": "pushSubscriptionSchema",
-      "_origin": "ast",
-      "community": 55,
-      "community_name": "push.service.js",
-      "file_type": "code",
-      "norm_label": "pushsubscriptionschema",
-      "source_file": "backend/src/models/PushSubscription.js",
-      "source_location": "L7"
-    },
-    {
-      "id": "backend_src_services_push_service",
-      "label": "push.service.js",
-      "_origin": "ast",
-      "community": 55,
-      "community_name": "push.service.js",
-      "file_type": "code",
-      "norm_label": "push.service.js",
-      "source_file": "backend/src/services/push.service.js",
+      "norm_label": "user.service.js",
+      "source_file": "backend/src/services/user.service.js",
       "source_location": "L1"
     },
     {
@@ -13312,28 +13279,6 @@
       "source_location": "L26"
     },
     {
-      "id": "backend_src_models_review",
-      "label": "Review.js",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "review.js",
-      "source_file": "backend/src/models/Review.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_models_review_reviewschema",
-      "label": "reviewSchema",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "reviewschema",
-      "source_file": "backend/src/models/Review.js",
-      "source_location": "L3"
-    },
-    {
       "id": "backend_src_models_withdrawalrequest",
       "label": "WithdrawalRequest.js",
       "_origin": "ast",
@@ -13364,17 +13309,6 @@
       "file_type": "code",
       "norm_label": "admin.service.js",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_services_vehicle_service",
-      "label": "vehicle.service.js",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "admin.service.js",
-      "file_type": "code",
-      "norm_label": "vehicle.service.js",
-      "source_file": "backend/src/services/vehicle.service.js",
       "source_location": "L1"
     },
     {
@@ -14379,48 +14313,81 @@
       "source_location": "L11"
     },
     {
-      "id": "backend_package_jest_collectcoveragefrom",
-      "label": "collectCoverageFrom",
+      "id": "backend_src_models_emaillog",
+      "label": "EmailLog.js",
       "_origin": "ast",
       "community": 71,
-      "community_name": "collectCoverageFrom",
+      "community_name": "email.service.js",
       "file_type": "code",
-      "norm_label": "collectcoveragefrom",
-      "source_file": "backend/package.json",
-      "source_location": "L22"
+      "norm_label": "emaillog.js",
+      "source_file": "backend/src/models/EmailLog.js",
+      "source_location": "L1"
     },
     {
-      "id": "ref_src_config",
-      "label": "!src/config/**",
+      "id": "backend_src_models_emaillog_emaillogschema",
+      "label": "emailLogSchema",
       "_origin": "ast",
       "community": 71,
-      "community_name": "collectCoverageFrom",
-      "file_type": "concept",
-      "norm_label": "!src/config/**",
-      "source_file": "backend/package.json",
-      "source_location": "L22"
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "emaillogschema",
+      "source_file": "backend/src/models/EmailLog.js",
+      "source_location": "L10"
     },
     {
-      "id": "ref_src_js",
-      "label": "src/**/*.js",
+      "id": "backend_src_services_email_service",
+      "label": "email.service.js",
       "_origin": "ast",
       "community": 71,
-      "community_name": "collectCoverageFrom",
-      "file_type": "concept",
-      "norm_label": "src/**/*.js",
-      "source_file": "backend/package.json",
-      "source_location": "L22"
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "email.service.js",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L1"
     },
     {
-      "id": "ref_src_seeds",
-      "label": "!src/seeds/**",
+      "id": "backend_tests_email_test",
+      "label": "email.test.js",
       "_origin": "ast",
       "community": 71,
-      "community_name": "collectCoverageFrom",
-      "file_type": "concept",
-      "norm_label": "!src/seeds/**",
-      "source_file": "backend/package.json",
-      "source_location": "L22"
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "email.test.js",
+      "source_file": "backend/__tests__/email.test.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_tests_email_test_point",
+      "label": "point",
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "point",
+      "source_file": "backend/__tests__/email.test.js",
+      "source_location": "L17"
+    },
+    {
+      "id": "backend_tests_email_test_savedenv",
+      "label": "savedEnv",
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "code",
+      "norm_label": "savedenv",
+      "source_file": "backend/__tests__/email.test.js",
+      "source_location": "L18"
+    },
+    {
+      "id": "backend_src_services_email_service_rationale_313",
+      "label": "IMPORTANT: Resend requires the `from` domain to be verified at",
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "email.service.js",
+      "file_type": "rationale",
+      "norm_label": "important: resend requires the `from` domain to be verified at",
+      "source_file": "backend/src/services/email.service.js",
+      "source_location": "L313"
     },
     {
       "id": "opencode",
@@ -15248,26 +15215,37 @@
       "source_location": "L1"
     },
     {
-      "id": "frontend_package_dependencies_lucide_react",
-      "label": "lucide-react",
+      "id": "backend_src_models_notification",
+      "label": "Notification.js",
       "_origin": "ast",
       "community": 85,
-      "community_name": "lucide-react",
+      "community_name": "notification.service.js",
       "file_type": "code",
-      "norm_label": "lucide-react",
-      "source_file": "frontend/package.json",
-      "source_location": "L18"
+      "norm_label": "notification.js",
+      "source_file": "backend/src/models/Notification.js",
+      "source_location": "L1"
     },
     {
-      "id": "lucide_react",
-      "label": "lucide-react",
+      "id": "backend_src_models_notification_notificationschema",
+      "label": "notificationSchema",
       "_origin": "ast",
       "community": 85,
-      "community_name": "lucide-react",
-      "file_type": "concept",
-      "norm_label": "lucide-react",
-      "source_file": "frontend/package.json",
-      "source_location": "L18"
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "notificationschema",
+      "source_file": "backend/src/models/Notification.js",
+      "source_location": "L3"
+    },
+    {
+      "id": "backend_src_services_notification_service",
+      "label": "notification.service.js",
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "notification.service.js",
+      "file_type": "code",
+      "norm_label": "notification.service.js",
+      "source_file": "backend/src/services/notification.service.js",
+      "source_location": "L1"
     },
     {
       "id": "frontend_package_dependencies_socket_io_client",
@@ -15391,136 +15369,48 @@
       "source_location": "L1"
     },
     {
-      "id": "backend_src_controllers_auth_controller",
-      "label": "auth.controller.js",
+      "id": "backend_package_jest_modulefileextensions",
+      "label": "moduleFileExtensions",
       "_origin": "ast",
       "community": 9,
-      "community_name": "auth.routes.js",
+      "community_name": "moduleFileExtensions",
       "file_type": "code",
-      "norm_label": "auth.controller.js",
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L1"
+      "norm_label": "modulefileextensions",
+      "source_file": "backend/package.json",
+      "source_location": "L30"
     },
     {
-      "id": "backend_src_routes_auth_routes",
-      "label": "auth.routes.js",
+      "id": "ref_js",
+      "label": "js",
       "_origin": "ast",
       "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "auth.routes.js",
-      "source_file": "backend/src/routes/auth.routes.js",
-      "source_location": "L1"
+      "community_name": "moduleFileExtensions",
+      "file_type": "concept",
+      "norm_label": "js",
+      "source_file": "backend/package.json",
+      "source_location": "L30"
     },
     {
-      "id": "backend_src_routes_auth_routes_router",
-      "label": "router",
+      "id": "ref_json",
+      "label": "json",
       "_origin": "ast",
       "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "router",
-      "source_file": "backend/src/routes/auth.routes.js",
-      "source_location": "L25"
+      "community_name": "moduleFileExtensions",
+      "file_type": "concept",
+      "norm_label": "json",
+      "source_file": "backend/package.json",
+      "source_location": "L30"
     },
     {
-      "id": "backend_src_validators_auth_validator",
-      "label": "auth.validator.js",
+      "id": "ref_mjs",
+      "label": "mjs",
       "_origin": "ast",
       "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "auth.validator.js",
-      "source_file": "backend/src/validators/auth.validator.js",
-      "source_location": "L1"
-    },
-    {
-      "id": "backend_src_validators_auth_validator_changepasswordschema",
-      "label": "changePasswordSchema",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "changepasswordschema",
-      "source_file": "backend/src/validators/auth.validator.js",
-      "source_location": "L29"
-    },
-    {
-      "id": "backend_src_validators_auth_validator_forgotpasswordschema",
-      "label": "forgotPasswordSchema",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "forgotpasswordschema",
-      "source_file": "backend/src/validators/auth.validator.js",
-      "source_location": "L67"
-    },
-    {
-      "id": "backend_src_validators_auth_validator_loginschema",
-      "label": "loginSchema",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "loginschema",
-      "source_file": "backend/src/validators/auth.validator.js",
-      "source_location": "L20"
-    },
-    {
-      "id": "backend_src_validators_auth_validator_refreshtokenschema",
-      "label": "refreshTokenSchema",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "refreshtokenschema",
-      "source_file": "backend/src/validators/auth.validator.js",
-      "source_location": "L25"
-    },
-    {
-      "id": "backend_src_validators_auth_validator_registerschema",
-      "label": "registerSchema",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "registerschema",
-      "source_file": "backend/src/validators/auth.validator.js",
-      "source_location": "L3"
-    },
-    {
-      "id": "backend_src_validators_auth_validator_resetpasswordschema",
-      "label": "resetPasswordSchema",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "resetpasswordschema",
-      "source_file": "backend/src/validators/auth.validator.js",
-      "source_location": "L76"
-    },
-    {
-      "id": "backend_src_validators_auth_validator_updateprofileschema",
-      "label": "updateProfileSchema",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "updateprofileschema",
-      "source_file": "backend/src/validators/auth.validator.js",
-      "source_location": "L42"
-    },
-    {
-      "id": "backend_src_validators_auth_validator_verifyotpschema",
-      "label": "verifyOtpSchema",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "auth.routes.js",
-      "file_type": "code",
-      "norm_label": "verifyotpschema",
-      "source_file": "backend/src/validators/auth.validator.js",
-      "source_location": "L71"
+      "community_name": "moduleFileExtensions",
+      "file_type": "concept",
+      "norm_label": "mjs",
+      "source_file": "backend/package.json",
+      "source_location": "L30"
     },
     {
       "id": "backend_src_controllers_review_controller",
@@ -15620,6 +15510,116 @@
       "norm_label": "react-hook-form",
       "source_file": "frontend/package.json",
       "source_location": "L21"
+    },
+    {
+      "id": "backend_src_services_vehicle_service",
+      "label": "vehicle.service.js",
+      "_origin": "ast",
+      "community": 95,
+      "community_name": "invalidateCache",
+      "file_type": "code",
+      "norm_label": "vehicle.service.js",
+      "source_file": "backend/src/services/vehicle.service.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_models_pushsubscription",
+      "label": "PushSubscription.js",
+      "_origin": "ast",
+      "community": 96,
+      "community_name": "push.service.js",
+      "file_type": "code",
+      "norm_label": "pushsubscription.js",
+      "source_file": "backend/src/models/PushSubscription.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_models_pushsubscription_pushsubscriptionschema",
+      "label": "pushSubscriptionSchema",
+      "_origin": "ast",
+      "community": 96,
+      "community_name": "push.service.js",
+      "file_type": "code",
+      "norm_label": "pushsubscriptionschema",
+      "source_file": "backend/src/models/PushSubscription.js",
+      "source_location": "L7"
+    },
+    {
+      "id": "backend_src_services_push_service",
+      "label": "push.service.js",
+      "_origin": "ast",
+      "community": 96,
+      "community_name": "push.service.js",
+      "file_type": "code",
+      "norm_label": "push.service.js",
+      "source_file": "backend/src/services/push.service.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_services_dispatch_service",
+      "label": "dispatch.service.js",
+      "_origin": "ast",
+      "community": 97,
+      "community_name": "dispatch.service.js",
+      "file_type": "code",
+      "norm_label": "dispatch.service.js",
+      "source_file": "backend/src/services/dispatch.service.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_models_review",
+      "label": "Review.js",
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "review.service.js",
+      "file_type": "code",
+      "norm_label": "review.js",
+      "source_file": "backend/src/models/Review.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "backend_src_models_review_reviewschema",
+      "label": "reviewSchema",
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "review.service.js",
+      "file_type": "code",
+      "norm_label": "reviewschema",
+      "source_file": "backend/src/models/Review.js",
+      "source_location": "L3"
+    },
+    {
+      "id": "backend_src_services_review_service",
+      "label": "review.service.js",
+      "_origin": "ast",
+      "community": 98,
+      "community_name": "review.service.js",
+      "file_type": "code",
+      "norm_label": "review.service.js",
+      "source_file": "backend/src/services/review.service.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "frontend_package_dependencies_lucide_react",
+      "label": "lucide-react",
+      "_origin": "ast",
+      "community": 99,
+      "community_name": "lucide-react",
+      "file_type": "code",
+      "norm_label": "lucide-react",
+      "source_file": "frontend/package.json",
+      "source_location": "L18"
+    },
+    {
+      "id": "lucide_react",
+      "label": "lucide-react",
+      "_origin": "ast",
+      "community": 99,
+      "community_name": "lucide-react",
+      "file_type": "concept",
+      "norm_label": "lucide-react",
+      "source_file": "frontend/package.json",
+      "source_location": "L18"
     }
   ],
   "links": [
@@ -15860,7 +15860,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L716",
+      "source_location": "L718",
       "weight": 1.0
     },
     {
@@ -15872,7 +15872,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L745",
+      "source_location": "L747",
       "weight": 1.0
     },
     {
@@ -15884,7 +15884,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L771",
+      "source_location": "L773",
       "weight": 1.0
     },
     {
@@ -15897,6 +15897,18 @@
       "context": "call",
       "source_file": "backend/src/controllers/admin.controller.js",
       "source_location": "L576",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_controllers_auth_controller_logout",
+      "target": "backend_src_services_jwt_service_decodetoken",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L75",
       "weight": 1.0
     },
     {
@@ -16304,7 +16316,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L819",
+      "source_location": "L832",
       "weight": 1.0
     },
     {
@@ -16316,7 +16328,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L872",
+      "source_location": "L885",
       "weight": 1.0
     },
     {
@@ -16328,7 +16340,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L890",
+      "source_location": "L903",
       "weight": 1.0
     },
     {
@@ -16340,7 +16352,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L892",
+      "source_location": "L905",
       "weight": 1.0
     },
     {
@@ -16352,7 +16364,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L567",
+      "source_location": "L576",
       "weight": 1.0
     },
     {
@@ -16364,7 +16376,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L626",
+      "source_location": "L635",
       "weight": 1.0
     },
     {
@@ -16376,7 +16388,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L620",
+      "source_location": "L629",
       "weight": 1.0
     },
     {
@@ -16388,7 +16400,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L601",
+      "source_location": "L610",
       "weight": 1.0
     },
     {
@@ -16412,7 +16424,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L542",
+      "source_location": "L551",
       "weight": 1.0
     },
     {
@@ -16424,7 +16436,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L582",
+      "source_location": "L591",
       "weight": 1.0
     },
     {
@@ -16580,7 +16592,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1436",
+      "source_location": "L1451",
       "weight": 1.0
     },
     {
@@ -16592,7 +16604,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1458",
+      "source_location": "L1473",
       "weight": 1.0
     },
     {
@@ -16604,7 +16616,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L576",
+      "source_location": "L591",
       "weight": 1.0
     },
     {
@@ -16616,7 +16628,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1187",
+      "source_location": "L1202",
       "weight": 1.0
     },
     {
@@ -16628,7 +16640,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1207",
+      "source_location": "L1222",
       "weight": 1.0
     },
     {
@@ -16640,7 +16652,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1251",
+      "source_location": "L1266",
       "weight": 1.0
     },
     {
@@ -16652,7 +16664,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1260",
+      "source_location": "L1275",
       "weight": 1.0
     },
     {
@@ -16676,7 +16688,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L201",
+      "source_location": "L216",
       "weight": 1.0
     },
     {
@@ -16688,7 +16700,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L202",
+      "source_location": "L217",
       "weight": 1.0
     },
     {
@@ -16700,7 +16712,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L208",
+      "source_location": "L223",
       "weight": 1.0
     },
     {
@@ -16736,7 +16748,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L358",
+      "source_location": "L373",
       "weight": 1.0
     },
     {
@@ -16748,7 +16760,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L750",
+      "source_location": "L765",
       "weight": 1.0
     },
     {
@@ -16760,7 +16772,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L907",
+      "source_location": "L922",
       "weight": 1.0
     },
     {
@@ -16772,7 +16784,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1041",
+      "source_location": "L1056",
       "weight": 1.0
     },
     {
@@ -16784,7 +16796,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L845",
+      "source_location": "L860",
       "weight": 1.0
     },
     {
@@ -16796,7 +16808,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L978",
+      "source_location": "L993",
       "weight": 1.0
     },
     {
@@ -16808,7 +16820,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1109",
+      "source_location": "L1124",
       "weight": 1.0
     },
     {
@@ -18464,7 +18476,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/Pages/admin/AdminBookingRequests.jsx",
-      "source_location": "L264",
+      "source_location": "L292",
       "weight": 1.0
     },
     {
@@ -18476,7 +18488,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/Pages/admin/AdminBookingRequests.jsx",
-      "source_location": "L42",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -18488,7 +18500,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/Pages/admin/AdminBookingRequests.jsx",
-      "source_location": "L44",
+      "source_location": "L45",
       "weight": 1.0
     },
     {
@@ -18536,7 +18548,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/Pages/admin/ManageBookings.jsx",
-      "source_location": "L59",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
@@ -18548,7 +18560,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/Pages/admin/ManageBookings.jsx",
-      "source_location": "L61",
+      "source_location": "L62",
       "weight": 1.0
     },
     {
@@ -18848,7 +18860,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/Pages/driver-auth/DriverRegister.jsx",
-      "source_location": "L137",
+      "source_location": "L139",
       "weight": 1.0
     },
     {
@@ -18956,7 +18968,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/Pages/driver/DriverDocuments.jsx",
-      "source_location": "L80",
+      "source_location": "L95",
       "weight": 1.0
     },
     {
@@ -19160,7 +19172,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L59",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
@@ -19341,7 +19353,7 @@
       "context": "import",
       "deferred": true,
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L796",
+      "source_location": "L798",
       "weight": 1.0
     },
     {
@@ -21255,6 +21267,18 @@
       "context": "import",
       "source_file": "backend/src/controllers/admin.controller.js",
       "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_controllers_auth_controller",
+      "target": "backend_src_services_jwt_service_decodetoken",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L2",
       "weight": 1.0
     },
     {
@@ -24691,6 +24715,18 @@
     },
     {
       "source": "frontend_src_pages_admin_adminbookingrequests",
+      "target": "frontend_src_services_endpoints_vehicleapi",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "frontend/src/Pages/admin/AdminBookingRequests.jsx",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_src_pages_admin_adminbookingrequests",
       "target": "frontend_src_utils_bookingtext_usecopybooking",
       "relation": "imports",
       "_origin": "ast",
@@ -25016,6 +25052,18 @@
     {
       "source": "frontend_src_pages_admin_managebookings",
       "target": "frontend_src_services_endpoints_adminapi",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "frontend/src/Pages/admin/ManageBookings.jsx",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_src_pages_admin_managebookings",
+      "target": "frontend_src_services_endpoints_vehicleapi",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -29551,7 +29599,7 @@
     },
     {
       "source": "backend_src_controllers_auth_controller",
-      "target": "backend_src_models_user",
+      "target": "backend_src_services_jwt_service",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -29559,6 +29607,18 @@
       "context": "import",
       "source_file": "backend/src/controllers/auth.controller.js",
       "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_controllers_auth_controller",
+      "target": "backend_src_models_user",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -39044,7 +39104,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L689",
+      "source_location": "L691",
       "weight": 1.0
     },
     {
@@ -39055,7 +39115,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L708",
+      "source_location": "L710",
       "weight": 1.0
     },
     {
@@ -39066,7 +39126,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L737",
+      "source_location": "L739",
       "weight": 1.0
     },
     {
@@ -39077,7 +39137,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L766",
+      "source_location": "L768",
       "weight": 1.0
     },
     {
@@ -39088,7 +39148,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L794",
+      "source_location": "L796",
       "weight": 1.0
     },
     {
@@ -39099,7 +39159,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L818",
+      "source_location": "L820",
       "weight": 1.0
     },
     {
@@ -39110,7 +39170,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L859",
+      "source_location": "L861",
       "weight": 1.0
     },
     {
@@ -39121,7 +39181,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L886",
+      "source_location": "L888",
       "weight": 1.0
     },
     {
@@ -39154,12 +39214,12 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/admin.controller.js",
-      "source_location": "L913",
+      "source_location": "L915",
       "weight": 1.0
     },
     {
       "source": "backend_src_controllers_auth_controller",
-      "target": "backend_src_controllers_auth_controller_resetpassword",
+      "target": "backend_src_controllers_auth_controller_verifyotp",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -39170,13 +39230,24 @@
     },
     {
       "source": "backend_src_controllers_auth_controller",
+      "target": "backend_src_controllers_auth_controller_resetpassword",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L114",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_controllers_auth_controller",
       "target": "backend_src_controllers_auth_controller_registerdriver",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L14",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -39187,7 +39258,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -39198,18 +39269,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L35",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_controllers_auth_controller",
-      "target": "backend_src_controllers_auth_controller_register",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L4",
+      "source_location": "L36",
       "weight": 1.0
     },
     {
@@ -39220,7 +39280,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L48",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_controllers_auth_controller",
+      "target": "backend_src_controllers_auth_controller_register",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backend/src/controllers/auth.controller.js",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -39231,7 +39302,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L67",
+      "source_location": "L68",
       "weight": 1.0
     },
     {
@@ -39242,23 +39313,12 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/controllers/auth.controller.js",
-      "source_location": "L78",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_controllers_auth_controller",
-      "target": "backend_src_controllers_auth_controller_forgotpassword",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/src/controllers/auth.controller.js",
       "source_location": "L87",
       "weight": 1.0
     },
     {
       "source": "backend_src_controllers_auth_controller",
-      "target": "backend_src_controllers_auth_controller_verifyotp",
+      "target": "backend_src_controllers_auth_controller_forgotpassword",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -40776,13 +40836,24 @@
     },
     {
       "source": "backend_src_services_admin_service",
+      "target": "backend_src_services_admin_service_rejectwithdrawalrequest",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backend/src/services/admin.service.js",
+      "source_location": "L1006",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_services_admin_service",
       "target": "backend_src_services_admin_service_getallreviews",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L1017",
+      "source_location": "L1030",
       "weight": 1.0
     },
     {
@@ -40793,7 +40864,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L1070",
+      "source_location": "L1083",
       "weight": 1.0
     },
     {
@@ -40804,7 +40875,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L1091",
+      "source_location": "L1104",
       "weight": 1.0
     },
     {
@@ -40815,7 +40886,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L1111",
+      "source_location": "L1124",
       "weight": 1.0
     },
     {
@@ -40958,7 +41029,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L453",
+      "source_location": "L462",
       "weight": 1.0
     },
     {
@@ -40969,7 +41040,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L479",
+      "source_location": "L488",
       "weight": 1.0
     },
     {
@@ -40980,7 +41051,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L501",
+      "source_location": "L510",
       "weight": 1.0
     },
     {
@@ -40991,7 +41062,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L523",
+      "source_location": "L532",
       "weight": 1.0
     },
     {
@@ -41002,7 +41073,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L541",
+      "source_location": "L550",
       "weight": 1.0
     },
     {
@@ -41013,7 +41084,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L547",
+      "source_location": "L556",
       "weight": 1.0
     },
     {
@@ -41024,7 +41095,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L557",
+      "source_location": "L566",
       "weight": 1.0
     },
     {
@@ -41035,7 +41106,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L572",
+      "source_location": "L581",
       "weight": 1.0
     },
     {
@@ -41046,7 +41117,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L586",
+      "source_location": "L595",
       "weight": 1.0
     },
     {
@@ -41057,7 +41128,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L605",
+      "source_location": "L614",
       "weight": 1.0
     },
     {
@@ -41068,7 +41139,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L624",
+      "source_location": "L633",
       "weight": 1.0
     },
     {
@@ -41079,7 +41150,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L639",
+      "source_location": "L648",
       "weight": 1.0
     },
     {
@@ -41090,7 +41161,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L674",
+      "source_location": "L687",
       "weight": 1.0
     },
     {
@@ -41101,7 +41172,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L698",
+      "source_location": "L711",
       "weight": 1.0
     },
     {
@@ -41112,7 +41183,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L784",
+      "source_location": "L797",
       "weight": 1.0
     },
     {
@@ -41123,7 +41194,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L840",
+      "source_location": "L853",
       "weight": 1.0
     },
     {
@@ -41134,7 +41205,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L929",
+      "source_location": "L942",
       "weight": 1.0
     },
     {
@@ -41145,18 +41216,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L948",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_services_admin_service",
-      "target": "backend_src_services_admin_service_rejectwithdrawalrequest",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/src/services/admin.service.js",
-      "source_location": "L993",
+      "source_location": "L961",
       "weight": 1.0
     },
     {
@@ -41271,13 +41331,24 @@
     },
     {
       "source": "backend_src_services_booking_service",
+      "target": "backend_src_services_booking_service_reachdestination",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backend/src/services/booking.service.js",
+      "source_location": "L1013",
+      "weight": 1.0
+    },
+    {
+      "source": "backend_src_services_booking_service",
       "target": "backend_src_services_booking_service_updatepaymentstatus",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1061",
+      "source_location": "L1076",
       "weight": 1.0
     },
     {
@@ -41288,7 +41359,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1137",
+      "source_location": "L1152",
       "weight": 1.0
     },
     {
@@ -41299,7 +41370,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1338",
+      "source_location": "L1353",
       "weight": 1.0
     },
     {
@@ -41310,7 +41381,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L1381",
+      "source_location": "L1396",
       "weight": 1.0
     },
     {
@@ -41332,7 +41403,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L228",
+      "source_location": "L243",
       "weight": 1.0
     },
     {
@@ -41354,7 +41425,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L383",
+      "source_location": "L398",
       "weight": 1.0
     },
     {
@@ -41365,7 +41436,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L429",
+      "source_location": "L444",
       "weight": 1.0
     },
     {
@@ -41376,7 +41447,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L496",
+      "source_location": "L511",
       "weight": 1.0
     },
     {
@@ -41387,7 +41458,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L640",
+      "source_location": "L655",
       "weight": 1.0
     },
     {
@@ -41398,7 +41469,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L803",
+      "source_location": "L818",
       "weight": 1.0
     },
     {
@@ -41409,7 +41480,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L865",
+      "source_location": "L880",
       "weight": 1.0
     },
     {
@@ -41420,18 +41491,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L927",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_src_services_booking_service",
-      "target": "backend_src_services_booking_service_reachdestination",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/src/services/booking.service.js",
-      "source_location": "L998",
+      "source_location": "L942",
       "weight": 1.0
     },
     {
@@ -48240,7 +48300,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L32",
+      "source_location": "L33",
       "weight": 1.0
     },
     {
@@ -48251,18 +48311,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L37",
-      "weight": 1.0
-    },
-    {
-      "source": "frontend_src_services_api",
-      "target": "frontend_src_services_api_clearauthstate",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "frontend/src/services/api.js",
-      "source_location": "L49",
+      "source_location": "L38",
       "weight": 1.0
     },
     {
@@ -48278,13 +48327,24 @@
     },
     {
       "source": "frontend_src_services_api",
+      "target": "frontend_src_services_api_clearauthstate",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "frontend/src/services/api.js",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "frontend_src_services_api",
       "target": "frontend_src_services_api_redirecttologinifneeded",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "frontend/src/services/api.js",
-      "source_location": "L55",
+      "source_location": "L56",
       "weight": 1.0
     },
     {
@@ -50209,19 +50269,19 @@
     },
     {
       "source": "backend_src_routes_auth_routes",
-      "target": "backend_src_middleware_auth_middleware_authenticate",
+      "target": "backend_src_controllers_auth_controller_logoutall",
       "relation": "indirect_call",
       "_origin": "ast",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "backend/src/routes/auth.routes.js",
-      "source_location": "L31",
+      "source_location": "L32",
       "weight": 1.0
     },
     {
       "source": "backend_src_routes_auth_routes",
-      "target": "backend_src_controllers_auth_controller_logoutall",
+      "target": "backend_src_middleware_auth_middleware_authenticate",
       "relation": "indirect_call",
       "_origin": "ast",
       "confidence": "INFERRED",
@@ -51529,5 +51589,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "0234fa8828446a3a2cc08ab9a0e8762914f5c669"
+  "built_at_commit": "f41ab27c213c0452b3ad8023c16d2b8df84679f6"
 }
