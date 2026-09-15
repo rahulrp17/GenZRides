@@ -239,26 +239,34 @@ export const initializeSocket = (server) => {
         driver.currentLocation = { type: "Point", coordinates: [longitude, latitude] };
         await driver.save();
 
-        const destination = booking.bookingStatus === "Started" ? booking.drop : booking.pickup;
+        // 1. Emit the raw location IMMEDIATELY — it must never be gated behind
+        //    the Google ETA call (a failure/there/timeout there used to swallow
+        //    the whole update, so the customer never saw the driver).
+        io.to(bookingId).emit("driver-location-updated", { latitude, longitude });
 
-        const eta = await getETA(
+        // 2. Best-effort ETA follow-up (non-blocking). Failure only drops ETA.
+        const destination = booking.bookingStatus === "Started" ? booking.drop : booking.pickup;
+        getETA(
           { latitude, longitude },
           { latitude: destination.latitude, longitude: destination.longitude }
-        );
-
-        const distanceKm = (eta.distance / 1000).toFixed(1);
-        const durationMin = Math.ceil(eta.duration / 60);
-
-        io.to(bookingId).emit("driver-location-updated", {
-          latitude,
-          longitude,
-          eta: {
-            distance: `${distanceKm} km`,
-            duration: `${durationMin} mins`,
-            distanceMeters: eta.distance,
-            durationSeconds: eta.duration,
-          },
-        });
+        )
+          .then((eta) => {
+            const distanceKm = (eta.distance / 1000).toFixed(1);
+            const durationMin = Math.ceil(eta.duration / 60);
+            io.to(bookingId).emit("driver-location-updated", {
+              latitude,
+              longitude,
+              eta: {
+                distance: `${distanceKm} km`,
+                duration: `${durationMin} mins`,
+                distanceMeters: eta.distance,
+                durationSeconds: eta.duration,
+              },
+            });
+          })
+          .catch(() => {
+            // ETA unavailable — the live location was already delivered above.
+          });
       } catch (err) {
         console.error(err);
       }
