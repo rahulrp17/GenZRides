@@ -419,12 +419,21 @@ export const approveDriver = async (driverId) => {
       new: true,
     },
   )
-    .populate("user", "name email phone")
+    .populate("user", "name email phone profileImage")
     .populate("vehicleType")
     .lean();
 
   if (!driver) {
     throw new Error("Driver not found.");
+  }
+
+  /* =====================================
+      COPY PROFILE PHOTO TO USER
+  ===================================== */
+  if (driver.documents?.profilePhoto && !driver.user?.profileImage) {
+    await User.findByIdAndUpdate(driver.user._id, {
+      profileImage: driver.documents.profilePhoto,
+    });
   }
 
   /* =====================================
@@ -636,13 +645,17 @@ export const deleteVehicle = async (vehicleId) => {
    BOOKING MANAGEMENT
 =========================================================== */
 
-export const getBookings = async (page = 1, limit = 10, status = "") => {
+export const getBookings = async (page = 1, limit = 10, status = "", vehicleType = "") => {
   const skip = (page - 1) * limit;
 
   const query = {};
 
   if (status) {
     query.bookingStatus = status;
+  }
+
+  if (vehicleType) {
+    query.vehicleType = vehicleType;
   }
 
   const [bookings, total] = await Promise.all([

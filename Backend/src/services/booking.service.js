@@ -164,6 +164,21 @@ export const createBooking = async (
   });
 
   /* ===========================
+     NOTIFY ADMINS
+  =========================== */
+
+  const admins = await User.find({ role: "admin" }).select("_id");
+  for (const admin of admins) {
+    await notifyUser({
+      user: admin._id,
+      title: "New Booking",
+      message: `New booking from ${pickup.address || "N/A"} to ${drop.address || "N/A"} (${booking.vehicleType}).`,
+      type: "Booking",
+      booking: booking._id,
+    });
+  }
+
+  /* ===========================
      RETURN
   =========================== */
 

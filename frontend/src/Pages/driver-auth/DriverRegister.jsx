@@ -35,6 +35,8 @@ const DriverRegister = () => {
     rcBookPhoto: null,
     pollutionCertificatePhoto: null,
     vehiclePhotos: [],
+    profilePhotoFile: null,
+    insuranceFile: null,
   });
   const [fileErrors, setFileErrors] = useState({});
 
@@ -227,6 +229,28 @@ const DriverRegister = () => {
           toast.success('Vehicle photos uploaded');
         }).catch((err) => {
           toast.error('Vehicle photo upload failed');
+          throw err;
+        })
+      );
+    }
+
+    if (files.profilePhotoFile) {
+      uploadPromises.push(
+        driverUploadAPI.uploadDocument('profilePhoto', files.profilePhotoFile).then(() => {
+          toast.success('Profile photo uploaded');
+        }).catch((err) => {
+          toast.error('Profile photo upload failed');
+          throw err;
+        })
+      );
+    }
+
+    if (files.insuranceFile) {
+      uploadPromises.push(
+        driverUploadAPI.uploadDocument('insurance', files.insuranceFile).then(() => {
+          toast.success('Insurance uploaded');
+        }).catch((err) => {
+          toast.error('Insurance upload failed');
           throw err;
         })
       );
@@ -694,6 +718,46 @@ const DriverRegister = () => {
         </label>
         {fileErrors.vehiclePhotos && <p className="text-red-400 text-xs mt-1">{fileErrors.vehiclePhotos}</p>}
       </div>
+
+      <div>
+        <p className={labelClass}>Profile Photo <span className="text-slate-500">(optional)</span></p>
+        <label className="block border-2 border-dashed border-white/10 rounded-xl p-6 text-center hover:border-green-500/60 transition cursor-pointer">
+          {files.profilePhotoFile ? (
+            <div className="space-y-2">
+              <img src={URL.createObjectURL(files.profilePhotoFile)} alt="Profile photo" className="w-full h-32 object-cover rounded-lg mx-auto" />
+              <p className="text-xs text-emerald-400">✓ {files.profilePhotoFile.name}</p>
+            </div>
+          ) : (
+            <>
+              <Upload size={28} className="mx-auto text-slate-500 mb-2" />
+              <p className="text-sm text-slate-400">Click to upload profile photo</p>
+              <p className="text-xs text-slate-500 mt-1">JPG, PNG, WEBP (max 5MB)</p>
+            </>
+          )}
+          <input type="file" accept="image/*" className="hidden"
+            onChange={(e) => handleFileChange('profilePhotoFile', e.target.files)} />
+        </label>
+      </div>
+
+      <div>
+        <p className={labelClass}>Insurance <span className="text-slate-500">(optional)</span></p>
+        <label className="block border-2 border-dashed border-white/10 rounded-xl p-6 text-center hover:border-green-500/60 transition cursor-pointer">
+          {files.insuranceFile ? (
+            <div className="space-y-2">
+              <img src={URL.createObjectURL(files.insuranceFile)} alt="Insurance" className="w-full h-32 object-cover rounded-lg mx-auto" />
+              <p className="text-xs text-emerald-400">✓ {files.insuranceFile.name}</p>
+            </div>
+          ) : (
+            <>
+              <Upload size={28} className="mx-auto text-slate-500 mb-2" />
+              <p className="text-sm text-slate-400">Click to upload insurance</p>
+              <p className="text-xs text-slate-500 mt-1">JPG, PNG, WEBP (max 5MB)</p>
+            </>
+          )}
+          <input type="file" accept="image/*" className="hidden"
+            onChange={(e) => handleFileChange('insuranceFile', e.target.files)} />
+        </label>
+      </div>
     </div>
   );
 
@@ -718,6 +782,8 @@ const DriverRegister = () => {
       ['RC Book Photo', files.rcBookPhoto ? files.rcBookPhoto.name : '—'],
       ['Pollution Certificate Photo', files.pollutionCertificatePhoto ? files.pollutionCertificatePhoto.name : '—'],
       ['Vehicle Photos', files.vehiclePhotos.length > 0 ? `${files.vehiclePhotos.length} photo(s)` : '—'],
+      ['Profile Photo', files.profilePhotoFile ? files.profilePhotoFile.name : '—'],
+      ['Insurance', files.insuranceFile ? files.insuranceFile.name : '—'],
     ];
 
     return (

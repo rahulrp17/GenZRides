@@ -66,15 +66,30 @@ const DriverDocuments = () => {
 
   const documents = profile?.data?.documents || {};
   const verificationStatus = documents.documentVerification || 'Pending';
+  const approvalStatus = profile?.data?.approvalStatus || 'Pending';
 
   const statusConfig = {
     Pending: { icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/10' },
     Verified: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
     Rejected: { icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/10' },
+    Approved: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
   };
 
   const status = statusConfig[verificationStatus] || statusConfig.Pending;
   const StatusIcon = status.icon;
+
+  const approvalCfg = statusConfig[approvalStatus] || statusConfig.Pending;
+  const ApprovalIcon = approvalCfg.icon;
+
+  const overallStatus =
+    (approvalStatus === 'Approved' && verificationStatus === 'Verified')
+      ? 'Approved'
+      : approvalStatus === 'Rejected'
+      ? 'Rejected'
+      : verificationStatus;
+
+  const overallCfg = statusConfig[overallStatus] || statusConfig.Pending;
+  const OverallIcon = overallCfg.icon;
 
   const handleUpload = (doc) => {
     const error = validateFile(doc.file);
@@ -103,9 +118,19 @@ const DriverDocuments = () => {
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl font-bold text-white tracking-tight">Documents</h1>
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${status.bg} ${status.color}`}>
-          <StatusIcon size={16} />
-          {verificationStatus}
+        <div className="flex items-center gap-3">
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${overallCfg.bg} ${overallCfg.color}`}>
+            <OverallIcon size={16} />
+            {overallStatus === 'Approved' ? 'Approved' : overallStatus}
+          </div>
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${approvalCfg.bg} ${approvalCfg.color}`}>
+            <ApprovalIcon size={16} />
+            Approval: {approvalStatus}
+          </div>
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${status.bg} ${status.color}`}>
+            <StatusIcon size={16} />
+            Docs: {verificationStatus}
+          </div>
         </div>
       </div>
 

@@ -17,7 +17,7 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import { adminAPI } from "../../services/endpoints";
+import { adminAPI, vehicleAPI } from "../../services/endpoints";
 import { useCopyBooking } from "../../utils/bookingText";
 import { TableSkeleton } from "../../components/shared/Skeleton";
 import ErrorState from "../../components/shared/ErrorState";
@@ -45,6 +45,7 @@ const STATUSES = [
 const ManageBookings = () => {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState("");
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [actionDialog, setActionDialog] = useState({
     open: false,
@@ -86,11 +87,22 @@ const ManageBookings = () => {
     };
   }, [socket, queryClient]);
 
+  const { data: vehicleData } = useQuery({
+    queryKey: ["vehicles"],
+    queryFn: async () => {
+      const { data } = await vehicleAPI.getAll();
+      return data;
+    },
+    staleTime: 300_000,
+  });
+  const vehicleTypes = vehicleData?.vehicles || [];
+
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["adminBookings", page, statusFilter],
+    queryKey: ["adminBookings", page, statusFilter, vehicleTypeFilter],
     queryFn: async () => {
       const params = { page, limit: 10 };
       if (statusFilter) params.status = statusFilter;
+      if (vehicleTypeFilter) params.vehicleType = vehicleTypeFilter;
       const { data } = await adminAPI.getBookings(params);
       return data;
     },
@@ -297,6 +309,28 @@ const ManageBookings = () => {
           </button>
         ))}
       </div>
+
+      {/* ── Vehicle type filter ────────────────────────────────── */}
+      {vehicleTypes.length > 0 && (
+        <div className="flex items-center gap-2">
+          <label className="text-xs font-semibold text-gray-400">Vehicle type</label>
+          <select
+            value={vehicleTypeFilter}
+            onChange={(e) => {
+              setVehicleTypeFilter(e.target.value);
+              setPage(1);
+            }}
+            className="bg-white/5 border border-white/10 text-white text-xs font-medium rounded-xl px-3 py-2 min-h-[40px] outline-none focus:border-emerald-500/50 transition cursor-pointer"
+          >
+            <option value="">All Types</option>
+            {vehicleTypes.map((v) => (
+              <option key={v._id} value={v._id} className="bg-gray-900 text-white">
+                {v.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* ── Feed ───────────────────────────────────────────────── */}
       {/* <FareNotes compact /> */}

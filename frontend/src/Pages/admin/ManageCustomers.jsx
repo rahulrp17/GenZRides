@@ -97,9 +97,13 @@ const ManageCustomers = () => {
                   <tr key={c._id} className="border-b border-white/5 hover:bg-white/5 transition">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
-                          <span className="text-green-400 font-semibold text-sm">{c.name?.charAt(0)?.toUpperCase()}</span>
-                        </div>
+                        {c.profileImage ? (
+                          <img src={c.profileImage} alt={c.name} className="w-9 h-9 rounded-full object-cover border border-green-500/30" />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
+                            <span className="text-green-400 font-semibold text-sm">{c.name?.charAt(0)?.toUpperCase()}</span>
+                          </div>
+                        )}
                         <span className="text-sm font-medium text-white">{c.name}</span>
                       </div>
                     </td>
@@ -139,9 +143,13 @@ const ManageCustomers = () => {
               <div key={c._id} className="bg-white/5 backdrop-blur-lg rounded-[30px] border border-white/10 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
-                      <span className="text-green-400 font-semibold text-xs">{c.name?.charAt(0)?.toUpperCase()}</span>
-                    </div>
+                    {c.profileImage ? (
+                      <img src={c.profileImage} alt={c.name} className="w-8 h-8 rounded-full object-cover border border-green-500/30" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
+                        <span className="text-green-400 font-semibold text-xs">{c.name?.charAt(0)?.toUpperCase()}</span>
+                      </div>
+                    )}
                     <span className="font-medium text-white">{c.name}</span>
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.isBlocked ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>

@@ -186,9 +186,13 @@ const ManageDrivers = () => {
                   <tr key={d._id} className="border-b border-white/5 hover:bg-white/5 transition">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
-                          <span className="text-green-400 font-semibold text-sm">{d.user?.name?.charAt(0)?.toUpperCase() || 'D'}</span>
-                        </div>
+                        {d.user?.profileImage ? (
+                          <img src={d.user.profileImage} alt={d.user?.name || 'Driver'} className="w-9 h-9 rounded-full object-cover border border-green-500/30" />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center">
+                            <span className="text-green-400 font-semibold text-sm">{d.user?.name?.charAt(0)?.toUpperCase() || 'D'}</span>
+                          </div>
+                        )}
                         <div>
                           <p className="text-sm font-medium text-white">{d.user?.name || 'Driver'}</p>
                           <p className="text-xs text-gray-500">{d.user?.email}</p>
@@ -230,7 +234,16 @@ const ManageDrivers = () => {
             {drivers.map((d) => (
               <div key={d._id} className="bg-white/5 backdrop-blur-lg rounded-[30px] border border-white/10 p-4 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-2 min-w-0">
-                  <span className="font-medium text-white truncate">{d.user?.name || 'Driver'}</span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    {d.user?.profileImage ? (
+                      <img src={d.user.profileImage} alt={d.user?.name || 'Driver'} className="w-8 h-8 rounded-full object-cover border border-green-500/30 shrink-0" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center shrink-0">
+                        <span className="text-green-400 font-semibold text-xs">{d.user?.name?.charAt(0)?.toUpperCase() || 'D'}</span>
+                      </div>
+                    )}
+                    <span className="font-medium text-white truncate">{d.user?.name || 'Driver'}</span>
+                  </div>
                   <Badge variant={approvalColors[d.approvalStatus]}>{d.approvalStatus}</Badge>
                 </div>
                 <p className="text-sm text-gray-400 mb-1 truncate">{d.vehicleBrand} {d.vehicleModel}{d.vehicleColor ? ` · ${d.vehicleColor}` : ''}</p>

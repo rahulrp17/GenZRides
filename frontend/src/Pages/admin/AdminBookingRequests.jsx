@@ -16,7 +16,7 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import { adminAPI } from "../../services/endpoints";
+import { adminAPI, vehicleAPI } from "../../services/endpoints";
 import { useCopyBooking } from "../../utils/bookingText";
 import { useSocket } from "../../Context/SocketContext";
 import { TableSkeleton } from "../../components/shared/Skeleton";
@@ -35,6 +35,7 @@ const AdminBookingRequests = () => {
     bookingId: null,
   });
   const [assigningDriverId, setAssigningDriverId] = useState(null);
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState("");
   const [cancelDialog, setCancelDialog] = useState({
     open: false,
     bookingId: null,
@@ -45,14 +46,22 @@ const AdminBookingRequests = () => {
   const navigate = useNavigate();
   const openBooking = (id) => navigate(`/admin/bookings/${id}`);
 
-  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ["adminPendingBookings"],
+  const { data: vehicleData } = useQuery({
+    queryKey: ["vehicles"],
     queryFn: async () => {
-      const { data } = await adminAPI.getBookings({
-        page: 1,
-        limit: 100,
-        status: "Pending",
-      });
+      const { data } = await vehicleAPI.getAll();
+      return data;
+    },
+    staleTime: 300_000,
+  });
+  const vehicleTypes = vehicleData?.vehicles || [];
+
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
+    queryKey: ["adminPendingBookings", vehicleTypeFilter],
+    queryFn: async () => {
+      const params = { page: 1, limit: 100, status: "Pending" };
+      if (vehicleTypeFilter) params.vehicleType = vehicleTypeFilter;
+      const { data } = await adminAPI.getBookings(params);
       return data;
     },
     refetchOnWindowFocus: false,
@@ -218,6 +227,25 @@ const AdminBookingRequests = () => {
                 </div>
 
       </div>
+
+      {/* ── Vehicle type filter ────────────────────────────────── */}
+      {vehicleTypes.length > 0 && (
+        <div className="flex items-center gap-2">
+          <label className="text-xs font-semibold text-gray-400">Vehicle type</label>
+          <select
+            value={vehicleTypeFilter}
+            onChange={(e) => setVehicleTypeFilter(e.target.value)}
+            className="bg-white/5 border border-white/10 text-white text-xs font-medium rounded-xl px-3 py-2 min-h-[40px] outline-none focus:border-green-500/50 transition cursor-pointer"
+          >
+            <option value="">All Types</option>
+            {vehicleTypes.map((v) => (
+              <option key={v._id} value={v._id} className="bg-gray-900 text-white">
+                {v.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* ── Feed ───────────────────────────────────────────────── */}
       {isLoading ? (
