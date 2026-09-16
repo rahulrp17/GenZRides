@@ -154,7 +154,6 @@ const CurrentRideCustomer = () => {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_KEY,
     libraries: ['marker'],
-    mapIds: ['genzrides_customer'],
   });
 
   const { data, isLoading, isError, error } = useQuery({
@@ -647,7 +646,7 @@ const CurrentRideCustomer = () => {
                     mapContainerStyle={mapContainerStyle}
                     center={mapCenterProp}
                     zoom={13}
-                    options={{...mapOptions, mapId: 'genzrides_customer'}}
+                    options={mapOptions}
                     onLoad={onMapLoad}
                     onDragStart={onMapDragStart}
                     onZoomChanged={() => { hasInteractedRef.current = true; }}

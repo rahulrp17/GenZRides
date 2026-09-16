@@ -5,26 +5,19 @@ const AdvancedMarker = ({ position, icon, title, map, zIndex }) => {
 
   useEffect(() => {
     if (!map || !position?.lat || !position?.lng) return;
-    const content = icon ? document.createElement('img') : undefined;
-    if (content) {
-      content.src = icon;
-      content.style.width = '32px';
-      content.style.height = '42px';
-      content.style.objectFit = 'contain';
-    }
-    const m = new window.google.maps.marker.AdvancedMarkerElement({
+    const m = new window.google.maps.Marker({
       position: { lat: position.lat, lng: position.lng },
       map,
       title: title || '',
-      content,
+      icon,
       zIndex,
     });
     markerRef.current = m;
     return () => {
-      m.map = null;
+      m.setMap(null);
       markerRef.current = null;
     };
-  }, [map, position?.lat, position?.lng, icon, title, zIndex]);
+  }, [map, position?.lat, position?.lng, title, zIndex]);
 
   return null;
 };

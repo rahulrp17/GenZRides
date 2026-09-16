@@ -107,7 +107,6 @@ const CurrentRide = () => {
   const { isLoaded: mapLoaded, loadError: mapLoadError } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_KEY,
     libraries: ['marker'],
-    mapIds: ['genzrides_driver'],
   });
 
   const { data: currentBooking, isLoading, isError: rideError, error: rideErr } = useQuery({
@@ -691,7 +690,7 @@ const CurrentRide = () => {
                       mapContainerStyle={mapContainerStyle}
                       center={mapCenterPropDriver}
                       zoom={pickupCoords ? 14 : 12}
-                      options={{...mapOptions, mapId: 'genzrides_driver'}}
+                      options={mapOptions}
                       onLoad={(map) => {
                        mapRef.current = map;
                        setMapInstance(map);
