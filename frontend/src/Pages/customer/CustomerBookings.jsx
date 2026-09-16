@@ -124,34 +124,34 @@ const CustomerBookings = () => {
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="font-display text-2xl font-bold text-white tracking-tight">My Bookings</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <button
             onClick={() => queryClient.invalidateQueries({ queryKey: ['myBookings'] })}
             disabled={isFetching}
             title="Refresh"
-            className="p-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition disabled:opacity-50"
+            className="p-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition disabled:opacity-50 shrink-0"
           >
             <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
           </button>
-        <div className="relative">
-          <Filter size={16} className="text-gray-400" />
-          <select
-            value={statusFilter}
-            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-            className="appearance-none bg-white/5 backdrop-blur-md border border-white/15 text-white rounded-xl px-4 py-2.5 pr-8 text-sm outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 hover:border-green-500/30 hover:bg-white/8 transition-all cursor-pointer shadow-lg shadow-black/20"
-          >
-            <option value="">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Accepted">Accepted</option>
-            <option value="On The Way">On The Way</option>
-            <option value="Arrived">Arrived</option>
-            <option value="Started">Started</option>
-            <option value="Reached">Reached</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-        </div>
+          <div className="relative flex-1 sm:flex-initial">
+            <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
+            <select
+              value={statusFilter}
+              onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+              className="appearance-none bg-white/5 backdrop-blur-md border border-white/15 text-white rounded-xl pl-8 pr-8 py-2 text-sm outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 hover:border-green-500/30 hover:bg-white/8 transition-all cursor-pointer shadow-lg shadow-black/20 w-full sm:w-48"
+            >
+              <option value="">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Accepted">Accepted</option>
+              <option value="On The Way">On The Way</option>
+              <option value="Arrived">Arrived</option>
+              <option value="Started">Started</option>
+              <option value="Reached">Reached</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
         </div>
       </div>
 
@@ -167,75 +167,75 @@ const CustomerBookings = () => {
         <>
           {/* Desktop Table */}
           <div className="hidden md:block bg-white/5 backdrop-blur-lg rounded-[30px] border border-white/10 overflow-x-auto">
-            <table className="w-full min-w-[640px]">
+            <table className="w-full min-w-[700px]">
               <thead>
                 <tr className="bg-white/5 border-b border-white/5">
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-green-400 uppercase">Route</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-green-400 uppercase">Date</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-green-400 uppercase">Driver</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-green-400 uppercase">Cab</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-green-400 uppercase">Status</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-green-400 uppercase">Fare</th>
-                  <th className="text-right px-6 py-3 text-xs font-semibold text-green-400 uppercase">Actions</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-green-400 uppercase">Route</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-green-400 uppercase">Date</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-green-400 uppercase">Driver</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-green-400 uppercase">Cab</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-green-400 uppercase">Status</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-green-400 uppercase">Fare</th>
+                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-green-400 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {bookings.map((b) => (
                   <tr key={b._id} className="border-b border-white/5 hover:bg-white/5 transition">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin size={14} className="text-green-400 shrink-0" />
-                        <span className="truncate max-w-[120px] text-gray-300">{b.pickup?.address}</span>
-                        <span className="text-gray-500">→</span>
-                        <MapPin size={14} className="text-red-400 shrink-0" />
-                        <span className="truncate max-w-[120px] text-gray-300">{b.drop?.address}</span>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2 text-xs">
+                        <MapPin size={12} className="text-green-400 shrink-0" />
+                        <span className="truncate max-w-[100px] text-gray-300">{b.pickup?.address}</span>
+                        <span className="text-gray-500 shrink-0">→</span>
+                        <MapPin size={12} className="text-red-400 shrink-0" />
+                        <span className="truncate max-w-[100px] text-gray-300">{b.drop?.address}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-300">
+                    <td className="px-4 py-3 text-xs text-gray-300">
                       {formatDateTime(b.pickupDateTime)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-300">
+                    <td className="px-4 py-3 text-xs text-gray-300">
                       {b.driver?.user?.name || <span className="text-gray-500 italic">Not assigned</span>}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/5 text-gray-300 border border-white/10">
-                        <Car size={12} className="text-green-400" />
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-white/5 text-gray-300 border border-white/10">
+                        <Car size={10} className="text-green-400" />
                         {b.vehicleType?.name || b.driver?.vehicleType?.name || '—'}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[b.bookingStatus] || 'bg-white/5 text-gray-400 border border-white/10'}`}>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${STATUS_COLORS[b.bookingStatus] || 'bg-white/5 text-gray-400 border border-white/10'}`}>
                         {b.bookingStatus}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-white">
+                    <td className="px-4 py-3 text-sm font-semibold text-white">
                       ₹{b.finalFare || b.estimatedFare}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => setSelectedBooking(b)}
-                          className="p-1.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition"
+                          className="p-1 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition"
                           title="View Details"
                         >
-                          <Eye size={16} />
+                          <Eye size={14} />
                         </button>
                         {b.bookingStatus === 'Completed' && (
                           <button
                             onClick={() => handleDownloadInvoice(b._id)}
-                            className="p-1.5 text-green-400 hover:text-green-300 hover:bg-white/5 rounded-xl transition"
+                            className="p-1 text-green-400 hover:text-green-300 hover:bg-white/5 rounded-lg transition"
                             title="Download Invoice"
                           >
-                            <Download size={16} />
+                            <Download size={14} />
                           </button>
                         )}
                         {['Pending', 'Accepted'].includes(b.bookingStatus) && (
                           <button
                             onClick={() => setCancelId(b._id)}
-                            className="p-1.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl hover:bg-red-500/30 transition"
+                            className="p-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition"
                             title="Cancel"
                           >
-                            <X size={16} />
+                            <X size={14} />
                           </button>
                         )}
                       </div>
@@ -249,44 +249,46 @@ const CustomerBookings = () => {
           {/* Mobile Cards */}
           <div className="md:hidden space-y-3">
             {bookings.map((b) => (
-              <div key={b._id} className="bg-white/5 backdrop-blur-lg rounded-[30px] border border-white/10 p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[b.bookingStatus] || ''}`}>
-                    {b.bookingStatus}
-                  </span>
+              <div key={b._id} className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${STATUS_COLORS[b.bookingStatus] || ''}`}>
+                      {b.bookingStatus}
+                    </span>
+                    <span className="text-xs text-gray-400">{formatDateTime(b.pickupDateTime).split(',')[0]}</span>
+                  </div>
                   <span className="text-sm font-bold text-white">
                     ₹{b.finalFare || b.estimatedFare}
                   </span>
                 </div>
-                <div className="space-y-1.5 mb-3">
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <MapPin size={14} className="text-green-400" />
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 text-xs text-gray-300">
+                    <MapPin size={12} className="text-green-400 shrink-0" />
                     <span className="truncate">{b.pickup?.address}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <MapPin size={14} className="text-red-400" />
+                  <div className="flex items-center gap-2 text-xs text-gray-300">
+                    <MapPin size={12} className="text-red-400 shrink-0" />
                     <span className="truncate">{b.drop?.address}</span>
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pt-2 border-t border-white/5">
                   <div className="flex items-center gap-2 min-w-0">
-                    <Car size={12} className="text-gray-500 shrink-0" />
-                    <span className="text-xs text-gray-400 truncate">{b.driver?.user?.name || 'No driver'}</span>
-                    <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-white/5 text-gray-300 border border-white/10 shrink-0">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/5 text-gray-300 border border-white/10 shrink-0">
                       {b.vehicleType?.name || b.driver?.vehicleType?.name || '—'}
                     </span>
+                    <span className="text-[11px] text-gray-400 truncate">{b.driver?.user?.name || 'No driver'}</span>
                   </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => setSelectedBooking(b)} className="p-1.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition">
+                  <div className="flex gap-1.5">
+                    <button onClick={() => setSelectedBooking(b)} className="p-1 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
                       <Eye size={14} />
                     </button>
                     {b.bookingStatus === 'Completed' && (
-                      <button onClick={() => handleDownloadInvoice(b._id)} className="p-1.5 text-green-400 hover:text-green-300 hover:bg-white/5 rounded-xl transition">
+                      <button onClick={() => handleDownloadInvoice(b._id)} className="p-1 text-green-400 hover:text-green-300 hover:bg-white/5 rounded-lg transition">
                         <Download size={14} />
                       </button>
                     )}
                     {['Pending', 'Accepted'].includes(b.bookingStatus) && (
-                      <button onClick={() => setCancelId(b._id)} className="p-1.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl hover:bg-red-500/30 transition">
+                      <button onClick={() => setCancelId(b._id)} className="p-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition">
                         <X size={14} />
                       </button>
                     )}
