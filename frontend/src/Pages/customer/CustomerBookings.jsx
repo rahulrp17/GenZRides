@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { Calendar, MapPin, Clock, Car, Eye, X, Download, Filter, Copy, Check, RefreshCw } from 'lucide-react';
+import { Calendar, MapPin, Clock, Car, Eye, X, Download, Filter, Copy, Check, RefreshCw, ChevronDown } from 'lucide-react';
 import { bookingAPI, invoiceAPI } from '../../services/endpoints';
 import { useSocket } from '../../Context/SocketContext';
 import { useCopyBooking } from '../../utils/bookingText';
@@ -133,11 +133,12 @@ const CustomerBookings = () => {
           >
             <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} />
           </button>
+        <div className="relative">
           <Filter size={16} className="text-gray-400" />
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-            className="px-3 py-2 bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:ring-2 focus:ring-green-500/30 rounded-xl text-sm outline-none"
+            className="appearance-none bg-white/5 backdrop-blur-md border border-white/15 text-white rounded-xl px-4 py-2.5 pr-8 text-sm outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 hover:border-green-500/30 hover:bg-white/8 transition-all cursor-pointer shadow-lg shadow-black/20"
           >
             <option value="">All Status</option>
             <option value="Pending">Pending</option>
@@ -149,6 +150,8 @@ const CustomerBookings = () => {
             <option value="Completed">Completed</option>
             <option value="Cancelled">Cancelled</option>
           </select>
+          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+        </div>
         </div>
       </div>
 
