@@ -8,6 +8,7 @@ import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import SearchBar from '../../components/shared/SearchBar';
+import useDebounce from '../../hooks/useDebounce';
 import Modal from '../../components/shared/Modal';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import { motion as Motion } from 'framer-motion';
@@ -15,14 +16,16 @@ import { motion as Motion } from 'framer-motion';
 const ManageCustomers = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  // Debounce typing → one request per pause, not one per keystroke.
+  const debouncedSearch = useDebounce(search, 300);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [actionDialog, setActionDialog] = useState({ open: false, action: null, id: null, title: '', message: '' });
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['adminCustomers', page, search],
+    queryKey: ['adminCustomers', page, debouncedSearch],
     queryFn: async () => {
-      const { data } = await adminAPI.getCustomers({ page, limit: 10, search });
+      const { data } = await adminAPI.getCustomers({ page, limit: 10, search: debouncedSearch });
       return data;
     },
     staleTime: 30_000,

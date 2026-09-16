@@ -127,8 +127,20 @@ export const invalidateCache = async (patternOrKey) => {
   if (isRedisConnected()) {
     try {
       if (patternOrKey.includes("*")) {
-        const keys = await redisClient.keys(patternOrKey);
-        if (keys.length) await redisClient.del(...keys);
+        // SCAN (cursor-based) instead of blocking KEYS() — invalidation
+        // must never stall the event loop on a large keyspace.
+        let cursor = "0";
+        do {
+          const [nextCursor, keys] = await redisClient.scan(
+            cursor,
+            "MATCH",
+            patternOrKey,
+            "COUNT",
+            200
+          );
+          cursor = nextCursor;
+          if (keys.length) await redisClient.del(...keys);
+        } while (cursor !== "0");
       } else {
         await redisClient.del(patternOrKey);
       }

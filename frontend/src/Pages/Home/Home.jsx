@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import Hero from '../../Component/Hero/Hero'
 import FloatingIcons from './FloatingIcons'
 import AIAssistant from '../../components/ai/AIAssistant'
@@ -10,11 +11,25 @@ import BookingTariff from '../../Component/Booking_Turiff/BookingTariff'
 import FarePricing from '../../Component/FarePricing/FarePricing'
 import SEO from '../../components/SEO'
 import { makeHomeJsonLd, breadcrumbJsonLd } from '../../utils/StructuredData'
+import { vehicleAPI } from '../../services/endpoints'
 
 const Home = () => {
+  const queryClient = useQueryClient();
   const breadcrumbs = breadcrumbJsonLd([
     { name: 'Home', path: '/' },
   ])
+  // Warm the fleet cache on mount. Same queryKey as VehicleShowcase, so when
+  // the section scrolls into view the data is already there — no skeleton gap.
+  useEffect(() => {
+    queryClient.prefetchQuery({
+      queryKey: ["vehicles"],
+      queryFn: async () => {
+        const { data } = await vehicleAPI.getAll();
+        return data;
+      },
+      staleTime: 5 * 60 * 1000,
+    });
+  }, [queryClient]);
   return (
     <main className="bg-black text-white overflow-x-clip">
       <SEO

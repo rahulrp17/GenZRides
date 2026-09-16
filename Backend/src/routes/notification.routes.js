@@ -12,6 +12,7 @@ import {
 } from "../controllers/notification.controller.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
+import { cacheMiddleware } from "../middleware/cache.middleware.js";
 import { validateParams } from "../middleware/validate.middleware.js";
 import { idParamSchema } from "../validators/common.validator.js";
 
@@ -21,7 +22,8 @@ router.use(authenticate);
 
 // Browser push (Web Push). Registered before `/:id` routes so the static
 // paths are never captured as an id param.
-router.get("/vapid-public-key", getVapidPublicKey);
+// Vapid key is identical for every user → cached 1h (changes only on key rotation).
+router.get("/vapid-public-key", cacheMiddleware("push:vapid-public-key", 3600), getVapidPublicKey);
 router.post("/push-subscriptions", savePushSubscription);
 router.delete("/push-subscriptions", removePushSubscription);
 

@@ -9,6 +9,7 @@ import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import SearchBar from '../../components/shared/SearchBar';
+import useDebounce from '../../hooks/useDebounce';
 import Modal from '../../components/shared/Modal';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import Badge from '../../components/shared/Badge';
@@ -26,6 +27,8 @@ const normalizeDriver = (d) => {
 const ManageDrivers = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  // Debounce typing → one request per pause, not one per keystroke.
+  const debouncedSearch = useDebounce(search, 300);
   const [tab, setTab] = useState('all');
   const [selectedDriverId, setSelectedDriverId] = useState(null);
   const [actionDialog, setActionDialog] = useState({ open: false, action: null, id: null, title: '', message: '' });
@@ -50,9 +53,9 @@ const ManageDrivers = () => {
   }, [socket, queryClient]);
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['adminDrivers', page, search, tab],
+    queryKey: ['adminDrivers', page, debouncedSearch, tab],
     queryFn: async () => {
-      const params = { page, limit: 10, search };
+      const params = { page, limit: 10, search: debouncedSearch };
       if (tab === 'pending') return (await adminAPI.getPendingDrivers()).data;
       if (tab === 'approved') return (await adminAPI.getApprovedDrivers()).data;
       if (tab === 'rejected') return (await adminAPI.getRejectedDrivers()).data;
