@@ -103,6 +103,9 @@ const CurrentRide = () => {
   const [livePathDriver, setLivePathDriver] = useState(null);
   const [liveStatus, setLiveStatus] = useState(null);
   const lastFetchDriverRef = useRef(0);
+  // decodePolyline allocates a new array per call — only apply when the
+  // encoded string actually changes, or the effect re-fires forever.
+  const appliedPolylineDriverRef = useRef(null);
 
   const [mapInstance, setMapInstance] = useState(null);
   const { isLoaded: mapLoaded, loadError: mapLoadError } = useJsApiLoader({
@@ -402,12 +405,21 @@ const CurrentRide = () => {
       };
       fetchRoute();
     } else if (['Arrived', 'Started', 'Reached', 'Completed'].includes(activeStatus) && pickup && drop) {
-      if (booking.routePolyline) setLivePathDriver(decodePolyline(booking.routePolyline));
-      else setLivePathDriver(null);
-    } else {
+      const encoded = booking.routePolyline;
+      if (encoded) {
+        if (appliedPolylineDriverRef.current !== encoded) {
+          appliedPolylineDriverRef.current = encoded;
+          setLivePathDriver(decodePolyline(encoded));
+        }
+      } else if (appliedPolylineDriverRef.current !== null || livePathDriver !== null) {
+        appliedPolylineDriverRef.current = null;
+        setLivePathDriver(null);
+      }
+    } else if (appliedPolylineDriverRef.current !== null || livePathDriver !== null) {
+      appliedPolylineDriverRef.current = null;
       setLivePathDriver(null);
     }
-  }, [mapLoaded, booking, selfLocation, liveStatus?.bookingStatus]);
+  }, [mapLoaded, booking, selfLocation, liveStatus?.bookingStatus, livePathDriver]);
 
   if (rideError) return <ErrorState message={rideErr?.message || 'Failed to load current ride'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['currentRide'] })} />;
 

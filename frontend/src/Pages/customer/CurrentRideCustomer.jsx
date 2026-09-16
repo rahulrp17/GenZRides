@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { GoogleMap, useJsApiLoader, Polyline } from '@react-google-maps/api';
@@ -191,14 +191,25 @@ const CurrentRideCustomer = () => {
 
   // Live elapsed time from backend timestamps (refresh-safe).
   const rideTime = useRideTime(booking);
-  const pickupCoordsEarly = booking?.pickup?.latitude && booking?.pickup?.longitude
-    ? { lat: booking.pickup.latitude, lng: booking.pickup.longitude }
-    : null;
-  const dropCoordsEarly = booking?.drop?.latitude && booking?.drop?.longitude
-    ? { lat: booking.drop.latitude, lng: booking.drop.longitude }
-    : null;
+  // Memoized on primitive coords — these objects sit in effect dep arrays,
+  // and fresh identities every render would re-trigger those effects
+  // endlessly (infinite setLivePath loop freezing navigation).
+  const pickupCoordsEarly = useMemo(() => (
+    booking?.pickup?.latitude && booking?.pickup?.longitude
+      ? { lat: booking.pickup.latitude, lng: booking.pickup.longitude }
+      : null
+  ), [booking?.pickup?.latitude, booking?.pickup?.longitude]);
+  const dropCoordsEarly = useMemo(() => (
+    booking?.drop?.latitude && booking?.drop?.longitude
+      ? { lat: booking.drop.latitude, lng: booking.drop.longitude }
+      : null
+  ), [booking?.drop?.latitude, booking?.drop?.longitude]);
   const [livePath, setLivePath] = useState(null);
   const lastFetchRef = useRef(0);
+  // Encoded polyline already applied to the map — decode allocates a new
+  // array every call, so without this guard the effect below would
+  // setState on every run and loop forever.
+  const appliedPolylineRef = useRef(null);
 
   // Check if review already exists for this completed booking
   useEffect(() => {
@@ -241,12 +252,25 @@ const CurrentRideCustomer = () => {
       };
       fetchRoute();
     } else if (['Arrived', 'Started', 'Reached', 'Completed'].includes(activeStatus)) {
-      if (activeBooking.routePolyline) setLivePath(decodePolyline(activeBooking.routePolyline));
-      else setLivePath(null);
+      const encoded = activeBooking.routePolyline;
+      if (encoded) {
+        if (appliedPolylineRef.current !== encoded) {
+          appliedPolylineRef.current = encoded;
+          setLivePath(decodePolyline(encoded));
+        }
+      } else {
+        if (appliedPolylineRef.current !== null) {
+          appliedPolylineRef.current = null;
+          setLivePath(null);
+        }
+      }
     } else {
-      setLivePath(null);
+      if (appliedPolylineRef.current !== null || livePath !== null) {
+        appliedPolylineRef.current = null;
+        setLivePath(null);
+      }
     }
-  }, [isLoaded, liveStatus?.bookingStatus, liveStatus?.routePolyline, booking?.bookingStatus, booking?.routePolyline, driverLocation, pickupCoordsEarly, dropCoordsEarly]);
+  }, [isLoaded, liveStatus?.bookingStatus, liveStatus?.routePolyline, booking?.bookingStatus, booking?.routePolyline, driverLocation, pickupCoordsEarly, dropCoordsEarly, livePath]);
 
   const onMapLoad = useCallback((map) => {
     mapRef.current = map;
