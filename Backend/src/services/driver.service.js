@@ -4,6 +4,11 @@ import Booking from "../models/Booking.js";
 import Vehicle from "../models/Vehicle.js";
 import User from "../models/User.js";
 import { notifyUser } from "./notification.service.js";
+import {
+  getDriverPeriodEarnings,
+  getDriverRates,
+  istMidnightUtc,
+} from "./driverStatus.service.js";
 
 /* ===========================================================
    CREATE DRIVER PROFILE
@@ -774,38 +779,14 @@ export const getDriverEarnings = async (userId) => {
     driver: driver._id,
   });
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const week = new Date();
-  week.setDate(week.getDate() - 7);
-
-  const month = new Date();
-  month.setMonth(month.getMonth() - 1);
-
-  const agg = await Booking.aggregate([
-    { $match: { driver: driver._id, bookingStatus: "Completed" } },
-    {
-      $group: {
-        _id: null,
-        todayEarnings: {
-          $sum: { $cond: [{ $gte: ["$completedAt", today] }, "$finalFare", 0] },
-        },
-        weekEarnings: {
-          $sum: { $cond: [{ $gte: ["$completedAt", week] }, "$finalFare", 0] },
-        },
-        monthEarnings: {
-          $sum: { $cond: [{ $gte: ["$completedAt", month] }, "$finalFare", 0] },
-        },
-      },
-    },
-  ]);
-
+  // Live period earnings from Completed bookings (IST day boundary).
+  // Never read driver.today/week/monthEarnings — those counters are
+  // write-only accumulators that are never reset.
   const {
-    todayEarnings = 0,
-    weekEarnings = 0,
-    monthEarnings = 0,
-  } = agg[0] || {};
+    today: todayEarnings,
+    week: weekEarnings,
+    month: monthEarnings,
+  } = await getDriverPeriodEarnings(driver._id);
 
   return {
     wallet: {
@@ -852,43 +833,21 @@ export const getDriverDashboard = async (userId) => {
         )
     : null;
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const istToday = istMidnightUtc();
 
   const todayTrips = await Booking.countDocuments({
     driver: driver._id,
     bookingStatus: "Completed",
     completedAt: {
-      $gte: today,
+      $gte: istToday,
     },
   });
 
-  const totalBookings = await Booking.countDocuments({
-    driver: driver._id,
-  });
-
-  const completedBookings =
-    await Booking.countDocuments({
-      driver: driver._id,
-      bookingStatus: "Completed",
-    });
-
-  const cancelledBookings =
-    await Booking.countDocuments({
-      driver: driver._id,
-      bookingStatus: "Cancelled",
-    });
-
-  const completionRate =
-    totalBookings === 0
-      ? 0
-      : Number(
-          (
-            (completedBookings /
-              totalBookings) *
-            100
-          ).toFixed(2)
-        );
+  // Live rates + period earnings from Bookings (source of truth).
+  // Never read the today/week/month profile counters (never reset)
+  // and never divide by all bookings (includes in-progress rides).
+  const rates = await getDriverRates(driver._id);
+  const period = await getDriverPeriodEarnings(driver._id);
 
   return {
     profile: {
@@ -923,11 +882,9 @@ export const getDriverDashboard = async (userId) => {
     currentRide,
 
     statistics: {
-      totalTrips: driver.totalTrips,
-      completedTrips:
-        driver.completedTrips,
-      cancelledTrips:
-        driver.cancelledTrips,
+      totalTrips: rates.totalTrips,
+      completedTrips: rates.completedTrips,
+      cancelledTrips: rates.cancelledTrips,
 
       todayTrips,
 
@@ -940,16 +897,17 @@ export const getDriverDashboard = async (userId) => {
       totalTips:
         driver.totalTips,
 
-      todayEarnings:
-        driver.todayEarnings,
+      todayEarnings: period.today,
 
-      weekEarnings:
-        driver.weekEarnings,
+      weekEarnings: period.week,
 
-      monthEarnings:
-        driver.monthEarnings,
+      monthEarnings: period.month,
 
-      completionRate,
+      completionRate: rates.completionRate,
+
+      cancellationRate: rates.cancellationRate,
+
+      acceptanceRate: rates.acceptanceRate,
     },
   };
 };
@@ -970,27 +928,21 @@ export const getDriverStatistics = async (
     throw new Error("Driver not found.");
   }
 
-  const totalForRate = (driver.completedTrips || 0) + (driver.cancelledTrips || 0);
-  const completionRate =
-    totalForRate === 0
-      ? 0
-      : Number(
-          ((driver.completedTrips / totalForRate) * 100).toFixed(2)
-        );
+  // Live rates + period earnings from Bookings (source of truth) —
+  // same helpers as the dashboard so both pages always agree.
+  const rates = await getDriverRates(driver._id);
+  const period = await getDriverPeriodEarnings(driver._id);
 
   return {
     rating: driver.rating,
     totalRatings:
       driver.totalRatings,
 
-    totalTrips:
-      driver.totalTrips,
+    totalTrips: rates.totalTrips,
 
-    completedTrips:
-      driver.completedTrips,
+    completedTrips: rates.completedTrips,
 
-    cancelledTrips:
-      driver.cancelledTrips,
+    cancelledTrips: rates.cancelledTrips,
 
     totalDistance:
       driver.totalDistance,
@@ -1001,16 +953,17 @@ export const getDriverStatistics = async (
     totalTips:
       driver.totalTips,
 
-    todayEarnings:
-      driver.todayEarnings,
+    todayEarnings: period.today,
 
-    weekEarnings:
-      driver.weekEarnings,
+    weekEarnings: period.week,
 
-    monthEarnings:
-      driver.monthEarnings,
+    monthEarnings: period.month,
 
-    completionRate,
+    completionRate: rates.completionRate,
+
+    cancellationRate: rates.cancellationRate,
+
+    acceptanceRate: rates.acceptanceRate,
 
     online: driver.isOnline,
 

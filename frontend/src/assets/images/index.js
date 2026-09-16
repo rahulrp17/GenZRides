@@ -1,7 +1,7 @@
 // Only assets actually imported across the app are re-exported here,
 // so unused multi-MB files (hero7, old logos, …) stay out of the bundle.
-import hero2 from "./hero2.jpg"; //2
-import hero4 from "./hero4.jpg"; //4
+import hero2 from "./hero2.webp"; //2
+import hero4 from "./hero4.webp"; //4
 import hero8 from "./hero8.webp";
 import hero10 from "./hero10.webp";
 import hero9 from "./hero9.webp";
@@ -11,7 +11,7 @@ import innova from "./innova.webp";
 import logo5 from "./logo5.webp";
 import GenZRides from "./GenZRides.png";
 import ChennaiBangalore from "./ChennaiBangalore.webp";
-import ChennaiMadurai from "./ChennaiMadurai.jpg";
+import ChennaiMadurai from "./ChennaiMadurai.webp";
 import CoimbatoreOoty from "./CoimbatoreOoty.webp";
 import TrichyChennai from "./TrichyChennai.webp";
 import AirportPickup from "./AirportPickup.png";
@@ -20,16 +20,16 @@ import RoundTrip from "./RoundTrip.png";
 import SUV from "./SUV.webp";
 import TempoTraveller from "./TempoTraveller.webp";
 import ChennaiRameshwaram from "./ChennaiRameshwaram.webp";
-import ChennaiCoimbatore from "./ChennaiCoimbatore.jpg";
+import ChennaiCoimbatore from "./ChennaiCoimbatore.webp";
 import MaduraiRameshwaram from "./MaduraiRameshwaram.webp";
 import CoimbatoreSalem from "./CoimbatoreSalem.webp";
 import MaduraiTrichy from "./MaduraiTrichy.webp";
-import TrichyAirport from "./TrichyAirport.jpg";
-import MaduraiAirport from "./MaduraiAirport.jpg";
-import CoimbatoreAirport from "./CoimbatoreAirport.jpg";
-import ChennaiAirport from "./ChennaiAirport.jpg";
-import BangaloreAirport from "./BangaloreAirport.jpg";
-import about2 from "./about2.jpg";
+import TrichyAirport from "./TrichyAirport.webp";
+import MaduraiAirport from "./MaduraiAirport.webp";
+import CoimbatoreAirport from "./CoimbatoreAirport.webp";
+import ChennaiAirport from "./ChennaiAirport.webp";
+import BangaloreAirport from "./BangaloreAirport.webp";
+import about2 from "./about2.webp";
 
 export {
   hero2,

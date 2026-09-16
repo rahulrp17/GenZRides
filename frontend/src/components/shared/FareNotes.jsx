@@ -10,7 +10,7 @@ const NOTES = [
   {
     icon: Wallet,
     title: "Driver bata",
-    text: "₹400/day from day one. One-way/drop: ₹600/day when total running exceeds 400 km. Round trip: ₹300/day always.",
+    text: "₹400/day from day one. One-way/drop: ₹600/day when total running exceeds 400 km. Round trip: ₹400/day always.",
   },
   {
     icon: Timer,
@@ -43,7 +43,9 @@ const FareNotes = ({ compact = false }) => (
         Fare notes
       </h3>
     </div>
-    <ul className={`relative grid gap-3 ${compact ? "" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
+    <ul
+      className={`relative grid gap-3 ${compact ? "" : "sm:grid-cols-2 lg:grid-cols-3"}`}
+    >
       {NOTES.map((n) => (
         <li
           key={n.title}

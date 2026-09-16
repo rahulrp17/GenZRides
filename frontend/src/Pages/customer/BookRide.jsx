@@ -32,6 +32,7 @@ import {
 // Google Maps loads only when the map panel mounts (own chunk).
 const RideMap = lazy(() => import("../../components/customer/RideMap"));
 import { useJsApiLoader } from "@react-google-maps/api";
+import { GOOGLE_MAPS_LIBRARIES } from "../../utils/googleMaps";
 import LocationPicker from "../../components/customer/LocationPicker";
 import VehicleSelector from "../../components/customer/VehicleSelector";
 import FareNotes from "../../components/shared/FareNotes";
@@ -112,9 +113,11 @@ const BookRide = () => {
   };
 
   // Ensure the Maps JS API is available for client-side geocoding fallback.
-  // Shares the loader singleton with RideMap — the script loads once.
+  // Uses the shared loader singleton (utils/googleMaps) — identical options
+  // on every page, so navigating between maps never re-triggers the load.
   const { isLoaded: mapsScriptLoaded } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_KEY,
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
   const estimateTimerRef = useRef(null);
@@ -865,8 +868,7 @@ const BookRide = () => {
             </Motion.div>
           )}
 
-          {/* Fare & cancellation notes near the price */}
-          <FareNotes compact />
+          
 
           {/* Book Button (sticky bottom — stays visible while page scrolls) */}
           <div className=" bottom-0 z-10 -mx-4 px-4 pb-4 pt-2 border-t border-white/10 bg-black/85 backdrop-blur-xl">
@@ -891,6 +893,8 @@ const BookRide = () => {
                 </>
               )}
             </button>
+            {/* Fare & cancellation notes near the price */}
+          <FareNotes compact />
           </div>
 
       {/* Premium glass confirm popup — Confirm uses the existing booking

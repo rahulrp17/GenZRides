@@ -1,7 +1,10 @@
 import "./App.css";
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import LoadingPage from "./components/shared/LoadingPage";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { trackPageview } from "./utils/analytics";
+import CookieBanner from "./components/CookieBanner";
+import StickyMobileCTA from "./components/StickyMobileCTA";
 
 import Navbar from "./Component/Navbar/Navbar";
 import Footer from "./Component/Footer/Footer";
@@ -79,6 +82,16 @@ const NewPassword = lazy(() => import("./Pages/Auth/NewPassword"));
 
 const PageFallback = () => <LoadingPage />;
 
+// Fires a GA4 pageview on every client-side navigation (no-op until the
+// visitor accepts cookies in <CookieBanner /> — see utils/analytics.js).
+const RouteTracker = () => {
+  const { pathname, search } = useLocation();
+  useEffect(() => {
+    trackPageview(`${pathname}${search}`);
+  }, [pathname, search]);
+  return null;
+};
+
 class RouteErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -113,13 +126,20 @@ function App() {
     <BrowserRouter>
       <ScrollToTopHandler />
       <ScrollProgress />
+      <RouteTracker />
 
       <RouteErrorBoundary>
         <Suspense fallback={<PageFallback />}>
           <Routes>
-        {/* Public routes */}
+        {/* Public routes — indexable, each page sets its own <SEO> + JSON-LD */}
         <Route path="/" element={<><Navbar /><Home /><Footer /></>} />
         <Route path="/booking" element={<GuestBookingPage />} />
+        {/* Private/auth/sensitive routes — noindex is emitted at page level
+            (<SEO noindex> in CarTypePage/ConfirmPage/WaitingPage, Login,
+            ForgotPassword/OtpVerification/NewPassword/ResetPassword,
+            DriverLogin/DriverRegister/DriverContinue) and at layout level
+            (AdminLayout/CustomerLayout/DriverLayout each render
+            <SEO noindex>), so crawlers never index dashboards or flows. */}
         <Route path="/booking/vehicles" element={<CarTypePage />} />
         <Route path="/booking/confirm" element={<ConfirmPage />} />
         <Route path="/booking/waiting" element={<WaitingPage />} />
@@ -195,6 +215,8 @@ function App() {
         </Route>
         <Route path="*" element={<><Navbar /><NotFound /><Footer /></>} />
           </Routes>
+          <StickyMobileCTA />
+          <CookieBanner />
         </Suspense>
       </RouteErrorBoundary>
     </BrowserRouter>

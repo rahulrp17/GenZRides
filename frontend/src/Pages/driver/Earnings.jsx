@@ -33,11 +33,13 @@ const Earnings = () => {
 
   const completedCount = statistics.completedTrips || 0;
   const cancelledCount = statistics.cancelledTrips || 0;
-  const acceptanceBase = completedCount + cancelledCount;
+  // True offer acceptance from the backend (accepted dispatches / all
+  // offers). Falls back to the local decided-trip ratio if absent.
   const acceptanceRate =
-    acceptanceBase === 0
+    statistics.acceptanceRate ??
+    (completedCount + cancelledCount === 0
       ? 0
-      : Number(((completedCount / acceptanceBase) * 100).toFixed(1));
+      : Number(((completedCount / (completedCount + cancelledCount)) * 100).toFixed(1)));
 
   const totalTrips = statistics.totalTrips ?? 0;
   const completionRate = statistics.completionRate ?? 0;

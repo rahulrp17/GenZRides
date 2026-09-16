@@ -1,5 +1,6 @@
 import React from "react";
-import SEO from "../../components/SEO";
+import SEO from "../../components/SEO"
+import { localBusinessJsonLd, breadcrumbJsonLd } from "../../utils/StructuredData";
 import { motion as Motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -127,7 +128,9 @@ const Services = () => (
       description="City rides, airport transfers, outstation trips and hourly rentals with verified drivers and upfront fares across Tamil Nadu."
       keywords="cab services, airport transfer taxi, outstation cab booking, hourly car rental with driver"
       path="/services"
-    />
+        jsonLd={localBusinessJsonLd}
+        breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Services",path:"/services"}])}
+      />
     <PageHero
       eyebrow="Our Services"
       title="Every trip, perfected"

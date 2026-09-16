@@ -1,11 +1,13 @@
 // Real business data (same as footer/contact page). Used for JSON-LD only.
+// Canonical production origin — never point schema URLs at preview deploys.
+import { PRODUCTION_ORIGIN } from "./StructuredData";
 const businessJsonLd = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "TaxiService"],
-  "@id": "https://www.genzrides.com/#business",
-  url: "https://www.genzrides.com/",
-  logo: "https://genzrides.vercel.app/logo5.png",
-  image: "https://genzrides.vercel.app/logo5.png",
+  "@id": `${PRODUCTION_ORIGIN}/#business`,
+  url: `${PRODUCTION_ORIGIN}/`,
+  logo: `${PRODUCTION_ORIGIN}/logo5.png`,
+  image: `${PRODUCTION_ORIGIN}/logo5.png`,
   name: "GenZRides India Pvt Ltd",
   telephone: "+919342830199",
   email: "support@genzrides.com",
@@ -32,7 +34,7 @@ const businessJsonLd = {
     { "@type": "City", name: "Madurai" },
     { "@type": "City", name: "Salem" },
   ],
-  sameAs: ["https://www.genzrides.com/"],
+  sameAs: [`${PRODUCTION_ORIGIN}/`],
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: "4.9",

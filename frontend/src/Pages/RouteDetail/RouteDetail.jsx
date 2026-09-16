@@ -173,6 +173,20 @@ const RouteDetail = () => {
     ],
   };
 
+  const routeServiceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `https://www.genzrides.com/routes/${slug}/#service`,
+    name: `${route.from} to ${route.to} Cab`,
+    description: route.desc,
+    serviceType: "Intercity TaxiService",
+    provider: { "@type": "LocalBusiness", name: "GenZRides" },
+    areaServed: [
+      { "@type": "City", name: route.from },
+      { "@type": "City", name: route.to },
+    ],
+  };
+
   return (
     <main className="bg-black text-white overflow-x-clip">
       <SEO
@@ -180,7 +194,8 @@ const RouteDetail = () => {
         description={`Book a ${route.from.toLowerCase()} to ${route.to.toLowerCase()} cab with verified drivers, transparent fixed fares and 24/7 support. One-way and round-trip available.`}
         keywords={`${route.from.toLowerCase()} to ${route.to.toLowerCase()} cab, ${route.from.toLowerCase()} to ${route.to.toLowerCase()} taxi fare, intercity cab Tamil Nadu`}
         path={`/routes/${slug}`}
-        jsonLd={breadcrumbJsonLd}
+        jsonLd={routeServiceJsonLd}
+        breadcrumbs={breadcrumbJsonLd}
       />
       <PageHero
         eyebrow={`${route.from} → ${route.to}`}

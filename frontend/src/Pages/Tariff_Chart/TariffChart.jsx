@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import SEO from "../../components/SEO";
+import { localBusinessJsonLd, breadcrumbJsonLd } from "../../utils/StructuredData";
 import { motion as Motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -138,6 +139,8 @@ const TariffChart = () => {
         description="Transparent cab tariff: Sedan from ₹15/km, SUV ₹20/km, Innova ₹21/km. No hidden charges. City, airport, outstation and rental fares."
         keywords="cab tariff, taxi fare per km Tamil Nadu, sedan SUV fare rates, outstation taxi price"
         path="/tariff"
+        jsonLd={localBusinessJsonLd}
+        breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Tariff",path:"/tariff"}])}
       />
       <PageHero
         eyebrow="Transparent Pricing"

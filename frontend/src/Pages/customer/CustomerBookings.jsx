@@ -315,7 +315,7 @@ const CustomerBookings = () => {
                   onClick={() => copyBooking(selectedBooking)}
                   title="Copy booking details"
                   aria-label="Copy booking details"
-                  className="inline-flex items-center gap-1.5 p-2 min-w-[40px] min-h-[40px] justify-center bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs font-medium hover:bg-white/10 hover:text-white transition"
+                  className=" hidden items-center gap-1.5 p-2 min-w-[40px] min-h-[40px] justify-center bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs font-medium hover:bg-white/10 hover:text-white transition"
                 >
                   {copied ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
                 </button>

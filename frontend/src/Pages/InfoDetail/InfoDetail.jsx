@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import SEO from "../../components/SEO";
+import { breadcrumbJsonLd } from "../../utils/StructuredData";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -132,6 +133,7 @@ const InfoDetail = () => {
           "@type": "FAQPage",
           mainEntity: FAQS.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } }))
         } : null}
+        breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Information",path:"/info"},{name:detail.title,path:`/info/${key}`}])}
       />
       <PageHero
         eyebrow="Information"

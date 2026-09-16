@@ -1,5 +1,6 @@
 import React from "react";
-import SEO from "../../components/SEO";
+import SEO from "../../components/SEO"
+import { localBusinessJsonLd, breadcrumbJsonLd } from "../../utils/StructuredData";
 import { motion as Motion } from "framer-motion";
 import { Link, Navigate, useParams } from "react-router-dom";
 import {
@@ -83,6 +84,8 @@ const AirportDetail = () => {
         description={`Flight-tracked ${airport.city} airport (${airport.code}) taxi pickups and drops with meet-and-greet, 45 min free waiting and 24/7 service.`}
         keywords={`${airport.city.toLowerCase()} airport taxi, ${airport.code} airport cab pickup, airport transfer Tamil Nadu`}
         path={`/airport/${airport.city.toLowerCase()}`}
+        jsonLd={localBusinessJsonLd}
+        breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Airport Transfers",path:"/airport-transfers"},{name:airport.city,path:`/airport/${airport.city.toLowerCase()}`}])}
       />
       <PageHero
         eyebrow={`${airport.city} Airport (${airport.code})`}

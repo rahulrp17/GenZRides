@@ -85,7 +85,9 @@ const DriverDashboard = () => {
   const cancelledTrips = d.statistics?.cancelledTrips ?? s.cancelledTrips ?? 0;
 
   const completionRate = d.statistics?.completionRate ?? 0;
-  const cancellationRate = totalTrips > 0 ? Math.round((cancelledTrips / totalTrips) * 100 * 100) / 100 : 0;
+  // Backend-computed from live Booking counts (cancelled / decided).
+  // Never derive from totalTrips — that counter historically excluded cancels.
+  const cancellationRate = d.statistics?.cancellationRate ?? 0;
 
   const rating = d.profile?.rating ?? s.rating ?? 5;
 

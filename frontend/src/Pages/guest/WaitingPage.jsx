@@ -34,7 +34,7 @@ const WaitingPage = () => {
 
   return (
     <main className="bg-black text-white overflow-x-clip">
-      <SEO noindex title="Booking Received" />
+      <SEO noindex title="Booking Received" description="Thanks for booking with GenZRides — your ride request is with our dispatch team." path="/booking/waiting" />
       <Navbar />
       <PageHero
         eyebrow="Booking Received"

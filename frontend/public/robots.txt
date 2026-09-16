@@ -1,14 +1,61 @@
 User-agent: *
 Allow: /
 
-# Private app areas — authenticated dashboards and flows stay out of search
+# Private app areas — authenticated dashboards stay out of search
+# (layouts also emit <meta name="robots" content="noindex, nofollow">)
 Disallow: /customer/
 Disallow: /driver/
 Disallow: /admin/
-Disallow: /booking/
-Allow: /booking$
+
+# Booking flow steps after /booking — not landing pages
+# (CarTypePage/ConfirmPage/WaitingPage also emit noindex at page level)
+Disallow: /booking/vehicles
+Disallow: /booking/confirm
+Disallow: /booking/waiting
+
+# Auth pages — never index (pages also emit noindex)
 Disallow: /login
 Disallow: /signup
+Disallow: /forgot-password
+Disallow: /verify-otp
+Disallow: /new-password
+Disallow: /reset-password
+Disallow: /driver/login
+Disallow: /driver/register
+
+# AI assistants & answer engines — explicitly allowed on public pages so
+# GenZRides routes, fares and services can be cited in AI answers.
+# NOTE: bots matching a named group ignore the "*" rules above, so the
+# private-area blocks are repeated here verbatim.
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Meta-ExternalAgent
+User-agent: Meta-ExternalFetcher
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: YouBot
+User-agent: cohere-ai
+Allow: /
+Disallow: /customer/
+Disallow: /driver/
+Disallow: /admin/
+Disallow: /booking/vehicles
+Disallow: /booking/confirm
+Disallow: /booking/waiting
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /verify-otp
+Disallow: /new-password
+Disallow: /reset-password
+Disallow: /driver/login
+Disallow: /driver/register
 
 Sitemap: https://www.genzrides.com/sitemap.xml
 Host: https://www.genzrides.com

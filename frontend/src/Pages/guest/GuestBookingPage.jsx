@@ -8,6 +8,7 @@ import GuestBookingForm from "./GuestBookingForm";
 import { hero10 } from "../../assets/images";
 import { Reveal } from "../../Component/Landing/Reveal";
 import SEO from "../../components/SEO";
+import { serviceJsonLd, breadcrumbJsonLd } from "../../utils/StructuredData";
 
 /**
  * Public /booking route: full guest booking flow entry (no login required).
@@ -20,6 +21,8 @@ const GuestBookingPage = () => (
       description="Book your cab in 3 quick steps without signing up: enter trip, choose Sedan/SUV with live fares, confirm. Tamil Nadu-wide service."
       keywords="book cab without login, guest cab booking, online taxi booking Tamil Nadu"
       path="/booking"
+      jsonLd={serviceJsonLd("Guest Cab Booking", "Book your cab in 3 quick steps without signing up: enter trip, choose Sedan/SUV with live fares, confirm.", "TaxiService", "Tamil Nadu", "booking")}
+      breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Book a Cab",path:"/booking"}])}
     />
     <Navbar />
     <PageHero

@@ -60,30 +60,22 @@ export const getDriverPerformance = async (
       });
     }
 
-    const completionRate =
-      driverStatusService.getCompletionRate(driver);
-
-    const cancellationRate =
-      driverStatusService.getCancellationRate(driver);
-
-    // You can replace these values later with actual
-    // accepted/rejected request counts.
-    const acceptanceRate =
-      driverStatusService.getAcceptanceRate(
-        driver.completedTrips,
-        driver.cancelledTrips
-      );
+    // Live rates from Bookings + live period earnings — same helpers as
+    // dashboard/statistics so every surface agrees. Never read the
+    // today/week/month profile counters (write-only, never reset).
+    const rates = await driverStatusService.getDriverRates(driver._id);
+    const period = await driverStatusService.getDriverPeriodEarnings(driver._id);
 
     res.status(200).json({
       success: true,
       data: {
-        totalTrips: driver.totalTrips,
-        completedTrips: driver.completedTrips,
-        cancelledTrips: driver.cancelledTrips,
+        totalTrips: rates.totalTrips,
+        completedTrips: rates.completedTrips,
+        cancelledTrips: rates.cancelledTrips,
 
-        completionRate,
-        cancellationRate,
-        acceptanceRate,
+        completionRate: rates.completionRate,
+        cancellationRate: rates.cancellationRate,
+        acceptanceRate: rates.acceptanceRate,
 
         rating: driver.rating,
         totalRatings: driver.totalRatings,
@@ -93,9 +85,9 @@ export const getDriverPerformance = async (
         totalEarnings: driver.totalEarnings,
         totalTips: driver.totalTips,
 
-        todayEarnings: driver.todayEarnings,
-        weekEarnings: driver.weekEarnings,
-        monthEarnings: driver.monthEarnings,
+        todayEarnings: period.today,
+        weekEarnings: period.week,
+        monthEarnings: period.month,
 
         isOnline: driver.isOnline,
         isAvailable: driver.isAvailable,

@@ -1,5 +1,6 @@
 import React from "react";
-import SEO from "../../components/SEO";
+import SEO from "../../components/SEO"
+import { localBusinessJsonLd, breadcrumbJsonLd } from "../../utils/StructuredData";
 import { motion as Motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Plane, ArrowRight, Radar, Luggage, Clock3, BadgeCheck } from "lucide-react";
@@ -60,7 +61,9 @@ const AirportTransfers = () => (
       description="Flight-tracked airport pickups and drops at MAA, BLR, CJB, TRZ and IXM. Meet-and-greet, 45 min free waiting, 24/7 service."
       keywords="Chennai airport taxi, Bangalore airport cab, airport pickup drop taxi, flight tracking cab"
       path="/airport-transfers"
-    />
+        jsonLd={localBusinessJsonLd}
+        breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Airport Transfers",path:"/airport-transfers"}])}
+      />
     <PageHero
       eyebrow="Airport Transfers"
       title="Never miss a flight again"

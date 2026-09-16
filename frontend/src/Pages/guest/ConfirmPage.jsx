@@ -142,7 +142,7 @@ const ConfirmPage = () => {
 
   return (
     <main className="bg-black text-white overflow-x-clip">
-      <SEO noindex title="Confirm Your Booking" />
+      <SEO noindex title="Confirm Your Booking" description="Review your trip details and confirm your cab booking with GenZRides." path="/booking/confirm" />
       <Navbar />
       <PageHero
         eyebrow="Step 3 of 3 — Confirmation"

@@ -1,5 +1,6 @@
 import React from "react";
-import SEO from "../../components/SEO";
+import SEO from "../../components/SEO"
+import { localBusinessJsonLd, breadcrumbJsonLd } from "../../utils/StructuredData";
 import { motion as Motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { MapPin, ArrowRight, Clock3, Route } from "lucide-react";
@@ -58,7 +59,9 @@ const PopularRoutes = () => (
       description="Top intercity cab routes: Chennai to Bangalore, Madurai, Trichy to Chennai and more. Fixed transparent fares with verified drivers."
       keywords="Chennai to Bangalore cab, Chennai to Madurai taxi, intercity cab Tamil Nadu, popular cab routes"
       path="/popular-routes"
-    />
+        jsonLd={localBusinessJsonLd}
+        breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Popular Routes",path:"/popular-routes"}])}
+      />
     <PageHero
       eyebrow="Popular Routes"
       title="Routes riders love"

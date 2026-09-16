@@ -1,5 +1,6 @@
 import React from "react";
 import SEO from "../../components/SEO";
+import { organizationJsonLd, breadcrumbJsonLd } from "../../utils/StructuredData";
 import { motion as Motion } from "framer-motion";
 import {
   ShieldCheck,
@@ -87,6 +88,8 @@ const About = () => {
         description="About GenZRides: premium cab service born on Tamil Nadu highways. Verified chauffeurs, honest fares, 24/7 support."
         keywords="about cab company Tamil Nadu, premium taxi service, verified cab drivers"
         path="/about"
+        jsonLd={organizationJsonLd}
+        breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"About",path:"/about"}])}
       />
       <PageHero
         eyebrow="About GenZRides"

@@ -22,30 +22,33 @@ export const formatBookingDetails = (booking) => {
   const cab =
     booking.vehicleType?.name || booking.driver?.vehicleType?.name || "N/A";
   const lines = [
-    `GenZRides Booking #${String(booking._id || "").slice(-8).toUpperCase()}`,
-    `Status: ${booking.bookingStatus || "N/A"}`,
-    `Customer: ${booking.customer?.name || booking.guestName || "N/A"}${
+    `🆔 GenZRides Booking Id: #${String(booking._id || "")
+      .slice(-8)
+      .toUpperCase()}`,
+    `📌 Status: ${booking.bookingStatus || "N/A"}`,
+    `👤 Customer: ${booking.customer?.name || booking.guestName || "N/A"}${
       booking.customer?.phone || booking.guestPhone
         ? ` (${booking.customer?.phone || booking.guestPhone})`
         : ""
     }`,
-    `Driver: ${booking.driver?.user?.name || "Not assigned"}${
+    `🚗 Driver: ${booking.driver?.user?.name || "Not assigned"}${
       booking.driver?.user?.phone ? ` (${booking.driver.user.phone})` : ""
     }`,
-    `Pickup: ${booking.pickup?.address || "N/A"}`,
-    `Drop: ${booking.drop?.address || "N/A"}`,
-    `Date & Time: ${formatDateTime(booking.pickupDateTime)}`,
-    `Trip Type: ${booking.tripType || "N/A"}`,
-    `Cab Type: ${cab}`,
-    `Distance: ${booking.distance != null ? `${Number(booking.distance).toFixed(1)} km` : "N/A"}`,
-    `Duration: ${booking.duration != null ? `${Math.ceil(Number(booking.duration))} min` : "N/A"}`,
-    `Fare: Rs.${booking.finalFare || booking.estimatedFare || 0}`,
-    `Payment: ${booking.paymentMethod || "Cash"} (${booking.paymentStatus || "Pending"})`,
+    `📍 Pickup: ${booking.pickup?.address || "N/A"}`,
+    `🏁 Drop: ${booking.drop?.address || "N/A"}`,
+    `🗓️ Date & Time: ${formatDateTime(booking.pickupDateTime)}`,
+    `🛣️ Trip Type: ${booking.tripType || "N/A"}`,
+    `🚙 Cab Type: ${cab}`,
+    `📏 Distance: ${booking.distance != null ? `${Number(booking.distance).toFixed(1)} km` : "N/A"}`,
+    `⏱️ Duration: ${booking.duration != null ? `${Math.ceil(Number(booking.duration))} min` : "N/A"}`,
+    `💵 Fare: Rs.${booking.finalFare || booking.estimatedFare || 0}`,
+    `💳 Payment: ${booking.paymentMethod || "Cash"} (${booking.paymentStatus || "Pending"})`,
+    `⚠️ Note: Please inform the customer that they are required to pay both the toll fee and the interstate permit fee.`,
   ];
-  if (booking.customerNotes) lines.push(`Note: ${booking.customerNotes}`);
+  if (booking.customerNotes) lines.push(`📝 Note: ${booking.customerNotes}`);
   if (booking.cancelReason)
     lines.push(
-      `Cancellation: ${booking.cancelledBy || ""} — ${booking.cancelReason}`.trim()
+      `❌ Cancellation: ${booking.cancelledBy || ""} — ${booking.cancelReason}`.trim(),
     );
   return lines.join("\n");
 };

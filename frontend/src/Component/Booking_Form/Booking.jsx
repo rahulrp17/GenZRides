@@ -3,6 +3,7 @@ import { FaCarSide, FaRetweet, FaMapMarkerAlt } from "react-icons/fa";
 import { motion as Motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { LoadScript, Autocomplete } from "@react-google-maps/api";
+import { GOOGLE_MAPS_LIBRARIES } from "../../utils/googleMaps";
 import { bookingAPI } from "../../services/endpoints";
 import "./Booking.css";
 
@@ -75,7 +76,7 @@ const Booking = () => {
   };
 
   return (
-    <LoadScript googleMapsApiKey={GOOGLE_MAPS_KEY} libraries={["places"]}>
+    <LoadScript googleMapsApiKey={GOOGLE_MAPS_KEY} libraries={GOOGLE_MAPS_LIBRARIES}>
       <div className="w-full flex items-center justify-center">
         <Motion.div
           initial={{ opacity: 0, y: 70 }}

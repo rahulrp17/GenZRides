@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { motion as Motion, useInView } from "framer-motion";
 import about from "../../assets/images/about.jpg";
-import about2 from "../../assets/images/about2.jpg";
+import about2 from "../../assets/images/about2.webp";
 import { FaCarSide } from "react-icons/fa";
 
 

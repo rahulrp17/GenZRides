@@ -24,7 +24,7 @@ const Footer = () => {
 
         {/* Logo & Contact */}
         <div>
-          <img src={GenZRides} alt="Logo" className="w-30 h-10 mb-4  rounded-[10px] object-fill ring-1 ring-green-500/40" />
+          <img src={GenZRides} alt="GenZRides cab service logo" className="w-30 h-10 mb-4  rounded-[10px] object-fill ring-1 ring-green-500/40" />
           {/* <p className="font-display text-lg font-bold text-white tracking-tight mb-3">
             GenZRides
           </p> */}

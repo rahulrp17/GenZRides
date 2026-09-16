@@ -213,7 +213,7 @@ const BookingTariff = () => {
         {/* Rules grid — responsive */}
         <div className="mt-8 sm:mt-10">
           <h3 className="font-display text-lg sm:text-xl font-bold text-white">Note — fare rules</h3>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">These match <span className="text-gray-300">fare.service.js FARE_CONFIG</span> — single source of truth.</p>
+          <p className=" hidden text-xs sm:text-sm text-gray-500 mt-1">These match <span className="text-gray-300">fare.service.js FARE_CONFIG</span> — single source of truth.</p>
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             {RULES.map((r, i) => (
               <Motion.div

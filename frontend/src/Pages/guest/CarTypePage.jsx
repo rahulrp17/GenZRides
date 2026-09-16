@@ -114,7 +114,7 @@ const CarTypePage = () => {
 
   return (
     <main className="bg-black text-white overflow-x-clip">
-      <SEO noindex title="Choose Your Car" />
+      <SEO noindex title="Choose Your Car" description="Pick your Sedan, SUV or premium cab with live upfront fares for your exact route." path="/booking/vehicles" />
       <Navbar />
       <PageHero
         eyebrow="Step 2 of 3 — Car Type"

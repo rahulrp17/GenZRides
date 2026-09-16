@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { GoogleMap, useJsApiLoader, Polyline } from '@react-google-maps/api';
+import { GOOGLE_MAPS_LIBRARIES } from '../../utils/googleMaps';
 import AdvancedMarker from '../../components/maps/AdvancedMarker';
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
@@ -153,7 +154,7 @@ const CurrentRideCustomer = () => {
   const [mapInstance, setMapInstance] = useState(null);
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: GOOGLE_MAPS_KEY,
-    libraries: ['marker'],
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
   const { data, isLoading, isError, error } = useQuery({

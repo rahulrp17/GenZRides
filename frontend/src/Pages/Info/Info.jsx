@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import SEO from "../../components/SEO";
+import { breadcrumbJsonLd } from "../../utils/StructuredData";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { useLocation, Link } from "react-router-dom";
 import {
@@ -118,6 +119,7 @@ const Info = () => {
         keywords="cab booking terms, taxi cancellation policy, cab service FAQs"
         path="/info"
         jsonLd={faqJsonLd}
+        breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Information",path:"/info"}])}
       />
       <PageHero
         eyebrow="Information"

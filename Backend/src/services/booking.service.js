@@ -584,6 +584,7 @@ export const cancelBooking = async (
       driver.isAvailable =
         driver.isOnline;
 
+      driver.totalTrips += 1;
       driver.cancelledTrips += 1;
 
       await driver.save();
@@ -755,6 +756,7 @@ export const driverCancelBooking = async (
 
   driver.isAvailable = driver.isOnline;
 
+  driver.totalTrips += 1;
   driver.cancelledTrips += 1;
 
   await driver.save();

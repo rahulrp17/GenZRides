@@ -146,7 +146,7 @@ const CustomerLayout = () => {
                   {user?.profileImage ? (
                     <img
                       src={user.profileImage}
-                      alt=""
+                      alt={`${user?.name || "Customer"} profile photo`}
                       className="w-9 h-9 rounded-full object-cover"
                     />
                   ) : (

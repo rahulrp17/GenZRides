@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import { FaFacebookF as FaFb, FaInstagram as FaIg, FaLinkedinIn as FaLi, FaTwitter as FaTw } from "react-icons/fa";
 import PageHero from "../../Component/Landing/PageHero";
-import SEO from "../../components/SEO";
+import SEO from "../../components/SEO"
+import { localBusinessJsonLd, breadcrumbJsonLd } from "../../utils/StructuredData";
 import { Reveal, GlowBlobs } from "../../Component/Landing/Reveal";
 import { hero10 } from "../../assets/images";
 
@@ -50,6 +51,8 @@ const ContactUs = () => {
         description="Contact GenZRides support anytime: +91 934830199, support@genzrides.com. Coimbatore, Tamil Nadu. Bookings, pricing and trip help."
         keywords="cab booking support, taxi helpline Tamil Nadu, contact cab service"
         path="/contact"
+        jsonLd={localBusinessJsonLd}
+        breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Contact",path:"/contact"}])}
       />
       <PageHero
         eyebrow="Contact GenZRides"
@@ -90,7 +93,7 @@ const ContactUs = () => {
                 {
                   icon: <MapPin size={26} />,
                   title: "Office Location",
-                  value: "Coimbatore, Tamil Nadu",
+                  value: "1/86 Ambalakara Street, Nehru Play Ground, Vengaimandalam, Trichy 621005, Tamil Nadu",
                   color: "from-orange-500 to-red-500",
                 },
                 {
