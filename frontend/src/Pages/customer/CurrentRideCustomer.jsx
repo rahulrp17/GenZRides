@@ -396,13 +396,18 @@ const CurrentRideCustomer = () => {
     }, 5000);
   }, [stopPolling]);
 
-  // Stop polling when ride ends
+  // Auto-refresh: start location polling as soon as an active ride is
+  // known — the customer never taps anything. Stops on ride end and on
+  // unmount (leaving the page). The map button remains as a pause/resume toggle.
   useEffect(() => {
     const status = booking?.bookingStatus;
-    if (status && ['Completed', 'Cancelled'].includes(status)) {
+    if (status && !['Completed', 'Cancelled'].includes(status)) {
+      startPolling();
+    } else {
       stopPolling();
     }
-  }, [booking?.bookingStatus, stopPolling]);
+    return () => stopPolling();
+  }, [booking?._id, booking?.bookingStatus, startPolling, stopPolling]);
 
   const handleSubmitReview = () => {
     if (!reviewRating) return toast.error('Please select a rating');
@@ -678,7 +683,7 @@ const CurrentRideCustomer = () => {
                     {lastUpdatedAtText && <span className="text-slate-300">· {lastUpdatedAtText}</span>}
                   </div>
                 )}
-                  {/* Refresh button — polls driver location every 5 s */}
+                  {/* Auto-refresh toggle — polling starts by itself on visit */}
                   <button
                     onClick={() => {
                       if (isPolling) stopPolling();
@@ -689,7 +694,7 @@ const CurrentRideCustomer = () => {
                         ? 'bg-emerald-600/80 text-white border-emerald-400'
                         : 'bg-black/70 text-white border-white/10 hover:bg-black/80'
                     }`}
-                    title={isPolling ? 'Stop polling' : 'Refresh driver location every 5s'}
+                    title={isPolling ? 'Auto-refresh on — tap to pause' : 'Auto-refresh paused — tap to resume'}
                   >
                     <RefreshCw size={14} className={isPolling ? 'animate-spin' : ''} />
                   </button>
