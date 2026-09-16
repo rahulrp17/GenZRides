@@ -397,14 +397,15 @@ export const createGuestBooking = async (guestData) => {
 
 export const getMyBookings = async (
   customerId,
-  { page = 1, limit = 12 } = {}
+  { page = 1, limit = 12, status } = {}
 ) => {
   const skip = (page - 1) * limit;
 
+  const query = { customer: customerId };
+  if (status) query.bookingStatus = status;
+
   const [bookings, total] = await Promise.all([
-    Booking.find({
-      customer: customerId,
-    })
+    Booking.find(query)
       .populate({
         path: "driver",
         populate: [
@@ -424,7 +425,7 @@ export const getMyBookings = async (
       .skip(skip)
       .limit(limit)
       .lean(),
-    Booking.countDocuments({ customer: customerId }),
+    Booking.countDocuments(query),
   ]);
 
   return {
