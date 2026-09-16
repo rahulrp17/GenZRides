@@ -74,7 +74,6 @@ export const getETA = async (origin, destination) => {
     throw new Error("Unable to calculate ETA.");
   }
 };
-
 export const reverseGeocode = async (latitude, longitude) => {
   try {
     const response = await axios.get(GOOGLE_GEOCODE_URL, {
@@ -86,6 +85,34 @@ export const reverseGeocode = async (latitude, longitude) => {
     return response.data.results[0].formatted_address;
   } catch (error) {
     console.error("Reverse Geocode Error:", error.response?.data || error.message);
+    return null;
+  }
+};
+
+/* ===========================================================
+   FORWARD GEOCODE: place name → coordinates.
+   Needed by the AI assistant (and anything else) that starts
+   from typed city names instead of map pins. Returns null —
+   never throws — so callers can reply with a friendly message.
+=========================================================== */
+
+export const geocodeAddress = async (address) => {
+  try {
+    if (!address || !String(address).trim()) return null;
+    const response = await axios.get(GOOGLE_GEOCODE_URL, {
+      params: { address: String(address).trim(), key: process.env.GOOGLE_MAPS_API_KEY },
+      timeout: REQUEST_TIMEOUT,
+    });
+
+    const best = response.data.results?.[0];
+    if (!best?.geometry?.location) return null;
+    return {
+      latitude: best.geometry.location.lat,
+      longitude: best.geometry.location.lng,
+      formattedAddress: best.formatted_address || String(address).trim(),
+    };
+  } catch (error) {
+    console.error("Geocode Error:", error.response?.data || error.message);
     return null;
   }
 };

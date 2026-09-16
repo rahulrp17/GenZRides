@@ -215,7 +215,7 @@ function App() {
         </Route>
         <Route path="*" element={<><Navbar /><NotFound /><Footer /></>} />
           </Routes>
-          <StickyMobileCTA />
+          {/* <StickyMobileCTA /> */}
           <CookieBanner />
         </Suspense>
       </RouteErrorBoundary>

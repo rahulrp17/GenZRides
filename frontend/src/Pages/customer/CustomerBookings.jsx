@@ -138,17 +138,17 @@ const CustomerBookings = () => {
             <select
               value={statusFilter}
               onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-              className="appearance-none bg-white/5 backdrop-blur-md border border-white/15 text-white rounded-xl pl-8 pr-8 py-2 text-sm outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 hover:border-green-500/30 hover:bg-white/8 transition-all cursor-pointer shadow-lg shadow-black/20 w-full sm:w-48"
+              className="appearance-none bg-gray-800 backdrop-blur-md border border-white/15 text-white rounded-xl pl-8 pr-8 py-2 text-sm outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 hover:border-green-500/30 hover:bg-white/8 transition-all cursor-pointer shadow-lg shadow-black/20 w-full sm:w-48"
             >
-              <option value="">All Status</option>
-              <option value="Pending">Pending</option>
-              <option value="Accepted">Accepted</option>
-              <option value="On The Way">On The Way</option>
-              <option value="Arrived">Arrived</option>
-              <option value="Started">Started</option>
-              <option value="Reached">Reached</option>
-              <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
+              <option value="" className="bg-gray-900 text-white">All Status</option>
+              <option value="Pending" className="bg-gray-900 text-white">Pending</option>
+              <option value="Accepted" className="bg-gray-900 text-white">Accepted</option>
+              <option value="On The Way" className="bg-gray-900 text-white">On The Way</option>
+              <option value="Arrived" className="bg-gray-900 text-white">Arrived</option>
+              <option value="Started" className="bg-gray-900 text-white">Started</option>
+              <option value="Reached" className="bg-gray-900 text-white">Reached</option>
+              <option value="Completed" className="bg-gray-900 text-white">Completed</option>
+              <option value="Cancelled" className="bg-gray-900 text-white">Cancelled</option>
             </select>
             <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>

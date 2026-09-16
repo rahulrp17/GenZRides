@@ -232,5 +232,5 @@ export const uploadAPI = {
 
 // ==================== AI ASSISTANT ====================
 export const aiAPI = {
-  chat: (message) => api.post('/ai/chat', { message }),
+  chat: (message, history = []) => api.post('/ai/chat', { message, history }),
 };

@@ -68,12 +68,17 @@ export default function AIAssistant() {
     if (!msg || loading) return;
 
     setError(null);
-    setMessages((prev) => [...prev, { role: "user", content: msg }]);
+    // Snapshot history BEFORE appending (last 6 turns for follow-up context).
+    let history = [];
+    setMessages((prev) => {
+      history = prev.slice(-6).map((m) => ({ role: m.role, content: m.content }));
+      return [...prev, { role: "user", content: msg }];
+    });
     setInput("");
     setLoading(true);
 
     try {
-      const { data } = await aiAPI.chat(msg);
+      const { data } = await aiAPI.chat(msg, history);
       if (data.success) {
         setMessages((prev) => [...prev, { role: "assistant", content: data.data.reply }]);
       } else {
