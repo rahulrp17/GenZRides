@@ -54,21 +54,24 @@ const ProfileCard = ({
     <Motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden bg-white/[0.04] backdrop-blur-xl rounded-[30px] border border-white/[0.08] p-6 sm:p-8"
+      className="relative overflow-hidden bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-[30px] border border-white/10 p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent" />
-      <div className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 blur-[100px]" />
+      <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent" />
+      <div className="pointer-events-none absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/15 blur-[100px] rounded-full" />
+      <div className="pointer-events-none absolute -bottom-28 -left-20 w-72 h-72 bg-blue-500/10 blur-[110px] rounded-full" />
 
       <div className="relative flex flex-col sm:flex-row sm:items-center gap-5">
         <div className="relative shrink-0 mx-auto sm:mx-0">
-          <div className={`w-24 h-24 rounded-full ${a.avatarBg} ring-2 ${a.avatarRing} flex items-center justify-center overflow-hidden`}>
-            {avatarSrc ? (
-              <img src={avatarSrc} alt={name || 'Profile'} className="w-full h-full object-cover" />
-            ) : (
-              <span className={`text-4xl font-bold ${a.avatarText}`}>
-                {name?.charAt(0)?.toUpperCase() || '?'}
-              </span>
-            )}
+          <div className="rounded-full bg-gradient-to-br from-emerald-400/60 via-white/10 to-emerald-600/40 p-[2.5px] shadow-[0_0_30px_rgba(16,185,129,0.25)]">
+            <div className={`w-24 h-24 rounded-full ${a.avatarBg} flex items-center justify-center overflow-hidden`}>
+              {avatarSrc ? (
+                <img src={avatarSrc} alt={name || 'Profile'} className="w-full h-full object-cover" />
+              ) : (
+                <span className={`text-4xl font-bold ${a.avatarText}`}>
+                  {name?.charAt(0)?.toUpperCase() || '?'}
+                </span>
+              )}
+            </div>
           </div>
           {onAvatarChange && (
             <label
@@ -136,9 +139,10 @@ const ProfileCard = ({
       {stats.length > 0 && (
         <div className="relative grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-6">
           {stats.map((s) => (
-            <div key={s.label} className="bg-black/25 border border-white/[0.07] rounded-2xl px-3 py-3 text-center min-w-0">
+            <div key={s.label} className="group relative overflow-hidden bg-black/30 border border-white/10 rounded-2xl px-3 py-3.5 text-center min-w-0 hover:border-emerald-500/30 transition-colors">
+              <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
               <p className="text-base sm:text-lg font-bold text-white truncate">{s.value}</p>
-              <p className="text-[10px] sm:text-[11px] text-gray-500 mt-0.5 truncate">{s.label}</p>
+              <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.14em] text-gray-500 mt-1 truncate">{s.label}</p>
             </div>
           ))}
         </div>

@@ -42,6 +42,7 @@ const requestWithdrawalSchema = z.object({
 });
 
 const updateProfileSchema = z.object({
+  vehicleType: z.string().length(24, 'Invalid vehicle type ID').regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId format').optional(),
   vehicleBrand: z.string().min(1).optional(),
   vehicleModel: z.string().min(1).optional(),
   vehicleColor: z.string().min(1).optional(),

@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { motion as Motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { User, Lock, Car } from 'lucide-react';
-import { driverAPI, userAPI, uploadAPI } from '../../services/endpoints';
+import { driverAPI, userAPI, uploadAPI, vehicleAPI } from '../../services/endpoints';
 import useAuth from '../../hooks/useAuth';
 import { CardSkeleton } from '../../components/shared/Skeleton';
 import ErrorState from '../../components/shared/ErrorState';
@@ -38,6 +38,27 @@ const DriverProfile = () => {
       return data;
     },
     staleTime: 60_000,
+  });
+
+  // Live trip counts (completed/decided) — the profile doc counters only
+  // ever counted completions, so Trips must come from statistics.
+  const { data: statistics } = useQuery({
+    queryKey: ['driverStats'],
+    queryFn: async () => {
+      const { data } = await driverAPI.getStatistics();
+      return data;
+    },
+    staleTime: 30_000,
+  });
+
+  // Cab-type options for the vehicle-type select (pre-selected below).
+  const { data: vehicleTypesData } = useQuery({
+    queryKey: ['vehicleTypes'],
+    queryFn: async () => {
+      const { data } = await vehicleAPI.getAll();
+      return data;
+    },
+    staleTime: 5 * 60_000,
   });
 
   const { register: registerPassword, handleSubmit: handleSubmitPassword, reset: resetPassword, formState: { errors: passwordErrors } } = useForm();
@@ -89,6 +110,14 @@ const DriverProfile = () => {
 
   const d = profile?.data || {};
   const vehicleType = typeof d.vehicleType === 'object' ? d.vehicleType : null;
+  const statsData = statistics?.data || {};
+  // Decided trips (completed + cancelled) from live statistics — the
+  // profile-doc totalTrips historically counted completions only.
+  const tripsCompleted = statsData.completedTrips ?? d.completedTrips ?? 0;
+  const tripsTotal = statsData.totalTrips ?? d.totalTrips ?? 0;
+  const vehicleOptions = (vehicleTypesData?.vehicles || [])
+    .filter((v) => v.isActive !== false)
+    .map((v) => ({ value: v._id, label: `${v.name}${v.seats ? ` — ${v.seats} seats` : ''}` }));
 
   const badges = [];
   if (d.approvalStatus) {
@@ -101,14 +130,13 @@ const DriverProfile = () => {
 
   const stats = [];
   if (d.rating != null) stats.push({ label: 'Rating', value: Number(d.rating).toFixed(1) });
-  if (d.completedTrips != null || d.totalTrips != null) {
-    stats.push({ label: 'Trips', value: `${d.completedTrips ?? 0}/${d.totalTrips ?? 0}` });
-  }
+  stats.push({ label: 'Trips', value: `${tripsCompleted}/${tripsTotal}` });
   if (vehicleType?.seats) stats.push({ label: 'Seats', value: vehicleType.seats });
   if (vehicleType?.name) stats.push({ label: 'Cab Type', value: vehicleType.name });
 
   const editDefaults = {
     name: user?.name || '',
+    vehicleType: vehicleType?._id || (typeof d.vehicleType === 'string' ? d.vehicleType : '') || '',
     vehicleBrand: d.vehicleBrand || '',
     vehicleModel: d.vehicleModel || '',
     vehicleColor: d.vehicleColor || '',
@@ -262,6 +290,14 @@ const DriverProfile = () => {
           },
           { name: 'email', label: 'Email', readOnly: true, readOnlyValue: user?.email, readOnlyNote: 'Email cannot be changed' },
           {
+            name: 'vehicleType',
+            label: 'Cab Type',
+            type: 'select',
+            options: vehicleOptions,
+            hint: vehicleType?.name ? `Currently: ${vehicleType.name} — changing cab type updates your fare slab` : 'Changing cab type updates your fare slab',
+            validation: { required: 'Please choose your cab type' },
+          },
+          {
             name: 'vehicleBrand',
             label: 'Vehicle Brand',
             placeholder: 'e.g. Maruti',
@@ -297,6 +333,7 @@ const DriverProfile = () => {
           updateMutation.mutateAsync({
             name: values.name,
             vehicle: {
+              vehicleType: values.vehicleType,
               vehicleBrand: values.vehicleBrand,
               vehicleModel: values.vehicleModel,
               vehicleColor: values.vehicleColor,

@@ -88,6 +88,12 @@ const BookRide = () => {
   const [, setDriverResponseTime] = useState(null);
   const [, setCurrentRide] = useState(null);
   const [createdBookingId, setCreatedBookingId] = useState(null);
+  // Ref mirror — the socket effect below closes over mount-time state,
+  // so without this every booking-updated event looks "new".
+  const createdBookingRef = useRef(null);
+  useEffect(() => {
+    createdBookingRef.current = createdBookingId;
+  }, [createdBookingId]);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelledInfo, setCancelledInfo] = useState(null);
@@ -128,6 +134,14 @@ const BookRide = () => {
     if (!socket) return;
 
     const handleBookingUpdated = (data) => {
+      // Ignore stale events for rides this page didn't create (e.g. review
+      // submission or payment updates on a just-completed ride) — otherwise
+      // a fresh "Book Again" visit bounces straight back to Current Ride.
+      // Terminal statuses never navigate either.
+      const eventId = data?.booking?._id;
+      const eventStatus = data?.booking?.bookingStatus;
+      if (!eventId || String(eventId) !== String(createdBookingRef.current)) return;
+      if (eventStatus && ['Completed', 'Cancelled'].includes(eventStatus)) return;
       setBookingData(data.booking);
       setBookingFlow("driver-accepted");
       setDriverResponseTime(Date.now());

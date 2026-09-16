@@ -4,7 +4,7 @@ import LoadingPage from "./components/shared/LoadingPage";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { trackPageview } from "./utils/analytics";
 import CookieBanner from "./components/CookieBanner";
-import StickyMobileCTA from "./components/StickyMobileCTA";
+// import StickyMobileCTA from "./components/StickyMobileCTA";
 
 import Navbar from "./Component/Navbar/Navbar";
 import Footer from "./Component/Footer/Footer";

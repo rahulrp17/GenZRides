@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Loader2, RotateCcw, X } from 'lucide-react';
+import { Loader2, RotateCcw, X, ChevronDown } from 'lucide-react';
 import Modal from '../shared/Modal';
 
 /**
@@ -79,14 +79,17 @@ const EditProfileModal = ({
                 {f.readOnlyNote && <p className="text-[11px] text-gray-500 mt-1">{f.readOnlyNote}</p>}
               </>
             ) : f.type === 'select' ? (
-              <select
-                {...register(f.name, f.validation)}
-                className={`w-full px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl outline-none [color-scheme:dark] ${ACCENT_RING[accent]}`}
-              >
-                {(f.options || []).map((o) => (
-                  <option key={o.value} value={o.value} className="bg-gray-900">{o.label}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  {...register(f.name, f.validation)}
+                  className={`w-full appearance-none pl-4 pr-10 py-2.5 bg-white/[0.06] backdrop-blur-md border border-white/15 text-white rounded-xl outline-none shadow-lg shadow-black/20 cursor-pointer transition-all hover:border-emerald-500/40 hover:bg-white/[0.08] [color-scheme:dark] ${ACCENT_RING[accent]}`}
+                >
+                  {(f.options || []).map((o) => (
+                    <option key={o.value} value={o.value} className="bg-gray-900 text-white">{o.label}</option>
+                  ))}
+                </select>
+                <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-400 pointer-events-none" />
+              </div>
             ) : (
               <input
                 type={f.type || 'text'}
