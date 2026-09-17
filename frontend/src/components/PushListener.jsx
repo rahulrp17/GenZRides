@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 import { useSocket } from "../Context/SocketContext";
 import useAuth from "../hooks/useAuth";
 import { showBrowserNotification } from "../utils/browserPush";
+import { playBookingAlert } from "../utils/alertSound";
 
 const detailsUrlFor = (role, bookingId) => {
   if (!bookingId) return null;
@@ -39,8 +40,20 @@ const PushListener = () => {
     if (!socket || !user) return;
     const role = user.role;
 
-    const alert = (title, message, bookingId) => {
-      if (
+    // Ask once for browser-notification permission at the exact moment it
+    // matters (an incoming ride request). After the user decides, this is
+    // a no-op. Without this, hidden-tab alerts vanish silently forever.
+    const ensureNotificationPermission = () => {
+      try {
+        if (typeof Notification !== "undefined" && Notification.permission === "default") {
+          Notification.requestPermission().catch(() => {});
+        }
+      } catch {
+        // unsupported — in-app toasts still work
+      }
+    };
+
+    const alert = (title, message, bookingId) => {      if (
         typeof document !== "undefined" &&
         document.hidden
       ) {
@@ -88,6 +101,9 @@ const PushListener = () => {
     // Driver-only: a booking was dispatched to this driver.
     const handleRideRequest = (booking) => {
       if (role !== "driver" || !booking) return;
+      // Audible alert first — the driver may be looking at another tab.
+      playBookingAlert();
+      ensureNotificationPermission();
       const cab = booking.vehicleType?.name
         ? ` (${booking.vehicleType.name})`
         : "";
@@ -104,6 +120,8 @@ const PushListener = () => {
     // Admin-only: a new guest/customer booking entered the queue.
     const handleNewBooking = (booking) => {
       if (role !== "admin") return;
+      playBookingAlert();
+      ensureNotificationPermission();
       alert(
         "New booking request",
         `${routeSummary(booking) || "A new booking"} needs a driver. Tap to review.`,
