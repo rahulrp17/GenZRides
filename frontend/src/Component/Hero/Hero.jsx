@@ -138,7 +138,7 @@ const Hero = () => {
           </Motion.div>
 
           <h1 className="font-editorial mt-5 text-[3rem] leading-[0.98] sm:text-7xl lg:text-[5.4rem] font-bold text-white tracking-tight">
-            <RevealLine delay={0.15}>Every Journey</RevealLine>
+            <RevealLine delay={0.15} className="lg:pb-3 md:pb-2 pb-1 ">Every Journey</RevealLine>
             <RevealLine delay={0.28}>
               <span className="italic font-semibold lg:text-[5.4rem] md:text-7xl text-[1.7rem] text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-emerald-400 to-teal-300">
                 Deserves a Better Ride.
