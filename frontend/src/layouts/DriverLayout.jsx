@@ -11,6 +11,7 @@ import { driverAPI } from '../services/endpoints';
 import SEO from '../components/SEO';
 import PushListener from '../components/PushListener';
 import AutoPushSync from '../components/AutoPushSync';
+import DriverLocationSharer from '../components/DriverLocationSharer';
 import { motion as Motion } from 'framer-motion';
 
 const navItems = [
@@ -244,6 +245,7 @@ const DriverLayout = () => {
         <main className="flex-1 min-w-0 w-full max-w-full overflow-x-clip p-4 sm:p-6">
           <PushListener />
           <AutoPushSync />
+          <DriverLocationSharer />
           <Outlet />
         </main>
       </div>
