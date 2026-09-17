@@ -4,6 +4,7 @@ import LoadingPage from "./components/shared/LoadingPage";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { trackPageview } from "./utils/analytics";
 import CookieBanner from "./components/CookieBanner";
+import SessionResume from "./components/SessionResume";
 // import StickyMobileCTA from "./components/StickyMobileCTA";
 
 import Navbar from "./Component/Navbar/Navbar";
@@ -127,6 +128,7 @@ function App() {
       <ScrollToTopHandler />
       <ScrollProgress />
       <RouteTracker />
+      <SessionResume />
 
       <RouteErrorBoundary>
         <Suspense fallback={<PageFallback />}>

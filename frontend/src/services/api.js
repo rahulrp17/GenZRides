@@ -130,9 +130,16 @@ api.interceptors.response.use(
         return Promise.reject(new Error(data.message || 'Token refresh failed'));
       } catch (refreshError) {
         processQueue(refreshError, null);
-        // Stale tokens after browser close/reopen must not linger.
-        clearAuthState();
-        redirectToLoginIfNeeded();
+        const refreshStatus = refreshError.response?.status;
+        // Only a server rejection (401/403) means the session is truly dead.
+        // Network errors, timeouts (e.g. backend cold-start after idle),
+        // 429s and 5xx must NEVER log the user out — tokens stay so the
+        // next attempt can retry the refresh instead of forcing a login.
+        if (refreshStatus === 401 || refreshStatus === 403) {
+          // Stale tokens after browser close/reopen must not linger.
+          clearAuthState();
+          redirectToLoginIfNeeded();
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
