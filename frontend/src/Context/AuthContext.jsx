@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { authAPI } from "../services/endpoints";
+import { authAPI, notificationAPI } from "../services/endpoints";
 
 const AuthContext = createContext(null);
 
@@ -57,6 +57,22 @@ export const AuthProvider = ({ children }) => {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  // Warm the navbar bell badge so it renders with a real count on first
+  // paint instead of popping in later. Fire-and-forget — navigation never
+  // waits for it; failures just leave the normal query to fetch on mount.
+  const warmNavbarBadge = () => {
+    queryClient
+      .prefetchQuery({
+        queryKey: ["unreadCount"],
+        queryFn: async () => {
+          const { data } = await notificationAPI.getUnreadCount();
+          return data;
+        },
+        staleTime: 30_000,
+      })
+      .catch(() => {});
+  };
+
   const login = async (credentials) => {
     const { data } = await authAPI.login(credentials);
     if (data.success) {
@@ -66,6 +82,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
       setUser(data.user);
+      warmNavbarBadge();
       return data;
     }
     throw new Error(data.message || "Login failed");
@@ -78,6 +95,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
       setUser(data.user);
+      warmNavbarBadge();
       return data;
     }
     throw new Error(data.message || "Registration failed");
