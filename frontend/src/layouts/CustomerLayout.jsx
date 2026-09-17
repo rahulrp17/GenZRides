@@ -168,7 +168,7 @@ const CustomerLayout = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 top-full mt-2 w-48 bg-gray-900/50  backdrop-blur-xl border border-green-700 rounded-xl shadow-2xl py-2"
+                    className="absolute right-0 top-full mt-2 w-48 bg-gray-900  backdrop-blur-xl border border-green-700 rounded-xl shadow-2xl py-2"
                   >
                     <NavLink
                       to="/customer/profile"

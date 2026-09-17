@@ -11,6 +11,26 @@ export const sendRideRequest = async (
   driverUserId,
   booking
 ) => {
+  // Persist first so the ride request ALWAYS lands in the driver's bell
+  // list — even if the socket emit below finds no connected tab. Done via
+  // createNotification directly (NOT notifyUser) so no second
+  // "notification" socket event fires — the ride-request toast stays the
+  // single realtime alert and nothing double-rings.
+  try {
+    const route = booking?.pickup?.address && booking?.drop?.address
+      ? `${booking.pickup.address} → ${booking.drop.address}`
+      : "New ride request";
+    await createNotification({
+      user: driverUserId,
+      title: "New ride request",
+      message: `${route}${booking?.estimatedFare ? ` · ₹${booking.estimatedFare}` : ""}`,
+      type: "Ride",
+      booking: booking?._id || booking || null,
+    });
+  } catch {
+    // persistence must never block dispatch
+  }
+
   let io;
 
   try {

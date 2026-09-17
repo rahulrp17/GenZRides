@@ -4,6 +4,7 @@ import User from "../src/models/User.js";
 import Vehicle from "../src/models/Vehicle.js";
 import DriverProfile from "../src/models/DriverProfile.js";
 import Booking from "../src/models/Booking.js";
+import Notification from "../src/models/Notification.js";
 import bcrypt from "bcryptjs";
 import {
   dispatchBooking,
@@ -24,6 +25,7 @@ let rejectedSedanDriver;
 let pendingSedanUser;
 let rejectedSedanUser;
 let sedanUser;
+let farSedanUser;
 let customerRef;
 let sedanBooking;
 let innovaBooking;
@@ -50,7 +52,7 @@ beforeAll(async () => {
   sedanUser = await mkUser("Sedan Driver", "sedandriver@test.com", "9876543241", "driver");
   const suvUser = await mkUser("Suv Driver", "suvdriver@test.com", "9876543242", "driver");
   const innovaUser = await mkUser("Innova Driver", "innovadriver@test.com", "9876543243", "driver");
-  const farSedanUser = await mkUser("Far Sedan Driver", "farsedan@test.com", "9876543244", "driver");
+  farSedanUser = await mkUser("Far Sedan Driver", "farsedan@test.com", "9876543244", "driver");
   pendingSedanUser = await mkUser("Pending Sedan", "pendingsedan@test.com", "9876543245", "driver");
   rejectedSedanUser = await mkUser("Rejected Sedan", "rejectedsedan@test.com", "9876543246", "driver");
 
@@ -144,6 +146,18 @@ describe("Dispatch vehicle-type targeting", () => {
     expect(queued).toContain(String(farSedanDriver._id));
     expect(queued).not.toContain(String(suvDriver._id));
     expect(queued).not.toContain(String(innovaDriver._id));
+  });
+
+  it("ride request is persisted to the offered driver's bell list", async () => {
+    // Queue order is most-recently-active first, so the far sedan driver
+    // (created last) gets the first offer — assert on them.
+    const rows = await Notification.find({
+      user: farSedanUser._id,
+      booking: sedanBooking._id,
+    });
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows[0].title).toBe("New ride request");
+    expect(rows[0].type).toBe("Ride");
   });
 
   it("dispatchBooking queues only the innova driver for an innova booking", async () => {
