@@ -192,7 +192,8 @@ const Navbar = () => {
       transition={{ duration: 0.7 }}
       className="fixed top-0 left-0 w-full z-50"
     >
-      <div className="bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_40px_rgba(0,0,0,0.45)]">
+      <div className="relative bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_40px_rgba(0,0,0,0.45)]">
+        <div aria-hidden className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-green-400/40 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3 lg:gap-4">
           {/* LEFT — Logo */}
           <div
@@ -303,7 +304,7 @@ const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/booking")}
-              className="flex items-center cursor-pointer  gap-1.5 text-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 xl:px-5 py-2 xl:py-2.5 rounded-full font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all whitespace-nowrap"
+              className="flex items-center cursor-pointer gap-1.5 text-sm bg-green-500 text-white px-4 xl:px-5 py-2 xl:py-2.5 rounded-full font-bold hover:bg-green-400 hover:shadow-[0_0_25px_rgba(74,222,128,0.5)] transition-all whitespace-nowrap"
             >
               Book <ArrowRight size={16} />
             </Motion.button>
@@ -451,67 +452,138 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu — premium glass dropdown */}
         <AnimatePresence>
           {isOpen && (
             <Motion.div
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.22 }}
+              initial={{ opacity: 0, y: -16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -16, scale: 0.98 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               ref={mobileMenuRef}
-              className="lg:hidden mx-4 mb-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[30px] shadow-2xl p-6 max-h-[70vh] overflow-y-auto"
+              className="lg:hidden mx-3 mb-3 rounded-[26px] bg-gradient-to-b from-white/15 via-white/[0.07] to-white/[0.03] p-px shadow-[0_25px_60px_rgba(0,0,0,0.6)] max-h-[72vh] overflow-y-auto"
             >
-              <div className="flex flex-col gap-1">
+              <div className="rounded-[25px] bg-[#0a0f0d]/90 backdrop-blur-2xl overflow-hidden">
+                <div aria-hidden className="h-px bg-gradient-to-r from-transparent via-green-400/60 to-transparent" />
+                <div className="flex flex-col gap-1 p-4 sm:p-5">
                 {user && (
-                  <div className="flex items-center gap-3 pb-4 mb-2 border-b border-white/10">
-                    {user?.profileImage ? (
-                      <img
-                        src={user.profileImage}
-                        alt=""
-                        className="w-11 h-11 rounded-full object-cover ring-1 ring-green-500/40"
-                      />
-                    ) : (
-                      <span className="w-11 h-11 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-white font-bold flex items-center justify-center text-lg">
-                        {avatarLetter}
-                      </span>
-                    )}
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">
+                  <Motion.div
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 }}
+                    className="flex items-center gap-3 p-3 mb-2 rounded-2xl bg-white/[0.04] border border-white/10"
+                  >
+                    <span className="rounded-full bg-gradient-to-br from-green-400/60 via-white/10 to-emerald-600/40 p-[2px]">
+                      {user?.profileImage ? (
+                        <img
+                          src={user.profileImage}
+                          alt=""
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-white font-bold flex items-center justify-center text-base">
+                          {avatarLetter}
+                        </span>
+                      )}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-white truncate">
                         {user?.name}
                       </p>
-                      <p className="text-xs text-green-400 capitalize">
+                      <p className="text-[11px] text-green-400 capitalize tracking-wider">
                         {user?.role}
                       </p>
                     </div>
-                  </div>
+                    <button
+                      onClick={() => {
+                        navigate(notifPath);
+                        setIsOpen(false);
+                      }}
+                      className="relative p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-300"
+                      aria-label="Notifications"
+                    >
+                      <Bell size={17} />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 min-w-4 h-4 px-0.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white text-[10px] font-bold flex items-center justify-center">
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                      )}
+                    </button>
+                  </Motion.div>
                 )}
 
-                {menuItems.map((item) => (
-                  <NavLink
+                {menuItems.map((item, i) => (
+                  <Motion.div
                     key={item.path}
-                    to={item.path}
-                    onClick={() => setIsOpen(false)}
-                    className={({ isActive }) =>
-                      `text-base py-2 ${
-                        isActive ? "text-green-400 font-bold" : "text-gray-300"
-                      }`
-                    }
+                    initial={{ opacity: 0, x: -14 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.08 + i * 0.045, duration: 0.3 }}
                   >
-                    {item.label}
-                  </NavLink>
+                    <NavLink
+                      to={item.path}
+                      onClick={() => setIsOpen(false)}
+                      className={({ isActive }) =>
+                        `group flex items-center gap-3 rounded-2xl px-3.5 py-3 transition-all ${
+                          isActive
+                            ? "bg-green-500/10 border border-green-500/25"
+                            : "border border-transparent hover:bg-white/5"
+                        }`
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <span
+                            className={`w-1 self-stretch rounded-full transition-all ${
+                              isActive
+                                ? "bg-gradient-to-b from-green-400 to-emerald-600 shadow-[0_0_10px_rgba(34,197,94,0.8)]"
+                                : "bg-white/10 group-hover:bg-white/20"
+                            }`}
+                            aria-hidden
+                          />
+                          <span
+                            className={`font-display text-[17px] tracking-tight ${
+                              isActive ? "text-green-400 font-bold" : "text-gray-200 font-medium"
+                            }`}
+                          >
+                            {item.label}
+                          </span>
+                          <ArrowRight
+                            size={15}
+                            className={`ml-auto transition-all ${
+                              isActive
+                                ? "text-green-400 translate-x-0 opacity-100"
+                                : "-translate-x-1 text-gray-600 opacity-0 group-hover:translate-x-0 group-hover:opacity-60"
+                            }`}
+                          />
+                        </>
+                      )}
+                    </NavLink>
+                  </Motion.div>
                 ))}
 
-                <button
-                  onClick={() => setMobileTransportOpen((v) => !v)}
-                  className="flex items-center justify-between w-full text-base py-2 text-gray-300"
+                <Motion.div
+                  initial={{ opacity: 0, x: -14 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.08 + menuItems.length * 0.045, duration: 0.3 }}
                 >
-                  <span>Transport</span>
-                  <ChevronDown
-                    size={16}
-                    className={`transition-transform ${mobileTransportOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+                  <button
+                    onClick={() => setMobileTransportOpen((v) => !v)}
+                    className={`flex items-center justify-between w-full rounded-2xl px-3.5 py-3 border transition-all ${
+                      mobileTransportOpen
+                        ? "bg-green-500/10 border-green-500/25 text-green-300"
+                        : "border-transparent text-gray-200 hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="w-1 self-stretch rounded-full bg-white/10" aria-hidden />
+                      <span className="font-display text-[17px] font-medium tracking-tight">Transport</span>
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform ${mobileTransportOpen ? "rotate-180 text-green-400" : "text-gray-500"}`}
+                    />
+                  </button>
+                </Motion.div>
                 <AnimatePresence>
                   {mobileTransportOpen && (
                     <Motion.div
@@ -542,15 +614,21 @@ const Navbar = () => {
                   )}
                 </AnimatePresence>
 
-                <button
-                  onClick={() => {
-                    navigate("/booking");
-                    setIsOpen(false);
-                  }}
-                  className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full py-3 mt-3 font-semibold"
+                <Motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.32, duration: 0.3 }}
+                  className="mt-3 pt-4 border-t border-white/10 space-y-2.5"
                 >
-                  Book a Ride <ArrowRight size={18} />
-                </button>
+                  <button
+                    onClick={() => {
+                      navigate("/booking");
+                      setIsOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-2 w-full bg-green-500 text-black rounded-2xl py-3.5 font-bold hover:bg-green-400 hover:shadow-[0_0_30px_rgba(74,222,128,0.4)] transition-all"
+                  >
+                    Book a Ride <ArrowRight size={18} />
+                  </button>
 
                 {user ? (
                   <>
@@ -559,7 +637,7 @@ const Navbar = () => {
                         navigate(profilePath);
                         setIsOpen(false);
                       }}
-                      className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white rounded-full py-3 mt-2 font-semibold"
+                      className="flex items-center justify-center gap-2 w-full bg-white/5 border border-white/10 text-white rounded-2xl py-3 font-semibold hover:bg-white/10 transition-all"
                     >
                       <User size={18} /> My Profile
                     </button>
@@ -568,7 +646,7 @@ const Navbar = () => {
                         navigate(dashboardPath);
                         setIsOpen(false);
                       }}
-                      className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white rounded-full py-3 mt-2 font-semibold"
+                      className="flex items-center justify-center gap-2 w-full bg-white/5 border border-white/10 text-white rounded-2xl py-3 font-semibold hover:bg-white/10 transition-all"
                     >
                       <LayoutDashboard size={18} /> Dashboard
                     </button>
@@ -578,14 +656,14 @@ const Navbar = () => {
                           navigate("/driver/continue");
                           setIsOpen(false);
                         }}
-                        className="border border-green-500/50 text-green-400 rounded-full py-3 mt-2 font-semibold"
+                        className="w-full border border-green-500/50 text-green-400 rounded-2xl py-3 font-semibold hover:bg-green-500/10 transition-all"
                       >
                         Drive With Us
                       </button>
                     )}
                     <button
                       onClick={handleLogout}
-                      className="flex items-center justify-center gap-2 border border-white/10 text-red-400 rounded-full py-3 mt-2 transition-all"
+                      className="flex items-center justify-center gap-2 w-full border border-red-500/25 text-red-400 rounded-2xl py-3 font-semibold hover:bg-red-500/10 transition-all"
                     >
                       <LogOut size={18} /> Logout
                     </button>
@@ -597,7 +675,7 @@ const Navbar = () => {
                         navigate("/driver/continue");
                         setIsOpen(false);
                       }}
-                      className="border border-green-500/50 text-green-400 rounded-full py-3 mt-2 font-semibold"
+                      className="w-full border border-green-500/50 text-green-400 rounded-2xl py-3 font-semibold hover:bg-green-500/10 transition-all"
                     >
                       Drive With Us
                     </button>
@@ -606,14 +684,16 @@ const Navbar = () => {
                         navigate("/signup");
                         setIsOpen(false);
                       }}
-                      className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full py-3 mt-2 font-semibold"
+                      className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl py-3 font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.4)] transition-all"
                     >
                       Sign Up
                     </button>
                   </>
                 )}
-              </div>
-            </Motion.div>
+              </Motion.div>
+            </div>
+          </div>
+          </Motion.div>
           )}
         </AnimatePresence>
       </div>
