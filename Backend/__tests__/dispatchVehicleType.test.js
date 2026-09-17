@@ -7,7 +7,8 @@ import Booking from "../src/models/Booking.js";
 import bcrypt from "bcryptjs";
 import {
   dispatchBooking,
-  findNearbyDrivers,
+  findEligibleDrivers,
+  acceptBooking,
 } from "../src/services/dispatch.service.js";
 
 let mongoServer;
@@ -17,6 +18,13 @@ let innovaVehicle;
 let sedanDriver;
 let suvDriver;
 let innovaDriver;
+let farSedanDriver;
+let pendingSedanDriver;
+let rejectedSedanDriver;
+let pendingSedanUser;
+let rejectedSedanUser;
+let sedanUser;
+let customerRef;
 let sedanBooking;
 let innovaBooking;
 
@@ -38,9 +46,13 @@ beforeAll(async () => {
     User.create({ name, email, phone, password: hashedPassword, role });
 
   const customer = await mkUser("Dispatch Cust", "dispatchcust@test.com", "9876543240", "customer");
-  const sedanUser = await mkUser("Sedan Driver", "sedandriver@test.com", "9876543241", "driver");
+  customerRef = customer;
+  sedanUser = await mkUser("Sedan Driver", "sedandriver@test.com", "9876543241", "driver");
   const suvUser = await mkUser("Suv Driver", "suvdriver@test.com", "9876543242", "driver");
   const innovaUser = await mkUser("Innova Driver", "innovadriver@test.com", "9876543243", "driver");
+  const farSedanUser = await mkUser("Far Sedan Driver", "farsedan@test.com", "9876543244", "driver");
+  pendingSedanUser = await mkUser("Pending Sedan", "pendingsedan@test.com", "9876543245", "driver");
+  rejectedSedanUser = await mkUser("Rejected Sedan", "rejectedsedan@test.com", "9876543246", "driver");
 
   const mkVehicle = (name) =>
     Vehicle.create({
@@ -59,7 +71,7 @@ beforeAll(async () => {
   suvVehicle = await mkVehicle("SUV");
   innovaVehicle = await mkVehicle("Innova");
 
-  const mkProfile = (user, vehicle, aadhaar, license, number) =>
+  const mkProfile = (user, vehicle, aadhaar, license, number, location, approval = "Approved") =>
     DriverProfile.create({
       user: user._id,
       aadhaarNumber: aadhaar,
@@ -70,14 +82,19 @@ beforeAll(async () => {
       vehicleColor: "White",
       vehicleYear: 2022,
       vehicleNumber: number,
-      approvalStatus: "Approved",
+      approvalStatus: approval,
       isOnline: true,
       isAvailable: true,
-      currentLocation: point(80.2, 13.0),
+      currentLocation: location || point(80.2, 13.0),
     });
   sedanDriver = await mkProfile(sedanUser, sedanVehicle, "111111111111", "DL1111111111", "KA01AA1111");
   suvDriver = await mkProfile(suvUser, suvVehicle, "222222222222", "DL2222222222", "KA01AA2222");
   innovaDriver = await mkProfile(innovaUser, innovaVehicle, "333333333333", "DL3333333333", "KA01AA3333");
+  // Same cab type but ~1500 km away (and one with no GPS fix at all):
+  // distance must NOT exclude them.
+  farSedanDriver = await mkProfile(farSedanUser, sedanVehicle, "444444444444", "DL4444444444", "KA01AA4444", point(77.2, 28.6));
+  pendingSedanDriver = await mkProfile(pendingSedanUser, sedanVehicle, "555555555555", "DL5555555555", "KA01AA5555", undefined, "Pending");
+  rejectedSedanDriver = await mkProfile(rejectedSedanUser, sedanVehicle, "666666666666", "DL6666666666", "KA01AA6666", undefined, "Rejected");
 
   sedanBooking = await Booking.create({
     customer: customer._id,
@@ -105,19 +122,26 @@ afterAll(async () => {
 });
 
 describe("Dispatch vehicle-type targeting", () => {
-  it("findNearbyDrivers returns only matching-type drivers", async () => {
-    const drivers = await findNearbyDrivers(13.0, 80.2, 5000, sedanVehicle._id);
+  it("findEligibleDrivers returns only matching-type drivers", async () => {
+    const drivers = await findEligibleDrivers(sedanVehicle._id);
     const ids = drivers.map((d) => String(d._id));
     expect(ids).toContain(String(sedanDriver._id));
     expect(ids).not.toContain(String(suvDriver._id));
     expect(ids).not.toContain(String(innovaDriver._id));
   });
 
-  it("dispatchBooking queues only the sedan driver for a sedan booking", async () => {
+  it("distance does not exclude: far-away same-type driver is included", async () => {
+    const drivers = await findEligibleDrivers(sedanVehicle._id);
+    const ids = drivers.map((d) => String(d._id));
+    expect(ids).toContain(String(farSedanDriver._id));
+  });
+
+  it("dispatchBooking queues only the sedan drivers for a sedan booking", async () => {
     const result = await dispatchBooking(sedanBooking._id, 13.0, 80.2);
     expect(result.success).toBe(true);
     const queued = result.booking.driverQueue.map(String);
     expect(queued).toContain(String(sedanDriver._id));
+    expect(queued).toContain(String(farSedanDriver._id));
     expect(queued).not.toContain(String(suvDriver._id));
     expect(queued).not.toContain(String(innovaDriver._id));
   });
@@ -129,5 +153,35 @@ describe("Dispatch vehicle-type targeting", () => {
     expect(queued).toContain(String(innovaDriver._id));
     expect(queued).not.toContain(String(sedanDriver._id));
     expect(queued).not.toContain(String(suvDriver._id));
+  });
+
+  it("approval gates eligibility: pending and rejected are excluded", async () => {
+    const drivers = await findEligibleDrivers(sedanVehicle._id);
+    const ids = drivers.map((d) => String(d._id));
+    expect(ids).not.toContain(String(pendingSedanDriver._id));
+    expect(ids).not.toContain(String(rejectedSedanDriver._id));
+  });
+
+  it("only verified drivers can accept; pending and rejected cannot", async () => {
+    const mkSedanBooking = () =>
+      Booking.create({
+        customer: customerRef._id,
+        pickup: loc("Pickup"),
+        drop: loc("Drop"),
+        pickupDateTime: new Date(),
+        vehicleType: sedanVehicle._id,
+        bookingStatus: "Pending",
+      });
+
+    // Approved control: accepts fine.
+    const b0 = await mkSedanBooking();
+    const accepted = await acceptBooking(b0._id, sedanUser._id);
+    expect(accepted.booking.bookingStatus).toBe("Accepted");
+
+    const b1 = await mkSedanBooking();
+    await expect(acceptBooking(b1._id, pendingSedanUser._id)).rejects.toThrow(/not approved/i);
+
+    const b2 = await mkSedanBooking();
+    await expect(acceptBooking(b2._id, rejectedSedanUser._id)).rejects.toThrow(/not approved|rejected/i);
   });
 });

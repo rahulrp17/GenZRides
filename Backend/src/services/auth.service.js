@@ -130,6 +130,7 @@ export const loginUser = async (email, password, userAgent = "") => {
       .populate("vehicleType", "name seats image");
 
     if (!driverProfile) throw new Error("Driver profile not found.");
+    // Only verified (approved) drivers may log in or use the driver app.
     if (driverProfile.approvalStatus === "Pending") {
       throw new Error("Your account is waiting for admin approval.");
     }

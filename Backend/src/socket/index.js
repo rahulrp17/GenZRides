@@ -131,6 +131,7 @@ export const initializeSocket = (server) => {
     if (socket.user.role === "driver") {
       try {
         const driver = await DriverProfile.findOne({ user: socket.user._id });
+        // Approval gates the app: only verified drivers go online.
         if (driver && driver.approvalStatus === "Approved") {
           // If driver already has an active ride (Accepted/On The Way/Arrived/Started/Reached), keep busy
           let hasActiveRide = !!driver.currentRide;

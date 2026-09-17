@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -65,6 +65,36 @@ const DriverBookingDetail = () => {
   const booking = data?.booking;
   const profile = profileData?.data;
   const { copied, copyBooking } = useCopyBooking();
+
+  // Location gate: accepting requires a live GPS fix (used for dispatch
+  // accuracy and trip tracking). 'needed' shows the enable-location prompt.
+  const [locCheck, setLocCheck] = useState('idle');
+
+  const handleAccept = () => {
+    if (acceptMutation.isPending || locCheck === 'checking') return;
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setLocCheck('needed');
+      return;
+    }
+    setLocCheck('checking');
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        // Seed the backend with this fix (best-effort), then accept.
+        try {
+          await driverAPI.updateLocation({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+          });
+        } catch {
+          // Non-fatal: accept proceeds with the verified live fix.
+        }
+        setLocCheck('idle');
+        acceptMutation.mutate();
+      },
+      () => setLocCheck('needed'),
+      { enableHighAccuracy: false, maximumAge: 60_000, timeout: 10_000 }
+    );
+  };
 
   if (isError) {
     return <ErrorState message={error?.response?.data?.message || error?.message || 'Failed to load booking'} />;
@@ -236,17 +266,41 @@ const DriverBookingDetail = () => {
               </div>
             )}
 
+            {locCheck !== 'idle' && (
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex items-center gap-3">
+                <MapPin size={18} className="text-blue-400 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-blue-300">
+                    {locCheck === 'checking' ? 'Getting your location…' : 'Location is off'}
+                  </p>
+                  {locCheck === 'needed' && (
+                    <p className="text-xs text-blue-400/80 mt-0.5">
+                      Turn on location to accept rides. Tap below, then choose “Allow”. If blocked, enable it in your browser’s Site settings.
+                    </p>
+                  )}
+                </div>
+                {locCheck === 'needed' && (
+                  <button
+                    onClick={handleAccept}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
+                  >
+                    Enable Location
+                  </button>
+                )}
+              </div>
+            )}
+
             <button
-              onClick={() => acceptMutation.mutate()}
-              disabled={acceptMutation.isPending || !isOnline || !isAvailable}
+              onClick={handleAccept}
+              disabled={acceptMutation.isPending || locCheck === 'checking' || !isOnline || !isAvailable}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-600/50 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-colors"
             >
-              {acceptMutation.isPending ? (
+              {acceptMutation.isPending || locCheck === 'checking' ? (
                 <Loader2 size={18} className="animate-spin" />
               ) : (
                 <CheckCircle size={18} />
               )}
-              {acceptMutation.isPending ? 'Accepting...' : 'Accept Booking Request'}
+              {acceptMutation.isPending ? 'Accepting...' : locCheck === 'checking' ? 'Locating…' : 'Accept Booking Request'}
             </button>
           </div>
         )}

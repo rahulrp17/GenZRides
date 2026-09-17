@@ -217,7 +217,7 @@ export const createBooking = async (
   notifyAdminOfBookingEmail(populatedBooking).catch(() => {});
 
   // VERBOSE: Auto-dispatch to matching vehicle-type drivers only
-  // Sedan→Sedan, SUV→SUV, Innova→Innova (via dispatch.service findNearbyDrivers vehicleType filter)
+  // Sedan→Sedan, SUV→SUV, Innova→Innova (via dispatch.service findEligibleDrivers vehicleType filter)
   // Admin still gets all bookings via emitToAdmins in booking.controller; this dispatch is driver-only.
   // Best-effort: never breaks booking creation.
   tryAutoDispatch(populatedBooking).catch(() => {});

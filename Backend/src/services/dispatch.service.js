@@ -5,33 +5,24 @@ import { notifyUser } from "./notification.service.js";
 import { sendRideRequest } from "./notification.service.js";
 
 /* ===========================================================
-   FIND NEARBY DRIVERS
+   FIND ELIGIBLE DRIVERS (NO DISTANCE FILTER)
+   Business rule: a booking reaches EVERY online + available driver
+   whose registered cab type matches — wherever they are. Proximity
+   is intentionally NOT a criterion (outstation/intercity trips need
+   non-local drivers too). Most-recently-active drivers are offered first.
 =========================================================== */
 
-export const findNearbyDrivers = async (
-  latitude,
-  longitude,
-  radius = 5000,
+export const findEligibleDrivers = async (
   vehicleTypeId = null
 ) => {
   // Vehicle-type filter: a booking must only reach drivers whose registered
   // cab type matches the customer's chosen vehicleType
   // (Sedan → Sedan, SUV → SUV, Innova → Innova, etc.).
   const query = {
+    // Only verified (approved) drivers are eligible.
     approvalStatus: "Approved",
     isOnline: true,
     isAvailable: true,
-
-    currentLocation: {
-      $near: {
-        $geometry: {
-          type: "Point",
-          coordinates: [longitude, latitude],
-        },
-
-        $maxDistance: radius,
-      },
-    },
   };
 
   if (vehicleTypeId) {
@@ -41,13 +32,14 @@ export const findNearbyDrivers = async (
   const drivers = await DriverProfile.find(query)
     .populate("user", "name phone profileImage")
     .populate("vehicleType")
+    .sort({ updatedAt: -1 })
     .limit(10)
     .lean();
 
   // VERBOSE: log vehicle-type routing result
   if (process.env.VERBOSE === "true" || process.env.NODE_ENV !== "production") {
     const typeStr = vehicleTypeId ? String(vehicleTypeId) : "ANY";
-    console.log(`[findNearbyDrivers] vehicleType=${typeStr} found=${drivers.length} drivers=${drivers.map(d=>`${d.user?.name||d._id}:${d.vehicleType?.name}`).join(",")}`);
+    console.log(`[findEligibleDrivers] vehicleType=${typeStr} found=${drivers.length} drivers=${drivers.map(d=>`${d.user?.name||d._id}:${d.vehicleType?.name}`).join(",")}`);
   }
 
   return drivers;
@@ -92,12 +84,10 @@ export const dispatchBooking = async (
 
   // Only drivers whose registered cab type matches the booking's
   // vehicleType are eligible — never send an SUV booking to a Sedan
-  // driver (or any other cross-type assignment).
+  // driver (or any other cross-type assignment). No distance filter:
+  // every matching online driver is offered, wherever they are.
   const nearbyDrivers =
-    await findNearbyDrivers(
-      latitude,
-      longitude,
-      5000,
+    await findEligibleDrivers(
       booking.vehicleType?._id || booking.vehicleType
     );
 
@@ -108,7 +98,7 @@ export const dispatchBooking = async (
     return {
       success: false,
       message:
-        `No nearby ${cabType} drivers available.`,
+        `No online ${cabType} drivers available right now.`,
     };
   }
 

@@ -5,7 +5,7 @@ import Vehicle from "../src/models/Vehicle.js";
 import DriverProfile from "../src/models/DriverProfile.js";
 import Booking from "../src/models/Booking.js";
 import {
-  findNearbyDrivers,
+  findEligibleDrivers,
   acceptBooking,
 } from "../src/services/dispatch.service.js";
 import { assignDriver } from "../src/services/admin.service.js";
@@ -138,24 +138,14 @@ afterAll(async () => {
 });
 
 describe("Vehicle-type dispatch filtering", () => {
-  it("findNearbyDrivers returns only drivers of the requested cab type", async () => {
-    const suvDrivers = await findNearbyDrivers(
-      13.08,
-      80.27,
-      5000,
-      suvVehicle._id
-    );
+  it("findEligibleDrivers returns only drivers of the requested cab type", async () => {
+    const suvDrivers = await findEligibleDrivers(suvVehicle._id);
     expect(suvDrivers.length).toBe(1);
     expect(suvDrivers[0].vehicleType._id.toString()).toBe(
       suvVehicle._id.toString()
     );
 
-    const sedanDrivers = await findNearbyDrivers(
-      13.08,
-      80.27,
-      5000,
-      sedanVehicle._id
-    );
+    const sedanDrivers = await findEligibleDrivers(sedanVehicle._id);
     expect(sedanDrivers.length).toBe(1);
     expect(sedanDrivers[0].vehicleType._id.toString()).toBe(
       sedanVehicle._id.toString()
