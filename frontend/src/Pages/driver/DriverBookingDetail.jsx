@@ -271,22 +271,14 @@ const DriverBookingDetail = () => {
                 <MapPin size={18} className="text-blue-400 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-blue-300">
-                    {locCheck === 'checking' ? 'Getting your location…' : 'Location is off'}
+                    {locCheck === 'checking' ? 'Getting your location…' : 'Please enable location to accept booking.'}
                   </p>
                   {locCheck === 'needed' && (
                     <p className="text-xs text-blue-400/80 mt-0.5">
-                      Turn on location to accept rides. Tap below, then choose “Allow”. If blocked, enable it in your browser’s Site settings.
+                      Turn on location, then tap Accept again. If blocked, allow it in your browser’s Site settings.
                     </p>
                   )}
                 </div>
-                {locCheck === 'needed' && (
-                  <button
-                    onClick={handleAccept}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
-                  >
-                    Enable Location
-                  </button>
-                )}
               </div>
             )}
 
