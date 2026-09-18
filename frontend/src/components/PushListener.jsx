@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { useSocket } from "../Context/SocketContext";
 import useAuth from "../hooks/useAuth";
 import { showBrowserNotification } from "../utils/browserPush";
-import { playBookingAlert } from "../utils/alertSound";
+import { bookingAlert } from "../utils/bookingAlert";
 
 const detailsUrlFor = (role, bookingId) => {
   if (!bookingId) return null;
@@ -99,10 +99,9 @@ const PushListener = () => {
     };
 
     // Driver-only: a booking was dispatched to this driver.
+    // Priority event: toast + native notification + sound together.
     const handleRideRequest = (booking) => {
       if (role !== "driver" || !booking) return;
-      // Audible alert first — the driver may be looking at another tab.
-      playBookingAlert();
       ensureNotificationPermission();
       const cab = booking.vehicleType?.name
         ? ` (${booking.vehicleType.name})`
@@ -110,7 +109,7 @@ const PushListener = () => {
       const fare = booking.estimatedFare
         ? ` · ₹${booking.estimatedFare}`
         : "";
-      alert(
+      bookingAlert(
         "New ride request",
         `${routeSummary(booking) || "A customer needs a ride"}${cab}${fare}. Tap to view.`,
         bookingIdOf(booking)
@@ -118,11 +117,11 @@ const PushListener = () => {
     };
 
     // Admin-only: a new guest/customer booking entered the queue.
+    // Priority event: toast + native notification + sound together.
     const handleNewBooking = (booking) => {
       if (role !== "admin") return;
-      playBookingAlert();
       ensureNotificationPermission();
-      alert(
+      bookingAlert(
         "New booking request",
         `${routeSummary(booking) || "A new booking"} needs a driver. Tap to review.`,
         bookingIdOf(booking)

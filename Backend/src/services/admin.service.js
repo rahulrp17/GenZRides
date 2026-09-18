@@ -410,10 +410,13 @@ export const getDriverById = async (driverId) => {
 /* ================= Approve Driver ================= */
 
 export const approveDriver = async (driverId) => {
+  // Approving the driver also verifies their documents — one admin action
+  // moves Docs, Approval and Overall to Approved together.
   const driver = await DriverProfile.findByIdAndUpdate(
     driverId,
     {
       approvalStatus: "Approved",
+      "documents.documentVerification": "Verified",
     },
     {
       new: true,

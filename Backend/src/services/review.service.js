@@ -51,19 +51,23 @@ export const createReview = async (
   });
 
   /* =====================================
-     UPDATE DRIVER AVERAGE RATING
+     UPDATE DRIVER AVERAGE RATING + COUNT
+     Both are recomputed from all reviews so the counters self-heal
+     even for drivers rated before counting existed.
   ===================================== */
 
   const agg = await Review.aggregate([
     { $match: { driver: booking.driver } },
-    { $group: { _id: null, avg: { $avg: "$rating" } } },
+    { $group: { _id: null, avg: { $avg: "$rating" }, count: { $sum: 1 } } },
   ]);
   const average = agg[0]?.avg || rating;
+  const totalRatings = agg[0]?.count || 1;
 
   await DriverProfile.findByIdAndUpdate(
     booking.driver,
     {
       rating: Number(average.toFixed(1)),
+      totalRatings,
     }
   );
 

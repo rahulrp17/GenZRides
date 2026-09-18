@@ -41,3 +41,30 @@ Shutdown sequence (clean, ordered by dependency)
 opencode -s ses_fa9da9a9cffe03VY7hYVrcPn5O
 
 opencode -s ses_f888c9caeffehYIZM4Ts6JHGc4
+
+
+Graphify: Upgrade the GenZRides AI assistant to understand Tamil + Tanglish naturally.
+
+Examples:
+- "Trichy airport la irundhu Chennai ku cab venum"
+- "Trichy to Madurai cab price enna?"
+- "Naalaiku morning Chennai poganum"
+- "எனக்கு திருச்சியிலிருந்து சென்னை கேப் வேண்டும்"
+
+Requirements:
+- Detect English, Tamil, Tanglish, and mixed messages automatically.
+- Understand common Tamil/Tanglish spelling variations and locations.
+- Extract intent: pickup, drop, date/time, trip type, vehicle, fare, booking.
+- Reply naturally in the user's language/style.
+- Preserve existing booking/API/business logic; do not invent data.
+- If required information is missing, ask only for the missing detail.
+- Use existing backend fare/booking APIs for real values.
+- Keep English support fully working.
+- Add test cases for Tamil, Tanglish, mixed-language and English queries.
+- Verify end-to-end AI responses and booking flow.
+
+For example, the assistant should understand:
+
+User: Trichy airport la irundhu Chennai ku cab venum
+
+AI: Sure! Trichy Airport → Chennai cab book panna mudiyum. 😊 Travel date and pickup time sollunga.

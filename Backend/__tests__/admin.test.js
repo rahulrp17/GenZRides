@@ -147,4 +147,53 @@ describe("Admin Endpoints", () => {
       expect(res.status).toBe(401);
     });
   });
+
+  describe("PATCH /api/admin/drivers/:id/approve", () => {
+    it("approving a driver verifies docs too (all-Approved together)", async () => {
+      const Vehicle = (await import("../src/models/Vehicle.js")).default;
+      const DriverProfile = (await import("../src/models/DriverProfile.js")).default;
+
+      const vehicle = await Vehicle.create({
+        name: "Approve Sedan",
+        seats: 4,
+        oneWayBaseFare: 100,
+        roundTripBaseFare: 100,
+        oneWayBaseKm: 0,
+        roundTripBaseKm: 0,
+        oneWayPerKm: 12,
+        roundTripPerKm: 12,
+        minimumDistance: 1,
+        isActive: true,
+      });
+      const hashed = await bcrypt.hash("Password123", 10);
+      const driverUser = await User.create({
+        name: "Approve Driver",
+        email: "approvedriver@test.com",
+        phone: "9876543299",
+        password: hashed,
+        role: "driver",
+      });
+      const profile = await DriverProfile.create({
+        user: driverUser._id,
+        aadhaarNumber: "999999999991",
+        licenseNumber: "DLAPPROVE001",
+        vehicleType: vehicle._id,
+        vehicleBrand: "Test",
+        vehicleModel: "Model",
+        vehicleColor: "White",
+        vehicleYear: 2022,
+        vehicleNumber: "KA01AP0001",
+        approvalStatus: "Pending",
+      });
+
+      const res = await request(app)
+        .patch(`/api/admin/drivers/${profile._id}/approve`)
+        .set("Authorization", `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.driver.approvalStatus).toBe("Approved");
+      expect(res.body.driver.documents?.documentVerification).toBe("Verified");
+    });
+  });
 });

@@ -3,6 +3,17 @@ import { getVehicles } from "./vehicle.service.js";
 import { calculateFare } from "./fare.service.js";
 import { getRoute, geocodeAddress } from "./googleMaps.service.js";
 import { getMyBookings } from "./booking.service.js";
+import {
+  detectLanguage,
+  normalizeLocations,
+  extractTanglishRoute,
+  extractTamilRoute,
+  extractTamilWhen,
+  cleanRouteEnds,
+  whenPhrase,
+  tamilIntentSignals,
+  T,
+} from "./tamilLanguage.js";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -36,6 +47,14 @@ Key routes and approximate distances:
 
 Rules:
 - Understand natural language, spelling mistakes and short messages.
+- The customer may write in English, Tamil script, or Tanglish (romanized
+  Tamil, e.g. "Trichy airport la irundhu Chennai ku cab venum" or "Trichy
+  to Madurai cab price enna?"). ALWAYS reply in the user's own
+  language and style: Tamil script → Tamil; Tanglish → friendly Tanglish
+  (e.g. "Sure! Trichy Airport → Chennai cab book panna mudiyum. 😊
+  Travel date and pickup time sollunga."); English → English.
+- Common mappings: venum = want, poganum = go, enna/evlo = what/how much,
+  vilai = price, naalaiku = tomorrow, cab/taxi = vehicle request.
 - When a booking or action is required, use the EXISTING backend data and flows only.
 - Never invent fares, drivers, bookings, locations or API responses. If you don't know something, say so or point to support.
 - For fare and booking-status questions, rely on real backend data provided above.
@@ -69,6 +88,22 @@ function buildVehicleContext(vehicles) {
     (v) =>
       `${v.name}: ${v.seats} seats, AC: ${v.isAC ? "Yes" : "No"}, One-way base: ₹${v.oneWayBaseFare} + ₹${v.oneWayPerKm}/km, Round-trip base: ₹${v.roundTripBaseFare} + ₹${v.roundTripPerKm}/km, Driver allowance: ₹${v.driverAllowance}/day`
   ).join("\n");
+}
+
+/* Price every active vehicle for a distance (shared by fare branches). */
+async function fareRowsFor(distance) {
+  const vehicles = await getVehicles();
+  if (!vehicles || vehicles.length === 0) return { rows: [], vehicles };
+  const rows = [];
+  for (const v of vehicles) {
+    try {
+      const result = await calculateFare({ vehicleId: v._id, distance, pickupDateTime: new Date(), tripType: "One Way", days: 1 });
+      rows.push({ name: v.name, seats: v.seats, fare: Math.round(result.estimatedFare) });
+    } catch {
+      rows.push({ name: v.name, seats: v.seats, fare: null });
+    }
+  }
+  return { rows, vehicles };
 }
 
 /* ===========================================================
@@ -120,21 +155,12 @@ async function getActiveBooking(userId) {
    line so route fares and "cheapest" answers share one engine. */
 async function computeFareReply(from, to, { markCheapest = false } = {}) {
   const { route, fromLabel, toLabel } = await resolveRoute(from, to);
-  const vehicles = await getVehicles();
+  const { rows, vehicles } = await fareRowsFor(route.distance);
   if (!vehicles || vehicles.length === 0) {
     return {
       text: `The route from ${fromLabel} to ${toLabel} is **${route.distance} km** (~${route.duration} min), but I couldn't fetch fare data right now.`,
       cheapest: null,
     };
-  }
-  const rows = [];
-  for (const v of vehicles) {
-    try {
-      const result = await calculateFare({ vehicleId: v._id, distance: route.distance, pickupDateTime: new Date(), tripType: "One Way", days: 1 });
-      rows.push({ name: v.name, seats: v.seats, fare: Math.round(result.estimatedFare) });
-    } catch {
-      rows.push({ name: v.name, seats: v.seats, fare: null });
-    }
   }
   const priced = rows.filter((r) => r.fare != null);
   const cheapest = priced.length ? priced.reduce((a, b) => (b.fare < a.fare ? b : a)) : null;
@@ -207,9 +233,66 @@ export async function chat(message, userId = null, history = []) {
 }
 
 async function fallbackChat(message, userId) {
-  const lower = message.toLowerCase().trim();
-  const locs = extractLocations(message);
+  const lang = detectLanguage(message);
+  // Normalize Tamil/Tanglish place spellings so geocoding + the English
+  // router below understand Tiruchy/Madras/திருச்சி etc. too.
+  const normalizedMsg = normalizeLocations(message);
+  const lower = normalizedMsg.toLowerCase().trim();
+  // Tamil/Tanglish "X la irundhu Y ku" shapes carry from→to explicitly —
+  // prefer them over the generic extractor for non-English input.
+  const tamilRoute =
+    lang === "ta"
+      ? extractTamilRoute(message)
+      : lang === "tanglish"
+        ? extractTanglishRoute(normalizedMsg)
+        : null;
+  const locs = tamilRoute || extractLocations(normalizedMsg);
+  const when = lang === "en" ? null : extractTamilWhen(message);
   const fareWords = /\b(fare|price|cost|estimate|how much|charge|rate|tariff)\b/i.test(lower);
+
+  // 0. Localized greeting (before the English one)
+  if (lang !== "en" && /^(hi+|hello|hey|vanakkam|வணக்கம்)[!.…]*$/i.test(lower) && lower.length < 30) {
+    return T.greeting[lang];
+  }
+
+  // Tamil/Tanglish fast path: fare or booking intent with a route →
+  // real Google distance + real fare engine, replied in kind.
+  if (lang !== "en") {
+    const signals = tamilIntentSignals(message);
+    const from = locs?.from ? cleanRouteEnds(locs.from) : "";
+    const to = locs?.to ? cleanRouteEnds(locs.to) : "";
+    if ((signals.wantsFare || signals.wantsBooking) && from && to) {
+      try {
+        const { route, fromLabel, toLabel } = await resolveRoute(from, to);
+        const { rows, vehicles } = await fareRowsFor(route.distance);
+        if (!vehicles || vehicles.length === 0) {
+          return lang === "ta"
+            ? `**${fromLabel} → ${toLabel}** route teriyudhu, aana fare data ippo kidaikala. Konjam wait panni try pannunga.`
+            : `Route **${fromLabel} → ${toLabel}** kandupidichiten, aana fare data ippo illa. Konjam wait panni try pannunga.`;
+        }
+        const lines = rows.map((r) =>
+          r.fare == null
+            ? `• **${r.name}** (${r.seats} seats): —`
+            : `• **${r.name}** (${r.seats} seats): ₹${r.fare}`
+        );
+        const head =
+          lang === "ta"
+            ? `**${fromLabel} → ${toLabel}**\n📏 தூரம்: ${route.distance} கி.மீ | ⏱ ~${route.duration} நிமிடம்\n\n**கட்டண மதிப்பீடு (One Way):**`
+            : `**${fromLabel} → ${toLabel}**\n📏 Distance: ${route.distance} km | ⏱ ~${route.duration} min\n\n**Fare Estimates (One Way):**`;
+        const tail = signals.wantsBooking
+          ? T.bookCTA[lang] + whenPhrase(when, lang)
+          : T.fareNote[lang] + whenPhrase(when, lang);
+        return `${head}\n${lines.join("\n")}\n\n${tail}`;
+      } catch (err) {
+        return err?.message || T.askRoute[lang];
+      }
+    }
+    // Booking intent but route incomplete → ask ONLY the missing detail.
+    if (signals.wantsBooking) return T.askBookingDetails[lang];
+    if (signals.wantsFare) return T.askRoute[lang];
+    // Otherwise fall through: normalized English loanwords let the
+    // generic router below handle airport/cancel/vehicles questions.
+  }
 
   // 1. Greeting — only when the message IS a greeting (never hijack
   // "hey, is airport pickup available?").
@@ -427,6 +510,8 @@ async function fallbackChat(message, userId) {
   if (/\b(help|what can you|how to|guide|support)\b/i.test(lower)) {
     return "I'm the GenZRides AI assistant. I can help you with:\n\n• **Airport pickup** — \"Is airport pickup available?\"\n• **Fare estimates** — \"Fare from Madurai to Chennai\"\n• **Extra charges** — bata, night, waiting, toll\n• **Cancellation & refunds**\n• **My bookings** — ride history (login required)\n• **Contact support** — 24×7 helpline\n\nJust type your question!";
   }
+
+  if (lang !== "en") return T.default[lang];
 
   return "I'm not sure how to help with that. Here are some things I can do:\n\n• **Airport** — \"Is airport pickup available?\"\n• **Fare** — \"Fare from Madurai to Chennai\"\n• **Vehicles** — \"What vehicles do you have?\"\n• **Bookings** — \"Show my bookings\"\n• **Support** — \"How do I contact support?\"";
 }

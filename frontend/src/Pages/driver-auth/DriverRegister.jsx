@@ -720,7 +720,7 @@ const DriverRegister = () => {
       </div>
 
       <div>
-        <p className={labelClass}>Profile Photo <span className="text-slate-500">(optional)</span></p>
+        <p className={labelClass}>Profile Photo <span className="text-slate-500 hidden">(optional)</span></p>
         <label className="block border-2 border-dashed border-white/10 rounded-xl p-6 text-center hover:border-green-500/60 transition cursor-pointer">
           {files.profilePhotoFile ? (
             <div className="space-y-2">
@@ -740,7 +740,7 @@ const DriverRegister = () => {
       </div>
 
       <div>
-        <p className={labelClass}>Insurance <span className="text-slate-500">(optional)</span></p>
+        <p className={labelClass}>Insurance <span className="text-slate-500 hidden">(optional)</span></p>
         <label className="block border-2 border-dashed border-white/10 rounded-xl p-6 text-center hover:border-green-500/60 transition cursor-pointer">
           {files.insuranceFile ? (
             <div className="space-y-2">

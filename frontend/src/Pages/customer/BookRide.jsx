@@ -756,7 +756,7 @@ const BookRide = () => {
                   </button>
                 ))}
               </div>
-              <div className="grid grid-cols-2 gap-2 mt-2">
+              <div className="grid-cols-2 hidden gap-2 mt-2">
                 {["Airport Pickup", "Airport Drop"].map((t) => (
                   <button
                     key={t}
@@ -890,7 +890,7 @@ const BookRide = () => {
               type="button"
               disabled={!canBook}
               onClick={() => canBook && setConfirmOpen(true)}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3.5 rounded-2xl font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+              className="w-full flex items-center mb-3 justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3.5 rounded-2xl font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
             >
               {bookMutation.isPending ? (
                 <>
