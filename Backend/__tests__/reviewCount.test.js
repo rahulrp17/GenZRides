@@ -92,6 +92,13 @@ describe("customer reviews count driver totalRatings", () => {
     expect(d.rating).toBe(5);
   });
 
+  it("booking carries the submitted rating (UI submitted-state)", async () => {
+    const Booking = (await import("../src/models/Booking.js")).default;
+    const b = await Booking.findById(bookings[0]._id).lean();
+    expect(b.rating).toBe(5);
+    expect(b.review).toBe("Great");
+  });
+
   it("second review increments count and averages", async () => {
     await createReview(bookings[1]._id, customer._id, { rating: 3, review: "OK" });
     const d = await DriverProfile.findById(driverProfile._id).lean();

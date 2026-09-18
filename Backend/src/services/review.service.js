@@ -50,6 +50,13 @@ export const createReview = async (
     review,
   });
 
+  // Stamp the booking itself so the UI (and any reader) sees the submitted
+  // state without joining reviews. Without this the form never flips to
+  // "submitted" and re-taps error as duplicates.
+  booking.rating = rating;
+  booking.review = review;
+  await booking.save();
+
   /* =====================================
      UPDATE DRIVER AVERAGE RATING + COUNT
      Both are recomputed from all reviews so the counters self-heal
