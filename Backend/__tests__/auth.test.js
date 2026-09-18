@@ -176,4 +176,56 @@ describe("Auth Endpoints", () => {
       expect(res.status).toBe(401);
     });
   });
+
+  describe("Password-reset OTP hardening", () => {
+    const otpUser = {
+      name: "Otp User",
+      email: "otp@example.com",
+      phone: "9876543299",
+      password: "Password123",
+    };
+
+    const requestOtp = async () => {
+      await request(app).post("/api/auth/register").send(otpUser);
+      const res = await request(app)
+        .post("/api/auth/forgot-password")
+        .send({ email: otpUser.email });
+      expect(res.status).toBe(200);
+      expect(res.body.otp).toMatch(/^\d{6}$/);
+      return res.body.otp;
+    };
+
+    it("stores only the OTP hash and verifies the real code", async () => {
+      const otp = await requestOtp();
+      const User = (await import("../src/models/User.js")).default;
+      const stored = await User.findOne({ email: otpUser.email }).select(
+        "+otp +otpExpiry +otpAttempts"
+      );
+      expect(stored.otp).not.toBe(otp);
+      expect(stored.otp).toMatch(/^[0-9a-f]{64}$/);
+      expect(stored.otpAttempts).toBe(0);
+
+      const ok = await request(app)
+        .post("/api/auth/verify-otp")
+        .send({ email: otpUser.email, otp });
+      expect(ok.status).toBe(200);
+      expect(ok.body.success).toBe(true);
+    });
+
+    it("voids the code after 5 wrong guesses", async () => {
+      const otp = await requestOtp();
+      for (let i = 0; i < 5; i++) {
+        const bad = await request(app)
+          .post("/api/auth/verify-otp")
+          .send({ email: otpUser.email, otp: "000000" });
+        expect(bad.status).toBe(400);
+      }
+      // Even the correct code is dead now — a fresh OTP is required.
+      const locked = await request(app)
+        .post("/api/auth/verify-otp")
+        .send({ email: otpUser.email, otp });
+      expect(locked.status).toBe(400);
+      expect(locked.body.message).toMatch(/too many|request a new/i);
+    });
+  });
 });

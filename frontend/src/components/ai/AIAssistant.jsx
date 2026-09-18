@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { Bot, Send, X, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import DOMPurify from "dompurify";
 import { aiAPI } from "../../services/endpoints";
 
 const SUGGESTED_PROMPTS = [
@@ -12,6 +13,14 @@ const SUGGESTED_PROMPTS = [
 
 function formatReply(text) {
   if (!text) return null;
+  // Model output is untrusted (prompt injection could smuggle event
+  // handlers/scripts). Sanitize to our tiny markdown subset before
+  // dangerouslySetInnerHTML — strips everything except strong/em/code.
+  const clean = (html) =>
+    DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: ["strong", "em", "code"],
+      ALLOWED_ATTR: ["class"],
+    });
   const lines = text.split("\n");
   return lines.map((line, i) => {
     let formatted = line
@@ -24,12 +33,12 @@ function formatReply(text) {
       return (
         <div key={i} className="flex gap-2 ml-1">
           <span className="text-green-400 mt-0.5 flex-shrink-0">•</span>
-          <span dangerouslySetInnerHTML={{ __html: formatted }} />
+          <span dangerouslySetInnerHTML={{ __html: clean(formatted) }} />
         </div>
       );
     }
     if (line.trim() === "") return <div key={i} className="h-2" />;
-    return <div key={i} dangerouslySetInnerHTML={{ __html: formatted }} />;
+    return <div key={i} dangerouslySetInnerHTML={{ __html: clean(formatted) }} />;
   });
 }
 

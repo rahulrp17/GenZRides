@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import User from "../models/User.js";
 import DriverProfile from "../models/DriverProfile.js";
 import { generateToken, generateTokenPair, hashToken } from "./jwt.service.js";
@@ -264,8 +265,11 @@ export const requestPasswordReset = async (email) => {
   const otp = String(Math.floor(100000 + Math.random() * 900000));
   const expiry = new Date(Date.now() + 10 * 60 * 1000);
 
-  user.otp = otp;
+  // Store only the hash — a database leak must never expose usable OTPs.
+  // Attempts reset on every new code.
+  user.otp = hashToken(otp);
   user.otpExpiry = expiry;
+  user.otpAttempts = 0;
   await user.save();
 
   // Best-effort email: try HTTPS API first (Resend/Brevo, never blocked),
@@ -329,10 +333,9 @@ export const requestPasswordReset = async (email) => {
     if (!sent) {
       emailWarning = "Email delivery failed. Please try again later or contact support.";
       console.error(`[auth] ALL EMAIL CHANNELS FAILED for ${user.email}. Last error: ${lastError?.message || 'no channel configured'}`);
-      console.error(`[auth] OTP for ${clean}: ${otp}`);
     }
   } catch (e) {
-    console.error(`[auth] OTP for ${clean}: ${otp} (email send failed: ${e.message})`);
+    console.error(`[auth] OTP email send failed for ${clean}: ${e.message}`);
     if (e.stack) console.error(`[auth] stack: ${e.stack.split('\n').slice(0, 3).join(' | ')}`);
   }
 
@@ -344,28 +347,64 @@ export const requestPasswordReset = async (email) => {
   };
 };
 
-export const verifyResetOtp = async (email, otp) => {
-  const clean = String(email || "").trim().toLowerCase();
-  const user = await User.findOne({ email: clean }).select("+password");
-  if (!user) throw new Error("No account found with this email.");
-  if (!user.otp || !user.otpExpiry) throw new Error("No OTP found. Please request a new one.");
+// Max wrong guesses per OTP code before it is voided (force re-request).
+const MAX_OTP_ATTEMPTS = 5;
+
+const assertOtpUsable = (user) => {
+  if (!user.otp || !user.otpExpiry) {
+    throw new Error("No OTP found. Please request a new one.");
+  }
   if (user.otpExpiry < new Date()) throw new Error("OTP expired. Please request a new one.");
-  if (String(user.otp) !== String(otp).trim()) throw new Error("Invalid OTP.");
+  if ((user.otpAttempts || 0) >= MAX_OTP_ATTEMPTS) {
+    throw new Error("Too many wrong attempts. Please request a new OTP.");
+  }
+};
+
+const otpMatches = (storedHash, input) => {
+  try {
+    const a = Buffer.from(String(storedHash || ""), "utf8");
+    const b = Buffer.from(hashToken(String(input || "").trim()), "utf8");
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+};
+
+const registerOtpAttempt = async (user) => {
+  user.otpAttempts = (user.otpAttempts || 0) + 1;
+  if (user.otpAttempts >= MAX_OTP_ATTEMPTS) {
+    // Void the code — guessing window closed until a fresh OTP is issued.
+    user.otp = null;
+    user.otpExpiry = null;
+  }
+  await user.save();
+};
+
+export const verifyResetOtp = async (email, otp) => {  const clean = String(email || "").trim().toLowerCase();
+  const user = await User.findOne({ email: clean }).select("+password +otp +otpExpiry +otpAttempts");
+  if (!user) throw new Error("No account found with this email.");
+  assertOtpUsable(user);
+  if (!otpMatches(user.otp, otp)) {
+    await registerOtpAttempt(user);
+    throw new Error("Invalid OTP.");
+  }
   return { success: true, message: "OTP verified." };
 };
 
-export const resetPasswordWithOtp = async (email, otp, newPassword) => {
-  const clean = String(email || "").trim().toLowerCase();
-  const user = await User.findOne({ email: clean }).select("+password");
+export const resetPasswordWithOtp = async (email, otp, newPassword) => {  const clean = String(email || "").trim().toLowerCase();
+  const user = await User.findOne({ email: clean }).select("+password +otp +otpExpiry +otpAttempts");
   if (!user) throw new Error("No account found with this email.");
-  if (!user.otp || !user.otpExpiry) throw new Error("No OTP found. Please request a new one.");
-  if (user.otpExpiry < new Date()) throw new Error("OTP expired. Please request a new one.");
-  if (String(user.otp) !== String(otp).trim()) throw new Error("Invalid OTP.");
+  assertOtpUsable(user);
+  if (!otpMatches(user.otp, otp)) {
+    await registerOtpAttempt(user);
+    throw new Error("Invalid OTP.");
+  }
 
   const hashed = await bcrypt.hash(newPassword, 12);
   user.password = hashed;
   user.otp = null;
   user.otpExpiry = null;
+  user.otpAttempts = 0;
   user.refreshTokens = [];
   await user.save();
 

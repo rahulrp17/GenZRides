@@ -13,6 +13,7 @@ const PageHero = ({ eyebrow, title, sub, img }) => (
           src={img}
           alt=""
           aria-hidden
+          decoding="async"
           className="absolute inset-0 w-full h-full object-cover opacity-40"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black" />

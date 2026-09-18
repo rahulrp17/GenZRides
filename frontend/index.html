@@ -31,10 +31,19 @@
     <title>GenZRides | Airport Taxi, City Rides & Outstation Cabs in Tamil Nadu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Non-blocking font CSS: render is never held waiting for webfonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Poppins:wght@400;500;600&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Poppins:wght@400;500;600&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
     <!-- Core Web Vitals: early hints so LCP assets + APIs resolve faster -->
     <link rel="preload" as="image" href="/logo5.png" fetchpriority="high" />
     <link rel="dns-prefetch" href="https://maps.googleapis.com" />
