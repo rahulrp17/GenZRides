@@ -36,5 +36,11 @@ router.get("/place-details", authenticate, validateQuery(placeDetailsSchema), pl
 // Public guest Places search (no JWT; same controllers/services/validation)
 router.get("/guest/autocomplete", guestSearchLimiter, validateQuery(autocompleteSchema), autocompleteCache, autocomplete);
 router.get("/guest/place-details", guestSearchLimiter, validateQuery(placeDetailsSchema), placeDetailsCache, getPlaceDetails);
+router.post(
+  "/guest/reverse-geocode",
+  guestSearchLimiter,
+  validate(reverseGeocodeSchema),
+  reverseGeocode
+);
 
 export default router;

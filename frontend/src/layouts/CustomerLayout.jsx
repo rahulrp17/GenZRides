@@ -3,7 +3,7 @@ import { NavLink, Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import {
   Home, Car, Clock, CreditCard, Wallet, Star, Bell, User,
-  MapPin, FileText, LogOut, Menu, X, ChevronDown, LayoutPanelLeft
+  MapPin, FileText, LogOut, Menu, X, ChevronDown, LayoutPanelLeft, PanelLeftClose, PanelLeftOpen
 } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 import SEO from '../components/SEO';
@@ -31,6 +31,7 @@ const CustomerLayout = () => {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   useEffect(() => {
@@ -76,46 +77,69 @@ const CustomerLayout = () => {
       </AnimatePresence>
 
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-72 bg-white/5 backdrop-blur-lg border-r border-white/10 z-50 transform transition-transform duration-300 lg:transform-none ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-72 shrink-0 border-r border-white/10 bg-[#070c0a]/90 backdrop-blur-xl transition-[width,translate] duration-300 ease-out ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        } ${sidebarExpanded ? "" : "lg:w-20"}`}
       >
-        <div className="flex flex-col h-full">
-          <div className="p-6 border-b border-white/5">
-           <h1 className="text-xl font-bold bg-gradient-to-r text-white bg-clip-text ">
-              Gen <span className="text-green-400">Z</span>Rides
-            </h1>
-            <p className="text-xs text-gray-400 mt-1">Customer Dashboard</p>
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-green-400/50 to-transparent" />
+        <div className="flex h-full flex-col">
+          <div className={`flex h-16 shrink-0 items-center border-b border-white/5 ${sidebarExpanded ? "gap-2 px-5" : "px-4 lg:justify-center lg:px-2"}`}>
+            {sidebarExpanded ? (
+              <div className="min-w-0">
+                <h1 className="truncate text-lg font-bold text-white">
+                  Gen<span className="text-green-400">Z</span>Rides
+                </h1>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-gray-500">Customer</p>
+              </div>
+            ) : (
+              <>
+                <div className="min-w-0 lg:hidden">
+                  <h1 className="truncate text-lg font-bold text-white">
+                    Gen<span className="text-green-400">Z</span>Rides
+                  </h1>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-gray-500">Customer</p>
+                </div>
+                <img src="/logo5.png" alt="GenZRides logo" title="GenZRides" className="hidden h-10 w-10 shrink-0 rounded-xl object-cover ring-1 ring-green-500/40 shadow-[0_0_24px_rgba(34,197,94,0.35)] lg:block" />
+              </>
+            )}
           </div>
 
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          <nav className={`flex-1 space-y-1 overflow-y-auto ${sidebarExpanded ? "p-3" : "p-3 lg:p-2"}`}>
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
                 end={item.end}
                 onClick={() => setSidebarOpen(false)}
+                title={sidebarExpanded ? undefined : item.label}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  `group flex items-center rounded-xl text-sm font-medium transition-all duration-200 ${
+                    sidebarExpanded
+                      ? "gap-3 px-3.5 py-2.5"
+                      : "gap-3 px-3.5 py-2.5 lg:mx-auto lg:h-11 lg:w-11 lg:justify-center lg:gap-0 lg:px-0 lg:py-0"
+                  } ${
                     isActive
-                      ? 'bg-green-500/10 text-green-400 border border-green-500/20'
-                      : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                      ? "border border-green-500/30 bg-green-500/10 text-green-300 shadow-[0_0_20px_rgba(34,197,94,0.18)]"
+                      : "border border-transparent text-gray-400 hover:border-white/10 hover:bg-white/5 hover:text-white"
                   }`
                 }
               >
-                <item.icon size={20} />
-                {item.label}
+                <item.icon size={20} className="shrink-0 transition-transform duration-200 group-hover:scale-110" />
+                <span className={`truncate ${sidebarExpanded ? "" : "lg:hidden"}`}>{item.label}</span>
               </NavLink>
             ))}
           </nav>
 
-          <div className="p-4 border-t border-white/5">
+          <div className={`shrink-0 border-t border-white/5 ${sidebarExpanded ? "p-3" : "p-3 lg:p-2"}`}>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 w-full transition"
+              title={sidebarExpanded ? undefined : "Sign Out"}
+              className={`flex w-full items-center rounded-xl text-sm font-medium text-red-400/90 transition hover:bg-red-500/10 hover:text-red-300 ${
+                sidebarExpanded ? "gap-3 px-3.5 py-2.5" : "gap-3 px-3.5 py-2.5 lg:mx-auto lg:h-11 lg:w-11 lg:justify-center lg:gap-0 lg:px-0 lg:py-0"
+              }`}
             >
-              <LogOut size={20} />
-              Sign Out
+              <LogOut size={20} className="shrink-0" />
+              <span className={sidebarExpanded ? "" : "lg:hidden"}>Sign Out</span>
             </button>
           </div>
         </div>
@@ -124,19 +148,27 @@ const CustomerLayout = () => {
       <div className="flex-1 flex flex-col min-h-screen min-w-0 w-full max-w-full">
         <header className="sticky top-0 z-30 bg-black/50 backdrop-blur-xl border-b border-white/10">
           <div className="flex items-center justify-between px-4 sm:px-6 py-3 min-w-0">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 hover:bg-white/10 text-gray-300 rounded-lg"
-            >
-              <Menu size={22} />
-            </button>
-
-            <div className="flex-1 max-w-md mx-1">
-              <h2 className="text-lg font-semibold text-green-400 hidden sm:block">
+            <div className="flex min-w-0 flex-1 items-center gap-1.5">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open menu"
+                className="lg:hidden p-2 hover:bg-white/10 text-gray-300 rounded-lg"
+              >
+                <Menu size={22} />
+              </button>
+              <button
+                onClick={() => setSidebarExpanded((v) => !v)}
+                title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+                aria-label={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+                aria-expanded={sidebarExpanded}
+                className="hidden lg:inline-flex p-2 rounded-xl border border-white/10 bg-white/5 text-gray-400 transition hover:border-green-500/30 hover:bg-green-500/10 hover:text-green-300 hover:shadow-[0_0_18px_rgba(34,197,94,0.25)]"
+              >
+                {sidebarExpanded ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
+              </button>
+              <h2 className="ml-1 truncate text-base sm:text-lg font-semibold text-green-400">
                 Customer Dashboard
               </h2>
             </div>
-
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}

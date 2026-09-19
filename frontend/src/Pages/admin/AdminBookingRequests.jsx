@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import { formatTripDuration } from "../../utils/formatDuration";
 import {
   Calendar,
   MapPin,
@@ -15,6 +16,9 @@ import {
   Car,
   Copy,
   Check,
+  Repeat,
+  ArrowRight,
+  ChevronDown,
 } from "lucide-react";
 import { adminAPI, vehicleAPI } from "../../services/endpoints";
 import { useCopyBooking } from "../../utils/bookingText";
@@ -23,6 +27,10 @@ import { TableSkeleton } from "../../components/shared/Skeleton";
 import ErrorState from "../../components/shared/ErrorState";
 import EmptyState from "../../components/shared/EmptyState";
 import Modal from "../../components/shared/Modal";
+import SearchBar from "../../components/shared/SearchBar";
+import ViewToggle from "../../components/shared/ViewToggle";
+import GlassTable from "../../components/shared/GlassTable";
+import useDebounce from "../../hooks/useDebounce";
 import ConfirmDialog from "../../components/shared/ConfirmDialog";
 import AssignDriverDialog from "../../components/shared/AssignDriverDialog";
 import { motion as Motion } from "framer-motion";
@@ -36,6 +44,27 @@ const AdminBookingRequests = () => {
   });
   const [assigningDriverId, setAssigningDriverId] = useState(null);
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState("");
+  const [search, setSearch] = useState("");
+  // Debounced so typing "Trichy" fires one request per pause, not per key.
+  const debouncedSearch = useDebounce(search, 300);
+  // Table/cards preference persists; switching never refetches — same data.
+  const [view, setView] = useState(
+    () => {
+      try {
+        return localStorage.getItem("adminRequestsView") || "cards";
+      } catch {
+        return "cards";
+      }
+    }
+  );
+  const changeView = (v) => {
+    setView(v);
+    try {
+      localStorage.setItem("adminRequestsView", v);
+    } catch {
+      // private mode — preference simply won't persist
+    }
+  };
   const [cancelDialog, setCancelDialog] = useState({
     open: false,
     bookingId: null,
@@ -57,15 +86,18 @@ const AdminBookingRequests = () => {
   const vehicleTypes = vehicleData?.vehicles || [];
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ["adminPendingBookings", vehicleTypeFilter],
+    queryKey: ["adminPendingBookings", vehicleTypeFilter, debouncedSearch],
     queryFn: async () => {
       const params = { page: 1, limit: 100, status: "Pending" };
       if (vehicleTypeFilter) params.vehicleType = vehicleTypeFilter;
+      if (debouncedSearch) params.search = debouncedSearch;
       const { data } = await adminAPI.getBookings(params);
       return data;
     },
     refetchOnWindowFocus: false,
     staleTime: 30_000,
+    // Keep the queue visible while search refetches.
+    placeholderData: (prev) => prev,
   });
 
   // Real-time: new guest/customer bookings and status changes refresh the
@@ -161,17 +193,99 @@ const AdminBookingRequests = () => {
   const customerName = (b) => b.customer?.name || b.guestName || "Guest";
   const customerPhone = (b) => b.customer?.phone || b.guestPhone || "";
 
+  const TripTypeBadge = ({ type }) => {
+    const round = type === "Round Trip";
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border backdrop-blur ${
+          round
+            ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+            : "bg-sky-500/15 text-sky-300 border-sky-500/30"
+        }`}
+      >
+        {round ? <Repeat size={12} /> : <ArrowRight size={12} />}
+        {type || "One Way"}
+      </span>
+    );
+  };
+
+  // Table view columns — same data and actions as the cards.
+  const requestColumns = [
+    {
+      header: "Booking",
+      cell: (b) => (
+        <div className="min-w-[130px]">
+          <p className="font-mono text-xs text-gray-400">#{b._id?.slice(-6).toUpperCase()}</p>
+          <p className="text-[11px] text-gray-500 mt-0.5 whitespace-nowrap">{formatDateTime(b.createdAt)}</p>
+        </div>
+      ),
+    },
+    {
+      header: "Customer",
+      cell: (b) => (
+        <div className="min-w-[140px] max-w-[200px]">
+          <p className="text-sm font-semibold text-white truncate">{customerName(b)}</p>
+          <p className="text-[11px] text-gray-500 truncate">{customerPhone(b)}</p>
+        </div>
+      ),
+    },
+    {
+      header: "Route",
+      cell: (b) => (
+        <div className="min-w-[180px] max-w-[260px]">
+          <p className="text-xs text-gray-300 truncate" title={b.pickup?.address}>
+            <span className="text-green-400 font-bold">↑ </span>{b.pickup?.address || "N/A"}
+          </p>
+          <p className="text-xs text-gray-300 truncate mt-1" title={b.drop?.address}>
+            <span className="text-red-400 font-bold">↓ </span>{b.drop?.address || "N/A"}
+          </p>
+        </div>
+      ),
+    },
+    {
+      header: "Type",
+      cell: (b) => <TripTypeBadge type={b.tripType} />,
+    },
+    {
+      header: "Fare",
+      tdClassName: "text-right",
+      thClassName: "text-right",
+      cell: (b) => <span className="font-bold text-white tabular-nums whitespace-nowrap">₹{(b.estimatedFare ?? 0).toLocaleString("en-IN")}</span>,
+    },
+    {
+      header: "Actions",
+      tdClassName: "text-right",
+      thClassName: "text-right",
+      cell: (b) => (
+        <span className="inline-flex items-center justify-end gap-1.5">
+          <button onClick={() => setSelectedBooking(b)} title="Details" aria-label="View details" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs hover:bg-white/10 transition">
+            <Eye size={14} />
+          </button>
+          <button onClick={() => openBooking(b._id)} title="Track" aria-label="Track booking" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 rounded-xl text-xs hover:bg-emerald-500/25 transition">
+            <MapPin size={14} />
+          </button>
+          <button onClick={() => setAssignDialog({ open: true, bookingId: b._id })} disabled={assignMutation.isPending || cancelMutation.isPending} title="Approve & assign" aria-label="Approve and assign driver" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-xs hover:shadow-[0_0_18px_rgba(34,197,94,0.5)] transition disabled:opacity-50">
+            <Check size={14} />
+          </button>
+          <button onClick={() => setCancelDialog({ open: true, bookingId: b._id })} disabled={assignMutation.isPending || cancelMutation.isPending} title="Cancel" aria-label="Cancel booking" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-red-500/15 border border-red-500/25 text-red-300 rounded-xl text-xs hover:bg-red-500/25 transition disabled:opacity-50">
+            <XCircle size={14} />
+          </button>
+        </span>
+      ),
+    },
+  ];
+
   return (
     <Motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-4 sm:space-y-6 min-w-0"
     >
-      {/* ── Hero panel ─────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-green-500/15 via-white/5 to-transparent p-4 sm:p-6">
+      {/* ── Hero panel (compact) ─────────────────────────────── */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-green-500/15 via-white/5 to-transparent p-4 sm:p-5">
         <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 bg-green-500/15 blur-[100px]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-green-400/60 to-transparent" />
-        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between min-w-0">
+        <div className="relative flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between min-w-0">
           <div className="min-w-0">
             <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-green-300">
               <BellRing size={12} /> Live queue
@@ -180,71 +294,95 @@ const AdminBookingRequests = () => {
                 <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-green-400" />
               </span>
             </p>
-            <h1 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight mt-1">
+            <h1 className="font-display text-lg sm:text-xl font-bold text-white tracking-tight mt-1">
               Booking Requests
             </h1>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5">
               Approve by assigning an online driver, or cancel with a reason.
             </p>
           </div>
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:min-w-[380px]">
-            <div className="bg-black/30 border border-white/10 rounded-2xl px-3 py-2.5 text-center min-w-0">
-              <p className="text-lg sm:text-xl font-bold text-white leading-none">
+          <div className="grid grid-cols-3 gap-2 lg:min-w-[360px]">
+            <div className="bg-black/30 border border-white/10 rounded-2xl px-3 py-2 text-center min-w-0">
+              <p className="text-base sm:text-lg font-bold text-white leading-none">
                 {isLoading ? "–" : bookings.length}
               </p>
-              <p className="text-[10px] sm:text-[11px] text-gray-400 mt-1 truncate">
+              <p className="text-[10px] text-gray-400 mt-1 truncate">
                 Pending
               </p>
             </div>
-            <div className="bg-black/30 border border-white/10 rounded-2xl px-3 py-2.5 text-center min-w-0">
-              <p className="text-lg sm:text-xl font-bold text-green-300 leading-none truncate">
+            <div className="bg-black/30 border border-white/10 rounded-2xl px-3 py-2 text-center min-w-0">
+              <p className="text-base sm:text-lg font-bold text-green-300 leading-none truncate">
                 ₹{isLoading ? "–" : totalValue.toLocaleString("en-IN")}
               </p>
-              <p className="text-[10px] sm:text-[11px] text-gray-400 mt-1 truncate">
+              <p className="text-[10px] text-gray-400 mt-1 truncate">
                 Queue value
               </p>
             </div>
-            <div className="bg-black/30 border border-white/10 rounded-2xl px-3 py-2.5 text-center min-w-0">
-              <p className="text-lg sm:text-xl font-bold text-emerald-300 leading-none">
+            <div className="bg-black/30 border border-white/10 rounded-2xl px-3 py-2 text-center min-w-0">
+              <p className="text-base sm:text-lg font-bold text-emerald-300 leading-none">
                 {onlineDrivers}
               </p>
-              <p className="text-[10px] sm:text-[11px] text-gray-400 mt-1 truncate">
+              <p className="text-[10px] text-gray-400 mt-1 truncate">
                 Drivers online
               </p>
             </div>
           </div>
         </div>
-        <div className="relative mt-4 flex flex-col sm:flex-row gap-2">
-                  <button
-                    onClick={() => refetch()}
-                    disabled={isFetching}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-2xl px-5 py-2.5 min-h-[44px] text-sm hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60"
-                  >
-                    <RefreshCw size={15} className={isFetching ? 'animate-spin' : ''} />
-                    {isFetching ? 'Refreshing…' : 'Refresh now'}
-                  </button>
-                  <p className="text-[11px] text-gray-500 self-center hidden md:block">Socket live · polling every 10s as backup</p>
-                </div>
+        <div className="relative mt-3 flex flex-col sm:flex-row gap-2 sm:items-center">
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-2xl px-5 py-2.5 min-h-[44px] text-sm hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60"
+          >
+            <RefreshCw size={15} className={isFetching ? 'animate-spin' : ''} />
+            {isFetching ? 'Refreshing…' : 'Refresh now'}
+          </button>
+          <p className="text-[11px] text-gray-500 self-center hidden md:block">Socket live · polling every 10s as backup</p>
+        </div>
 
       </div>
 
-      {/* ── Vehicle type filter ────────────────────────────────── */}
-      {vehicleTypes.length > 0 && (
-        <div className="flex items-center gap-2">
-          <label className="text-xs font-semibold text-gray-400">Vehicle type</label>
-          <select
-            value={vehicleTypeFilter}
-            onChange={(e) => setVehicleTypeFilter(e.target.value)}
-            className="bg-white/5 border border-white/10 text-white text-xs font-medium rounded-xl px-3 py-2 min-h-[40px] outline-none focus:border-green-500/50 transition cursor-pointer"
-          >
-            <option value="">All Types</option>
-            {vehicleTypes.map((v) => (
-              <option key={v._id} value={v._id} className="bg-gray-900 text-white">
-                {v.name}
-              </option>
-            ))}
-          </select>
+      {/* ── Premium search + vehicle filter + view toggle ── */}
+      <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+        <div className="relative flex-1 min-w-0">
+          <SearchBar
+            value={search}
+            onChange={(v) => setSearch(v)}
+            placeholder="Search name, email, booking ID, pickup, drop, trip type…"
+          />
+          {isFetching && !isLoading && (
+            <span className="absolute right-11 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-white/20 border-t-emerald-400 rounded-full animate-spin pointer-events-none" aria-label="Searching" />
+          )}
         </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <ViewToggle view={view} onChange={changeView} />
+          {vehicleTypes.length > 0 && (
+            <>
+              <label className="text-xs font-semibold text-gray-400 hidden sm:inline">Vehicle</label>
+              <div className="relative flex-1 sm:flex-none">
+              <select
+                value={vehicleTypeFilter}
+                onChange={(e) => setVehicleTypeFilter(e.target.value)}
+                className="w-full sm:w-auto appearance-none bg-white/[0.06] backdrop-blur-xl border border-white/15 text-white text-xs font-semibold rounded-2xl pl-4 pr-10 py-3 min-h-[48px] outline-none cursor-pointer hover:border-emerald-500/40 focus:border-emerald-500/60 transition shadow-lg shadow-black/20"
+              >
+                <option value="">All Types</option>
+                {vehicleTypes.map((v) => (
+                  <option key={v._id} value={v._id} className="bg-gray-900 text-white">
+                    {v.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-400 pointer-events-none" />
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+      {debouncedSearch && !isLoading && (
+        <p className="text-xs text-gray-400 -mt-1" role="status">
+          <span className="text-white font-bold">{bookings.length}</span> result{bookings.length === 1 ? "" : "s"} for{" "}
+          <span className="text-emerald-300 font-semibold">“{debouncedSearch}”</span>
+        </p>
       )}
 
       {/* ── Feed ───────────────────────────────────────────────── */}
@@ -253,11 +391,27 @@ const AdminBookingRequests = () => {
       ) : bookings.length === 0 ? (
         <EmptyState
           icon={Calendar}
-          title="No pending booking requests"
-          description="All bookings have been assigned or completed."
+          title={debouncedSearch ? "No matching requests" : "No pending booking requests"}
+          description={
+            debouncedSearch
+              ? `Nothing matches “${debouncedSearch}”. Try a name, email, booking ID, place, or trip type (one way, round trip).`
+              : "All bookings have been assigned or completed."
+          }
+          action={
+            debouncedSearch ? (
+              <button
+                onClick={() => setSearch("")}
+                className="px-5 py-2.5 min-h-[44px] rounded-2xl bg-white/5 border border-white/15 text-sm font-semibold text-white hover:bg-white/10 transition"
+              >
+                Clear search
+              </button>
+            ) : undefined
+          }
         />
       ) : (
-        <div className="grid gap-3 sm:gap-4 w-full max-w-6xl">
+        <>
+          {view === "cards" ? (
+          <div className="grid gap-3 sm:gap-4 w-full max-w-full">
           {bookings.map((b, i) => (
             <Motion.article
               key={b._id}
@@ -278,18 +432,22 @@ const AdminBookingRequests = () => {
                 {/* Route side */}
                 <div className="p-4 sm:p-5 min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5 mb-3 min-w-0">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-500/15 text-green-300 border border-green-500/25 rounded-full text-[11px] font-semibold">
+                    <span className=" hidden items-center gap-1.5 px-2.5 py-1 bg-green-500/15 text-green-300 border border-green-500/25 rounded-full text-[11px] font-semibold">
                       <span className="relative flex w-1.5 h-1.5">
                         <span className="absolute inline-flex w-full h-full rounded-full bg-green-400 opacity-60 animate-ping" />
                         <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-green-400" />
                       </span>
                       Awaiting driver
                     </span>
-                    <span className="font-mono text-[11px] text-gray-500">
+                    <TripTypeBadge type={b.tripType} />
+                    <span className="font-mono text-[14px] bg-green-400/15 border border-green-400/25 rounded-full px-2 py-0.5 text-green-500">
                       #{b._id?.slice(-6).toUpperCase()}
                     </span>
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] text-gray-500">
                       <Clock size={11} /> {formatDateTime(b.pickupDateTime)}
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] text-gray-500" title={`Booked ${formatDateTime(b.createdAt)}`}>
+                      <Calendar size={11} /> Booked {formatDateTime(b.createdAt)}
                     </span>
                   </div>
 
@@ -417,7 +575,11 @@ const AdminBookingRequests = () => {
               </div>
             </Motion.article>
           ))}
-        </div>
+          </div>
+          ) : (
+            <GlassTable columns={requestColumns} rows={bookings} rowKey={(b) => b._id} />
+          )}
+        </>
       )}
 
       {/* Booking Detail Modal */}
@@ -480,15 +642,25 @@ const AdminBookingRequests = () => {
               <div className="bg-white/5 rounded-2xl p-3">
                 <p className="text-[11px] text-gray-500">Duration</p>
                 <p className="font-medium text-white text-sm">
-                  {selectedBooking.duration != null
-                    ? `${Math.ceil(Number(selectedBooking.duration))} min`
-                    : "—"}
+                  {formatTripDuration(selectedBooking.duration)}
                 </p>
               </div>
               <div className="bg-white/5 rounded-2xl p-3">
                 <p className="text-[11px] text-gray-500">Fare</p>
                 <p className="font-medium text-white text-sm">
                   ₹{selectedBooking.estimatedFare}
+                </p>
+              </div>
+              <div className="bg-white/5 rounded-2xl p-3">
+                <p className="text-[11px] text-gray-500">Trip Type</p>
+                <p className="font-medium text-white text-sm">
+                  {selectedBooking.tripType || "One Way"}
+                </p>
+              </div>
+              <div className="bg-white/5 rounded-2xl p-3">
+                <p className="text-[11px] text-gray-500">Booked On</p>
+                <p className="font-medium text-white text-sm">
+                  {formatDateTime(selectedBooking.createdAt)}
                 </p>
               </div>
             </div>

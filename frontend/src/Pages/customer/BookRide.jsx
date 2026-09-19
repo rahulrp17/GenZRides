@@ -4,9 +4,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { useSocket } from "../../Context/SocketContext";
 import { toast } from "react-hot-toast";
+import { formatTripDuration } from "../../utils/formatDuration";
 import {
   MapPin,
-  Calendar,
   CreditCard,
   StickyNote,
   Send,
@@ -22,7 +22,13 @@ import {
   Download,
   X,
   Car,
+  CalendarDays,
+  CarFront,
+  Repeat,
+  ArrowRight,
 } from "lucide-react";
+import useAuth from "../../hooks/useAuth";
+import { DateInput, TimeInput } from "@mantine/dates";
 import {
   bookingAPI,
   fareAPI,
@@ -59,10 +65,134 @@ const getMinDateTime = () => {
   return `${y}-${m}-${day}T${h}:${min}`;
 };
 
+const formatCurrency = (n) => `₹${Number(n ?? 0).toFixed(2)}`;
+
+const perKmLabel = (n) =>
+  n == null
+    ? "—"
+    : `₹${Number(n) % 1 === 0 ? Number(n).toFixed(0) : Number(n).toFixed(2)}/km`;
+
+const fmtWhen = (iso) =>
+  iso
+    ? new Date(iso).toLocaleString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "N/A";
+
+const pad = (n) => String(n).padStart(2, "0");
+
+// Pickup must be at least 30 minutes from now (mirrors guest flow + backend).
+const minPickupDate = () => {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() + 30);
+  return d;
+};
+
+const mantineInputStyles = {
+  input: {
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderColor: "rgba(255,255,255,0.12)",
+    color: "#fff",
+    height: 46,
+    borderRadius: 12,
+    fontSize: 15,
+  },
+  section: { color: "#4ade80" },
+};
+
+function DateTimeField({ id, label, value, minDate, minTime, onChange }) {
+  const [dateVal, setDateVal] = useState(null);
+  const [timeVal, setTimeVal] = useState("");
+  const valueRef = useRef(value);
+
+  useEffect(() => {
+    if (valueRef.current === value) return;
+    valueRef.current = value;
+    if (value) {
+      const d = new Date(value);
+      // Invalid dates (bad restored value) fall back to empty.
+      if (!Number.isNaN(d.getTime())) {
+        setDateVal(d);
+        setTimeVal(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
+        return;
+      }
+    }
+    setDateVal(null);
+    setTimeVal("");
+  }, [value]);
+
+  const combine = (d, t) => {
+    if (!d) return "";
+    const [h, m] = (t || "00:00").split(":").map(Number);
+    const dt = new Date(d);
+    dt.setHours(h || 0, m || 0, 0, 0);
+    return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(
+      dt.getDate(),
+    )}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  };
+
+  const handleDateChange = useCallback(
+    (d) => {
+      setDateVal(d);
+      onChange(combine(d, timeVal));
+    },
+    [onChange, timeVal],
+  );
+
+  const handleTimeChange = useCallback(
+    (t) => {
+      setTimeVal(t);
+      onChange(combine(dateVal, t));
+    },
+    [onChange, dateVal],
+  );
+
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        className="text-sm font-medium text-gray-300 flex items-center gap-1.5"
+      >
+        <CalendarDays size={14} className="text-green-400" /> {label}
+      </label>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1.5">
+        <DateInput
+          id={id}
+          value={dateVal}
+          onChange={handleDateChange}
+          minDate={minDate}
+          placeholder="Pick a date"
+          valueFormat="DD MMM YYYY"
+          clearable
+          styles={mantineInputStyles}
+          popoverProps={{ withinPortal: true }}
+        />
+        <TimeInput
+          value={timeVal}
+          onChange={(e) => handleTimeChange(e.currentTarget.value)}
+          withSeconds={false}
+          format="24"
+          minTime={minTime}
+          placeholder="Pick a time"
+          styles={mantineInputStyles}
+        />
+      </div>
+      <p className="text-xs text-gray-500 mt-1.5">
+        Pickup must be at least 30 minutes from now.
+      </p>
+    </div>
+  );
+}
+
 const BookRide = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { socket } = useSocket();
+  const { user } = useAuth();
 
   const [pickupCoords, setPickupCoords] = useState(null);
   const [pickupAddress, setPickupAddress] = useState("");
@@ -100,23 +230,9 @@ const BookRide = () => {
   // Which field is currently resolving coords → place name ("pickup"/"drop"/null).
   // Booking is blocked while set, so only real names are ever stored.
   const [resolvingAddress, setResolvingAddress] = useState(null);
-  const datetimeInputRef = useRef(null);
 
-  const openDatetimePicker = () => {
-    const el = datetimeInputRef.current;
-    if (!el) return;
-    try {
-      if (typeof el.showPicker === "function") {
-        el.showPicker();
-        return;
-      }
-    } catch { /* already open or blocked */ }
-    try {
-      el.focus({ preventScroll: true });
-    } catch {
-      el.focus();
-    }
-  };
+  const minDate = minPickupDate();
+  const minTime = `${pad(minDate.getHours())}:${pad(minDate.getMinutes())}`;
 
   // Ensure the Maps JS API is available for client-side geocoding fallback.
   // Uses the shared loader singleton (utils/googleMaps) — identical options
@@ -774,26 +890,15 @@ const BookRide = () => {
               </div>
             </div>
 
-            {/* Date & Time */}
-            <div>
-              <label
-                onClick={openDatetimePicker}
-                className="flex items-center gap-2 text-xs font-medium text-gray-400 mb-1.5 cursor-pointer"
-              >
-                <Calendar size={14} /> Pickup Date & Time
-              </label>
-              <div onClick={openDatetimePicker} className="cursor-pointer">
-                <input
-                  ref={datetimeInputRef}
-                  type="datetime-local"
-                  value={pickupDateTime}
-                  min={getMinDateTime()}
-                  onChange={(e) => setPickupDateTime(e.target.value)}
-                  onClick={openDatetimePicker}
-                  className="w-full px-3 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl text-base focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none transition touch-manipulation [color-scheme:dark] cursor-pointer"
-                />
-              </div>
-            </div>
+            {/* Date & Time — Mantine pickers matching the guest booking form */}
+            <DateTimeField
+              id="pickup-datetime"
+              label="Pickup Date & Time"
+              value={pickupDateTime}
+              minDate={minDate}
+              minTime={minTime}
+              onChange={setPickupDateTime}
+            />
 
             {/* Round Trip Days */}
             {tripType === "Round Trip" && (
@@ -878,7 +983,7 @@ const BookRide = () => {
             >
               <span>{fareEstimate.distance?.toFixed(1)} km</span>
               <span className="w-1 h-1 rounded-full bg-gray-500" />
-              <span>{Math.ceil(fareEstimate.duration)} min</span>
+              <span>{formatTripDuration(fareEstimate.duration)}</span>
             </Motion.div>
           )}
 
@@ -911,80 +1016,138 @@ const BookRide = () => {
           <FareNotes compact />
           </div>
 
-      {/* Premium glass confirm popup — Confirm uses the existing booking
-          API via bookMutation; Cancel just closes. The Book button is
-          disabled unless the form is valid, and the mutation guards
-          against duplicate submissions. */}
+      {/* Premium glass confirm popup — same layout as the guest flow, but the
+          customer's name/email/phone come from the backend auth profile.
+          Confirm uses the existing booking API via bookMutation; Cancel just
+          closes. The Book button is disabled unless the form is valid, and
+          the mutation guards against duplicate submissions. */}
       <Modal
         isOpen={confirmOpen}
         onClose={() => !bookMutation.isPending && setConfirmOpen(false)}
         title="Confirm your booking"
         maxWidth="max-w-lg"
       >
-        <div className="space-y-4">
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2.5 text-sm">
-            {/* Fare breakdown */}
-            {fareEstimate?.fareBreakdown && (
-              <>
-                <div className="flex justify-between gap-3">
-                  <span className="text-gray-500">Base fare</span>
-                  <span className="text-white font-medium">₹{fareEstimate.fareBreakdown.baseFare}</span>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <span className="text-gray-500">Distance fare</span>
-                  <span className="text-white font-medium">₹{fareEstimate.fareBreakdown.distanceFare}</span>
-                </div>
-                {fareEstimate.fareBreakdown.driverAllowance > 0 && (
-                  <div className="flex justify-between gap-3">
-                    <span className="text-gray-500">Driver bata</span>
-                    <span className="text-white font-medium">₹{fareEstimate.fareBreakdown.driverAllowance}</span>
-                  </div>
-                )}
-                {fareEstimate.fareBreakdown.tollCharges > 0 && (
-                  <div className="flex justify-between gap-3">
-                    <span className="text-gray-500">Toll fee</span>
-                    <span className="text-white font-medium">₹{fareEstimate.fareBreakdown.tollCharges}</span>
-                  </div>
-                )}
-                {fareEstimate.fareBreakdown.permitCharges > 0 && (
-                  <div className="flex justify-between gap-3">
-                    <span className="text-gray-500">Permit fee</span>
-                    <span className="text-white font-medium">₹{fareEstimate.fareBreakdown.permitCharges}</span>
-                  </div>
-                )}
-                {tripType === "One Way" && (
-                  <div className="flex justify-between gap-3">
-                    <span className="text-gray-500">Waiting charge</span>
-                    <span className="text-white font-medium">₹2.5/min after 30 min</span>
-                  </div>
-                )}
-                {fareEstimate.fareBreakdown.waitingCharge > 0 && (
-                  <div className="flex justify-between gap-3">
-                    <span className="text-gray-500">Waiting fee</span>
-                    <span className="text-white font-medium">₹{fareEstimate.fareBreakdown.waitingCharge}</span>
-                  </div>
-                )}
-                {/* {fareEstimate.fareBreakdown.nightCharge > 0 && (
-                  <div className="flex justify-between gap-3">
-                    <span className="text-gray-500">Night charge</span>
-                    <span className="text-white font-medium">₹{fareEstimate.fareBreakdown.nightCharge}</span>
-                  </div>
-                )} */}
-              </>
+        <div className="space-y-3">
+          {/* Customer details — compact contact strip (backend profile) */}
+          <div className="bg-white/5 border border-white/10 rounded-xl divide-y divide-white/10">
+            {[
+              ["Customer", user?.name || "—"],
+              ["Email", user?.email || "—"],
+              ["Phone", user?.phone || "—"],
+            ].map(([label, value]) => (
+              <div key={label} className="flex items-center justify-between gap-3 px-3.5 py-2 text-[13px] min-w-0">
+                <span className="shrink-0 text-[10px] uppercase tracking-widest text-gray-500 font-semibold">{label}</span>
+                <span className="text-white font-medium truncate">{value}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Trip card — route, schedule, vehicle */}
+          <div className="bg-gradient-to-br from-emerald-500/15 via-white/5 to-transparent border border-emerald-500/20 rounded-xl p-3.5">
+            <div className="relative pl-4 space-y-2 text-[13px]">
+              <span aria-hidden className="absolute left-[4px] top-1 bottom-1 w-px bg-gradient-to-b from-green-400/70 via-white/15 to-red-400/70" />
+              <div className="relative min-w-0">
+                <span aria-hidden className="absolute  left-[-15px] top-1 w-[9px] h-[9px] rounded-full bg-green-400 ring-4 ring-green-400/20" />
+                <p className="text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Pickup</p>
+                <p className="text-white font-medium break-words">{pickupAddress}</p>
+              </div>
+              <div className="relative min-w-0">
+                <span aria-hidden className="absolute  left-[-15px] top-3 w-[9px] h-[9px] rounded-full bg-red-400 ring-4 ring-red-400/20" />
+                <p className="text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Drop</p>
+                <p className="text-white font-medium break-words">{dropAddress}</p>
+              </div>
+            </div>
+
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[12px]">
+              <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                <CalendarDays size={12} className="text-blue-400 shrink-0" />
+                <span className="truncate">{fmtWhen(pickupDateTime)}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                <CarFront size={12} className="text-green-400 shrink-0" />
+                <span className="truncate">{vehicles?.vehicles?.find((v) => v._id === selectedVehicle)?.name || "Selected car"}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                <Navigation size={12} className="text-sky-400 shrink-0" />
+                <span className="truncate">{fareEstimate?.distance?.toFixed(1)} km · {formatTripDuration(fareEstimate?.duration || 0)}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                {tripType === "Round Trip"
+                  ? <Repeat size={12} className="text-emerald-400 shrink-0" />
+                  : <ArrowRight size={12} className="text-emerald-400 shrink-0" />}
+                <span className="truncate">{tripType}{tripType === "Round Trip" ? ` · ${days} day${days > 1 ? "s" : ""}` : ""}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Fare breakdown */}
+          <div className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 space-y-1.5 text-[13px]">
+            {fareEstimate?.perKm != null && (
+              <div className="flex justify-between gap-3">
+                <span className="text-gray-500">
+                  {tripType === "Round Trip"
+                    ? "Round trip base fare per km"
+                    : "One way base fare per km"}
+                </span>
+                <span className="text-white font-medium">{perKmLabel(fareEstimate.perKm)}</span>
+              </div>
+            )}
+            <div className="flex justify-between gap-3">
+              <span className="text-gray-500">Base fare</span>
+              <span className="text-white font-medium">{formatCurrency(fareEstimate?.fareBreakdown?.baseFare)}</span>
+            </div>
+            <div className="flex justify-between gap-3">
+              <span className="text-gray-500">Distance fare</span>
+              <span className="text-white font-medium">{formatCurrency(fareEstimate?.fareBreakdown?.distanceFare)}</span>
+            </div>
+            {fareEstimate?.fareBreakdown?.driverAllowance > 0 && (
+              <div className="flex justify-between gap-3">
+                <span className="text-gray-500">
+                  Driver bata{tripType === "Round Trip" ? ` × ${fareEstimate.fareBreakdown.billableDays || days} day(s)` : ""}
+                </span>
+                <span className="text-white font-medium">{formatCurrency(fareEstimate?.fareBreakdown?.driverAllowance)}</span>
+              </div>
+            )}
+            {fareEstimate?.fareBreakdown?.tollCharges > 0 && (
+              <div className="flex justify-between gap-3">
+                <span className="text-gray-500">Toll fee</span>
+                <span className="text-white font-medium">{formatCurrency(fareEstimate?.fareBreakdown?.tollCharges)}</span>
+              </div>
+            )}
+            {fareEstimate?.fareBreakdown?.permitCharges > 0 && (
+              <div className="flex justify-between gap-3">
+                <span className="text-gray-500">Permit fee</span>
+                <span className="text-white font-medium">{formatCurrency(fareEstimate?.fareBreakdown?.permitCharges)}</span>
+              </div>
+            )}
+            {fareEstimate?.fareBreakdown?.waitingCharge > 0 && (
+              <div className="flex justify-between gap-3">
+                <span className="text-gray-500">Waiting fee (first 30 min free)</span>
+                <span className="text-white font-medium">{formatCurrency(fareEstimate?.fareBreakdown?.waitingCharge)}</span>
+              </div>
             )}
             <div className="flex justify-between items-center gap-3 pt-2 border-t border-white/10">
               <span className="text-gray-300 font-semibold">Total fare</span>
-              <span className="font-display text-2xl font-bold text-green-400">
+              <span className="font-display text-xl font-bold text-green-400">
                 {fareEstimate ? `₹${fareEstimate.estimatedFare}` : "—"}
               </span>
             </div>
           </div>
-          {/* Notes */}
-          <div className="bg-red-600 border-white/10 rounded-2xl p-4 text-xs text-white space-y-1.5">
-            <p><strong>Note:</strong> Pay cash to the driver. Tolls &amp; permits extra at actuals.</p>
-            {tripType === "One Way" && <p>Waiting charge ₹2.5/min applies after 30 min free waiting.</p>}
-            {notes.trim() && <p className="text-gray-300">Note: {notes.trim()}</p>}
-          </div>
+
+          {/* Notes — single line */}
+          <p className="text-[11px] leading-5 bg-red-700 border border-white/10 rounded-md px-2.5 py-1.5">
+            <span className="text-black font-bold">Note:</span>{" "}
+            <span className="text-white">Pay cash to the driver. Tolls &amp; permits at actuals.{tripType === "One Way" && " Waiting ₹2.5/min after 30 min free."}</span>
+            {notes.trim() && (
+              <>
+                <br />
+                <span className="text-black font-bold">Customer note:</span>{" "}
+                <span className="text-white">{notes.trim()}</span>
+              </>
+            )}
+          </p>
+
+          {/* Actions */}
           <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"

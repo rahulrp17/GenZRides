@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { MapPin, Clock, Car, ArrowLeft, Loader2, CheckCircle, Navigation, User, Wifi, WifiOff, Copy, Check } from 'lucide-react';
 import { bookingAPI, driverAPI } from '../../services/endpoints';
 import { useCopyBooking } from '../../utils/bookingText';
+import { formatTripDuration } from '../../utils/formatDuration';
 import { CardSkeleton } from '../../components/shared/Skeleton';
 import ErrorState from '../../components/shared/ErrorState';
 import { motion as Motion } from 'framer-motion';
@@ -201,7 +202,7 @@ const DriverBookingDetail = () => {
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <p className="text-xs text-gray-400">Duration</p>
-              <p className="text-sm font-medium">{booking.duration != null ? `${Math.ceil(Number(booking.duration))} min` : 'N/A'}</p>
+              <p className="text-sm font-medium">{formatTripDuration(booking.duration)}</p>
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <p className="text-xs text-gray-400">Payment</p>

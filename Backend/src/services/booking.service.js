@@ -278,10 +278,13 @@ export const createGuestBooking = async (guestData) => {
       throw new Error("Your account has been blocked.");
     }
   } else {
-    const emailTaken = await User.findOne({ email: cleanEmail });
-    const recordEmail = emailTaken
-      ? `guest-${guestPhone}@guest.letsgocab.local`
-      : cleanEmail;
+    // NEVER claim the guest's real email on the account. Guest accounts use a
+    // phone-keyed placeholder so the real address stays free for a proper
+    // registration later, repeat guests always succeed, and the admin dashboard
+    // can separate "Instant Bookers" from registered customers cleanly.
+    // The real address typed by the guest is snapshotted on the booking itself
+    // (see guestEmail on Booking), never lost.
+    const recordEmail = `guest-${guestPhone}@guest.letsgocab.local`;
 
     // Random unusable password: guest accounts cannot log in with it.
     const randomPassword = crypto.randomBytes(32).toString("hex");
@@ -1368,9 +1371,18 @@ export const getAvailableBookings = async (
       user: driverUserId,
     }).select("vehicleType");
 
-    if (driverProfile?.vehicleType) {
-      query.vehicleType = driverProfile.vehicleType;
+    // A driver must never see another cab type's bookings. If their own
+    // cab type is not set yet, show nothing — never everything (otherwise
+    // a Sedan driver would see SUV/Innova requests in their feed).
+    if (!driverProfile?.vehicleType) {
+      return {
+        success: true,
+        total: 0,
+        bookings: [],
+      };
     }
+
+    query.vehicleType = driverProfile.vehicleType;
   }
 
   const bookings = await Booking.find(query)

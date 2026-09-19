@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { formatTripDuration } from "./formatDuration";
 
 const formatDateTime = (value) => {
   if (!value) return "N/A";
@@ -40,7 +41,7 @@ export const formatBookingDetails = (booking) => {
     `🛣️ Trip Type: ${booking.tripType || "N/A"}`,
     `🚙 Cab Type: ${cab}`,
     `📏 Distance: ${booking.distance != null ? `${Number(booking.distance).toFixed(1)} km` : "N/A"}`,
-    `⏱️ Duration: ${booking.duration != null ? `${Math.ceil(Number(booking.duration))} min` : "N/A"}`,
+    `⏱️ Duration: ${formatTripDuration(booking.duration)}`,
     `💵 Fare: Rs.${booking.finalFare || booking.estimatedFare || 0}`,
     `💳 Payment: ${booking.paymentMethod || "Cash"} (${booking.paymentStatus || "Pending"})`,
     `⚠️ Note: Please inform the customer that they are required to pay both the toll fee and the interstate permit fee.`,

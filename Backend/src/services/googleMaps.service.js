@@ -39,6 +39,18 @@ const requestRoute = async (origin, destination, fieldMask) => {
 };
 
 export const getRoute = async (origin, destination) => {
+  // Optional offline stub for tests that stream the full booking/fare
+  // pipeline without a network call. Enabled explicitly via env so tests
+  // that mock Google HTTP responses (e.g. aiFare's 460 km fixture) still
+  // exercise the real path.
+  if (process.env.GOOGLE_ROUTES_MOCK_KM) {
+    return {
+      distance: Number(process.env.GOOGLE_ROUTES_MOCK_KM),
+      duration: 120,
+      polyline: "test-polyline",
+    };
+  }
+
   try {
     const route = await requestRoute(
       origin,

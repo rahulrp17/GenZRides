@@ -12,6 +12,7 @@ import { sedan, innova, hero4 } from "../../assets/images";
 import { loadDraft, saveDraft } from "./guestDraft";
 import { Reveal } from "../../Component/Landing/Reveal";
 import { cardHover } from "../../Component/Landing/motion";
+import { formatTripDuration } from "../../utils/formatDuration";
 
 const imageFor = (v) => {
   if (v?.image) return v.image;
@@ -189,8 +190,8 @@ const CarTypePage = () => {
                       </div>
                       <div className="p-5">
                         <div className="flex items-center gap-4 text-sm text-gray-300 mb-3">
-                          <span className="inline-flex items-center gap-1.5"><Users size={15} className="text-green-400" /> {v.seats}</span>
-                          <span className="inline-flex items-center gap-1.5"><Luggage size={15} className="text-green-400" /> {v.luggage}</span>
+                          <span className="inline-flex items-center gap-1.5"><Users size={15} className="text-green-400" /> {v.seats}{""} Seats</span>
+                          <span className="inline-flex items-center gap-1.5"><Luggage size={15} className="text-green-400" /> {v.luggage}{""} Bags</span>
                         </div>
                         <div className="border-t border-white/10 pt-3 min-h-[44px] flex items-center">
                           {estimatingId === v._id ? (
@@ -200,7 +201,7 @@ const CarTypePage = () => {
                           ) : fare ? (
                             <p className="text-xl font-bold text-green-400">
                               ₹{fare.estimatedFare}
-                              <span className="text-xs font-normal text-gray-500 ml-2">{fare.distance?.toFixed(1)} km · {Math.ceil(fare.duration)} min</span>
+                              <span className="text-xs font-normal text-gray-500 ml-2">{fare.distance?.toFixed(1)} km · {formatTripDuration(fare.duration)}</span>
                             </p>
                           ) : (
                             <p className="text-sm text-gray-400">Tap to calculate fare</p>

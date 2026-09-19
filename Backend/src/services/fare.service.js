@@ -31,7 +31,7 @@ export const FARE_CONFIG = {
   // One-way / drop uses 400 standard; round-trip is always 300 (per fare
   // notes + tests). Separate constants keep the two policies explicit.
   driverBataStandard: 400,
-  driverBataRoundTrip: 300,
+  driverBataRoundTrip: 400,
   driverBataHighDistance: 600,
   driverBataHighDistanceThresholdKm: 400,
 

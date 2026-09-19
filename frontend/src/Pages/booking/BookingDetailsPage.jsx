@@ -10,6 +10,7 @@ import {
 import { motion as Motion } from 'framer-motion';
 import { bookingAPI, driverAPI, adminAPI } from '../../services/endpoints';
 import { useCopyBooking } from '../../utils/bookingText';
+import { formatTripDuration } from '../../utils/formatDuration';
 import useAuth from '../../hooks/useAuth';
 import { useSocket } from '../../Context/SocketContext';
 import { CardSkeleton } from '../../components/shared/Skeleton';
@@ -294,7 +295,7 @@ const BookingDetailsPage = () => {
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <p className="text-xs text-gray-400 flex items-center gap-1"><Clock size={12} /> Duration</p>
-              <p className="text-sm font-medium text-white mt-0.5">{booking.duration != null ? `${Math.ceil(Number(booking.duration))} min` : 'N/A'}</p>
+              <p className="text-sm font-medium text-white mt-0.5">{formatTripDuration(booking.duration)}</p>
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <p className="text-xs text-gray-400 flex items-center gap-1"><CreditCard size={12} /> Fare</p>

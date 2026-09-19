@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import { formatTripDuration } from "../../utils/formatDuration";
 import {
   Calendar,
   Eye,
@@ -16,6 +17,9 @@ import {
   CalendarCheck,
   Copy,
   Check,
+  Repeat,
+  ArrowRight,
+  ChevronDown,
 } from "lucide-react";
 import { adminAPI, vehicleAPI } from "../../services/endpoints";
 import { useCopyBooking } from "../../utils/bookingText";
@@ -24,6 +28,10 @@ import ErrorState from "../../components/shared/ErrorState";
 import EmptyState from "../../components/shared/EmptyState";
 import Pagination from "../../components/shared/Pagination";
 import Modal from "../../components/shared/Modal";
+import SearchBar from "../../components/shared/SearchBar";
+import ViewToggle from "../../components/shared/ViewToggle";
+import GlassTable from "../../components/shared/GlassTable";
+import useDebounce from "../../hooks/useDebounce";
 import CancelReasonDialog from "../../components/shared/CancelReasonDialog";
 import AssignDriverDialog from "../../components/shared/AssignDriverDialog";
 // 
@@ -46,6 +54,22 @@ const ManageBookings = () => {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState("");
+  const [search, setSearch] = useState("");
+  // Debounced so typing "Trichy" fires one request per pause, not per key.
+  const debouncedSearch = useDebounce(search, 300);
+  // Table/cards preference persists; switching never refetches or resets
+  // search, filters or page — all live outside the view branch.
+  const [view, setView] = useState(
+    () => localStorage.getItem("adminBookingsView") || "cards"
+  );
+  const changeView = (v) => {
+    setView(v);
+    try {
+      localStorage.setItem("adminBookingsView", v);
+    } catch {
+      // private mode — preference simply won't persist
+    }
+  };
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [actionDialog, setActionDialog] = useState({
     open: false,
@@ -97,16 +121,19 @@ const ManageBookings = () => {
   });
   const vehicleTypes = vehicleData?.vehicles || [];
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["adminBookings", page, statusFilter, vehicleTypeFilter],
+  const { data, isLoading, isFetching, isError, error } = useQuery({
+    queryKey: ["adminBookings", page, statusFilter, vehicleTypeFilter, debouncedSearch],
     queryFn: async () => {
       const params = { page, limit: 10 };
       if (statusFilter) params.status = statusFilter;
       if (vehicleTypeFilter) params.vehicleType = vehicleTypeFilter;
+      if (debouncedSearch) params.search = debouncedSearch;
       const { data } = await adminAPI.getBookings(params);
       return data;
     },
     staleTime: 30_000,
+    // Keep the previous page visible while search/pagination refetches.
+    placeholderData: (prev) => prev,
   });
 
   const { data: driversData } = useQuery({
@@ -202,28 +229,141 @@ const ManageBookings = () => {
     b.bookingStatus !== "Completed" && b.bookingStatus !== "Cancelled";
   const fareOf = (b) => b.finalFare || b.estimatedFare;
 
+  const formatBookedOn = (iso) => {
+    if (!iso) return "—";
+    try {
+      return new Date(iso).toLocaleString("en-IN", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "—";
+    }
+  };
+
+  const TripTypeBadge = ({ type }) => {
+    const round = type === "Round Trip";
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border backdrop-blur ${
+          round
+            ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+            : "bg-sky-500/15 text-sky-300 border-sky-500/30"
+        }`}
+      >
+        {round ? <Repeat size={12} /> : <ArrowRight size={12} />}
+        {type || "One Way"}
+      </span>
+    );
+  };
+
+  // Table view columns — same data and actions as the cards.
+  const bookingColumns = [
+    {
+      header: "Booking",
+      cell: (b) => (
+        <div className="min-w-[130px]">
+          <p className="font-mono text-xs text-gray-400">#{b._id?.slice(-6).toUpperCase()}</p>
+          <p className="text-[11px] text-gray-500 mt-0.5 whitespace-nowrap">{formatBookedOn(b.createdAt)}</p>
+        </div>
+      ),
+    },
+    {
+      header: "Customer",
+      cell: (b) => (
+        <div className="min-w-[140px] max-w-[200px]">
+          <p className="text-sm font-semibold text-white truncate">{b.customer?.name || "N/A"}</p>
+          <p className="text-[11px] text-gray-500 truncate">{b.customer?.email || b.customer?.phone || ""}</p>
+        </div>
+      ),
+    },
+    {
+      header: "Route",
+      cell: (b) => (
+        <div className="min-w-[180px] max-w-[260px]">
+          <p className="text-xs text-gray-300 truncate" title={b.pickup?.address}>
+            <span className="text-green-400 font-bold">↑ </span>{b.pickup?.address || "N/A"}
+          </p>
+          <p className="text-xs text-gray-300 truncate mt-1" title={b.drop?.address}>
+            <span className="text-red-400 font-bold">↓ </span>{b.drop?.address || "N/A"}
+          </p>
+        </div>
+      ),
+    },
+    {
+      header: "Type",
+      cell: (b) => <TripTypeBadge type={b.tripType} />,
+    },
+    {
+      header: "Status",
+      cell: (b) => (
+        <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ${statusColors[b.bookingStatus]}`}>
+          {b.bookingStatus}
+        </span>
+      ),
+    },
+    {
+      header: "Fare",
+      tdClassName: "text-right",
+      thClassName: "text-right",
+      cell: (b) => <span className="font-bold text-white tabular-nums whitespace-nowrap">₹{(fareOf(b) ?? 0).toLocaleString("en-IN")}</span>,
+    },
+    {
+      header: "Actions",
+      tdClassName: "text-right",
+      thClassName: "text-right",
+      cell: (b) => (
+        <span className="inline-flex items-center justify-end gap-1.5">
+          <button onClick={() => setSelectedBooking(b)} title="Details" aria-label="View details" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs hover:bg-white/10 transition">
+            <Eye size={14} />
+          </button>
+          <button onClick={() => openBooking(b._id)} title="Track ride" aria-label="Track ride" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 rounded-xl text-xs hover:bg-emerald-500/25 transition">
+            <MapPin size={14} />
+          </button>
+          {!b.driver && b.bookingStatus === "Pending" && (
+            <button onClick={() => setAssignDialog({ open: true, bookingId: b._id })} title="Assign driver" aria-label="Assign driver" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-xs hover:shadow-[0_0_18px_rgba(34,197,94,0.5)] transition">
+              <User size={14} />
+            </button>
+          )}
+          {canAct(b) && (
+            <>
+              <button onClick={() => completeMutation.mutate(b._id)} disabled={completeMutation.isPending} title="Complete" aria-label="Complete booking" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 rounded-xl text-xs hover:bg-emerald-500/25 transition disabled:opacity-50">
+                <Check size={14} />
+              </button>
+              <button onClick={() => setActionDialog({ open: true, action: "cancel", id: b._id })} title="Cancel" aria-label="Cancel booking" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-red-500/15 border border-red-500/25 text-red-300 rounded-xl text-xs hover:bg-red-500/25 transition">
+                <XCircle size={14} />
+              </button>
+            </>
+          )}
+        </span>
+      ),
+    },
+  ];
+
   return (
     <Motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-4 sm:space-y-6 min-w-0"
     >
-      {/* ── Hero panel ─────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-500/15 via-white/5 to-transparent p-4 sm:p-6">
+      {/* ── Hero panel (compact) ─────────────────────────────── */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-500/15 via-white/5 to-transparent p-4 sm:p-5">
         <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 bg-violet-500/20 blur-[100px]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/60 to-transparent" />
-        <div className="relative min-w-0">
+        <div className="relative min-w-0 flex flex-wrap items-center gap-x-4 gap-y-1">
           <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-300">
             <CalendarCheck size={12} /> Operations
           </p>
-          <h1 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight mt-1">
+          <h1 className="font-display text-lg sm:text-xl font-bold text-white tracking-tight">
             Manage Bookings
           </h1>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-[11px] sm:text-xs text-gray-400 w-full">
             Track every ride, assign drivers, complete or cancel — updates live.
           </p>
         </div>
-        <div className="relative mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        <div className="relative mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
             {
               label: "Total rides",
@@ -255,13 +395,13 @@ const ManageBookings = () => {
           ].map((s) => (
             <div
               key={s.label}
-              className="bg-black/30 border border-white/10 rounded-2xl px-3 py-2.5 min-w-0"
+              className="bg-black/30 border border-white/10 rounded-2xl px-3 py-2 min-w-0"
             >
-              <p className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-gray-400 truncate">
+              <p className="flex items-center gap-1.5 text-[10px] text-gray-400 truncate">
                 <s.icon size={12} className={s.tint} />
                 {s.label}
               </p>
-              <p className="text-base sm:text-lg font-bold text-white leading-tight mt-1 truncate">
+              <p className="text-base sm:text-lg font-bold text-white leading-tight mt-0.5 truncate">
                 {s.value}
               </p>
             </div>
@@ -310,26 +450,59 @@ const ManageBookings = () => {
         ))}
       </div>
 
-      {/* ── Vehicle type filter ────────────────────────────────── */}
-      {vehicleTypes.length > 0 && (
-        <div className="flex items-center gap-2">
-          <label className="text-xs font-semibold text-gray-400">Vehicle type</label>
-          <select
-            value={vehicleTypeFilter}
-            onChange={(e) => {
-              setVehicleTypeFilter(e.target.value);
+      {/* ── Premium search + vehicle filter + view toggle ── */}
+      <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+        <div className="relative flex-1 min-w-0">
+          <SearchBar
+            value={search}
+            onChange={(v) => {
+              setSearch(v);
               setPage(1);
             }}
-            className="bg-white/5 border border-white/10 text-white text-xs font-medium rounded-xl px-3 py-2 min-h-[40px] outline-none focus:border-emerald-500/50 transition cursor-pointer"
-          >
-            <option value="">All Types</option>
-            {vehicleTypes.map((v) => (
-              <option key={v._id} value={v._id} className="bg-gray-900 text-white">
-                {v.name}
-              </option>
-            ))}
-          </select>
+            placeholder="Search name, email, booking ID, pickup, drop, trip type…"
+          />
+          {isFetching && !isLoading && (
+            <span className="absolute right-11 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-white/20 border-t-emerald-400 rounded-full animate-spin pointer-events-none" aria-label="Searching" />
+          )}
         </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <ViewToggle view={view} onChange={changeView} />
+          {vehicleTypes.length > 0 && (
+            <>
+              <label className="text-xs font-semibold text-gray-400 hidden sm:inline">Vehicle</label>
+              <div className="relative flex-1 sm:flex-none">
+              <select
+                value={vehicleTypeFilter}
+                onChange={(e) => {
+                  setVehicleTypeFilter(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full sm:w-auto appearance-none bg-white/[0.06] backdrop-blur-xl border border-white/15 text-white text-xs font-semibold rounded-2xl pl-4 pr-10 py-3 min-h-[48px] outline-none cursor-pointer hover:border-emerald-500/40 focus:border-emerald-500/60 transition shadow-lg shadow-black/20"
+              >
+                <option value="" className="bg-gray-900 text-white">All Types</option>
+                {vehicleTypes.map((v) => (
+                  <option key={v._id} value={v._id} className="bg-gray-900 text-white">
+                    {v.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-400 pointer-events-none" />
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+      {debouncedSearch && !isLoading && (
+        <p className="text-xs text-gray-400 -mt-1" role="status">
+          {pagination.total != null ? (
+            <>
+              <span className="text-white font-bold">{pagination.total}</span> result{pagination.total === 1 ? "" : "s"} for{" "}
+              <span className="text-emerald-300 font-semibold">“{debouncedSearch}”</span>
+            </>
+          ) : (
+            <>Searching for <span className="text-emerald-300 font-semibold">“{debouncedSearch}”</span>…</>
+          )}
+        </p>
       )}
 
       {/* ── Feed ───────────────────────────────────────────────── */}
@@ -339,16 +512,32 @@ const ManageBookings = () => {
       ) : bookings.length === 0 ? (
         <EmptyState
           icon={Calendar}
-          title="No bookings found"
+          title={debouncedSearch ? "No matching bookings" : "No bookings found"}
           description={
-            statusFilter
-              ? `No ${statusFilter.toLowerCase()} bookings.`
-              : "Bookings will appear here."
+            debouncedSearch
+              ? `Nothing matches “${debouncedSearch}”. Try a name, email, booking ID, place, or trip type (one way, round trip).`
+              : statusFilter
+                ? `No ${statusFilter.toLowerCase()} bookings.`
+                : "Bookings will appear here."
+          }
+          action={
+            debouncedSearch ? (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setPage(1);
+                }}
+                className="px-5 py-2.5 min-h-[44px] rounded-2xl bg-white/5 border border-white/15 text-sm font-semibold text-white hover:bg-white/10 transition"
+              >
+                Clear search
+              </button>
+            ) : undefined
           }
         />
       ) : (
         <>
-          <div className="grid gap-3 sm:gap-4 w-full max-w-6xl">
+          {view === "cards" ? (
+          <div className="grid gap-3 sm:gap-4 w-full max-w-full">
             {bookings.map((b, i) => (
               <Motion.article
                 key={b._id}
@@ -368,8 +557,12 @@ const ManageBookings = () => {
                       >
                         {b.bookingStatus}
                       </span>
-                      <span className="font-mono text-[11px] text-gray-500">
-                        #{b._id?.slice(-6).toUpperCase()}
+                      <TripTypeBadge type={b.tripType} />
+                      <span className="font-mono text-[12px] bg-purple-400/15 font-bold border border-purple-400/25 text-purple-500 px-2.5 py-1 rounded-full ">
+                      #{b._id?.slice(-6).toUpperCase()}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                        <Calendar size={11} /> {formatBookedOn(b.createdAt)}
                       </span>
                     </div>
                     <div className="relative pl-5 space-y-3 min-w-0">
@@ -411,19 +604,11 @@ const ManageBookings = () => {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5 mt-3">
-                      {b.tripType && (
-                        <span className="px-2.5 py-1.5 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
-                          {b.tripType}
-                        </span>
-                      )}
-                      {(b.vehicleType?.name || b.driver?.vehicleType?.name) && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
-                          <Car size={12} className="text-violet-400 shrink-0" />
-                          {b.vehicleType?.name || b.driver?.vehicleType?.name}
-                        </span>
-                      )}
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
-                        <Wallet size={12} className="text-amber-400 shrink-0" />
+                        <Car size={12} className="text-violet-400 shrink-0" />
+                        {(b.vehicleType?.name || b.driver?.vehicleType?.name) && (
+                          <>{b.vehicleType?.name || b.driver?.vehicleType?.name} · </>
+                        )}
                         {b.paymentMethod || "Cash"} ·{" "}
                         {b.paymentStatus || "Pending"}
                       </span>
@@ -496,6 +681,9 @@ const ManageBookings = () => {
               </Motion.article>
             ))}
           </div>
+          ) : (
+            <GlassTable columns={bookingColumns} rows={bookings} rowKey={(b) => b._id} />
+          )}
 
           <Pagination
             page={pagination.page || 1}
@@ -650,15 +838,19 @@ const ManageBookings = () => {
               <div className="bg-white/5 rounded-2xl p-3">
                 <p className="text-[11px] text-gray-500">Duration</p>
                 <p className="font-medium text-white text-sm">
-                  {selectedBooking.duration != null
-                    ? `${Math.ceil(Number(selectedBooking.duration))} min`
-                    : "—"}
+                  {formatTripDuration(selectedBooking.duration)}
                 </p>
               </div>
               <div className="bg-white/5 rounded-2xl p-3">
                 <p className="text-[11px] text-gray-500">Trip Type</p>
                 <p className="font-medium text-white text-sm">
                   {selectedBooking.tripType}
+                </p>
+              </div>
+              <div className="bg-white/5 rounded-2xl p-3">
+                <p className="text-[11px] text-gray-500">Booked On</p>
+                <p className="font-medium text-white text-sm">
+                  {formatBookedOn(selectedBooking.createdAt)}
                 </p>
               </div>
               <div className="bg-white/5 rounded-2xl p-3">

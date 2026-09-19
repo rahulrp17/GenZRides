@@ -664,13 +664,15 @@ export const getBookings = async (req, res) => {
       limit = 10,
       status = "",
       vehicleType = "",
+      search = "",
     } = req.query;
 
     const bookings = await adminService.getBookings(
       Number(page),
       Number(limit),
       status,
-      vehicleType
+      vehicleType,
+      search
     );
 
     res.status(200).json({

@@ -5,19 +5,116 @@ import { toast } from "react-hot-toast";
 import {
   MapPin,
   Navigation,
+  Crosshair,
   Loader2,
   ArrowRight,
   CalendarDays,
   Hash,
+  X,
+  MapPinned,
+  AlertTriangle,
+  Plane,
 } from "lucide-react";
+import { DateInput, TimeInput } from "@mantine/dates";
+import { NumberInput } from "@mantine/core";
 import { guestAPI } from "../../services/endpoints";
-import { saveDraft, minPickupISO } from "./guestDraft";
+import { loadDraft, saveDraft, minPickupISO } from "./guestDraft";
+import RideMap from "../../components/customer/RideMap";
+import { toDisplayAddress } from "../../utils/locationFormat";
 
 const DEBOUNCE_MS = 300;
 
+const CHENNAI_AIRPORT = {
+  address:
+    "Chennai International Airport (MAA), Meenambakkam, Chennai, Tamil Nadu 600027",
+  lat: 12.9941,
+  lng: 80.1709,
+};
+
 const pad = (n) => String(n).padStart(2, "0");
 
-function PlaceField({ label, icon, placeholder, value, onPick, accent }) {
+const mantineInputStyles = {
+  input: {
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderColor: "rgba(255,255,255,0.12)",
+    color: "#fff",
+    height: 46,
+    borderRadius: 12,
+    fontSize: 15,
+  },
+  section: { color: "#4ade80" },
+};
+
+const resolvePlaceName = async (coords) => {
+  try {
+    const { data } = await guestAPI.reverseGeocode({
+      latitude: coords.lat,
+      longitude: coords.lng,
+    });
+    if (data.success) {
+      const name = toDisplayAddress(data.data, null);
+      if (name) return name;
+    }
+  } catch {
+    /* fall through to client-side geocoder */
+  }
+  try {
+    if (typeof window !== "undefined" && window.google?.maps?.Geocoder) {
+      const geocoder = new window.google.maps.Geocoder();
+      const result = await geocoder.geocode({
+        location: { lat: coords.lat, lng: coords.lng },
+      });
+      const name = toDisplayAddress(
+        result?.results?.[0]?.formatted_address,
+        null,
+      );
+      if (name) return name;
+    }
+  } catch {
+    /* no name available */
+  }
+  return null;
+};
+
+function ActionButton({ icon, iconBg, title, hint, onClick, loading }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={loading}
+      className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 transition text-left disabled:opacity-60"
+    >
+      <span
+        className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${iconBg}`}
+      >
+        {loading ? (
+          <Loader2 size={16} className="animate-spin text-white/60" />
+        ) : (
+          icon
+        )}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm text-white truncate">{title}</span>
+        {hint && (
+          <span className="block text-xs text-gray-400 truncate">{hint}</span>
+        )}
+      </span>
+    </button>
+  );
+}
+
+function PlaceField({
+  id,
+  label,
+  icon,
+  accent,
+  placeholder,
+  value,
+  onPick,
+  onCurrentLocation,
+  onSetOnMap,
+  locationBusy,
+}) {
   const [text, setText] = useState(value?.address || "");
   const [open, setOpen] = useState(false);
   const [predictions, setPredictions] = useState([]);
@@ -26,7 +123,6 @@ function PlaceField({ label, icon, placeholder, value, onPick, accent }) {
   const timerRef = useRef(null);
   const boxRef = useRef(null);
 
-  // Keep typed text in sync when a place is picked elsewhere (e.g. swap)
   useEffect(() => {
     if (!open) setText(value?.address || "");
   }, [value, open]);
@@ -38,6 +134,14 @@ function PlaceField({ label, icon, placeholder, value, onPick, accent }) {
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const t = setTimeout(() => {
+      boxRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 120);
+    return () => clearTimeout(t);
+  }, [open]);
 
   const search = useCallback((input) => {
     setText(input);
@@ -61,6 +165,16 @@ function PlaceField({ label, icon, placeholder, value, onPick, accent }) {
     }, DEBOUNCE_MS);
   }, []);
 
+  const finishPick = useCallback(
+    (place) => {
+      onPick(place);
+      setText(place.address);
+      setOpen(false);
+      setPredictions([]);
+    },
+    [onPick],
+  );
+
   const pick = useCallback(
     async (prediction) => {
       setResolving(true);
@@ -69,16 +183,12 @@ function PlaceField({ label, icon, placeholder, value, onPick, accent }) {
           placeId: prediction.placeId,
         });
         if (data.success && data.data?.lat != null && data.data?.lng != null) {
-          const place = {
+          finishPick({
             address:
               data.data.formattedAddress || data.data.name || prediction.text,
             lat: data.data.lat,
             lng: data.data.lng,
-          };
-          onPick(place);
-          setText(place.address);
-          setOpen(false);
-          setPredictions([]);
+          });
           return;
         }
         toast.error(
@@ -92,8 +202,31 @@ function PlaceField({ label, icon, placeholder, value, onPick, accent }) {
         setResolving(false);
       }
     },
-    [onPick],
+    [finishPick],
   );
+
+  const handleActionTap = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const handleCurrentLocationTap = useCallback(() => {
+    handleActionTap();
+    onCurrentLocation(id);
+  }, [handleActionTap, onCurrentLocation, id]);
+
+  const handleSetOnMapTap = useCallback(() => {
+    handleActionTap();
+    onSetOnMap(id);
+  }, [handleActionTap, onSetOnMap, id]);
+
+  const handleAirportTap = useCallback(() => {
+    handleActionTap();
+    finishPick({ ...CHENNAI_AIRPORT });
+  }, [handleActionTap, finishPick]);
+
+  const hasText = text.trim().length >= 2;
+  const busy =
+    searching || resolving || (id === "pickup" && locationBusy === "pickup");
 
   return (
     <div ref={boxRef} className="relative min-w-0">
@@ -111,7 +244,7 @@ function PlaceField({ label, icon, placeholder, value, onPick, accent }) {
           autoComplete="off"
           className="w-full bg-white/5 border border-white/10 pl-10 pr-10 py-3 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 transition text-[15px] [color-scheme:dark]"
         />
-        {(searching || resolving) && (
+        {busy && (
           <Loader2
             size={16}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400 animate-spin"
@@ -120,37 +253,72 @@ function PlaceField({ label, icon, placeholder, value, onPick, accent }) {
       </div>
 
       <AnimatePresence>
-        {open && text.trim().length >= 2 && (
+        {open && (
           <Motion.div
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.15 }}
-            className="absolute left-0 right-0 top-full mt-2 z-30 bg-[#0a0f0d]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[240px] overflow-y-auto"
+            className="absolute left-0 right-0 top-full mt-2 z-50 bg-[#0a0f0d]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[240px] overflow-y-auto"
           >
-            {searching ? (
-              <p className="px-4 py-4 text-sm text-gray-400 text-center">
-                Searching places…
-              </p>
-            ) : predictions.length === 0 ? (
-              <p className="px-4 py-4 text-sm text-gray-400 text-center">
-                No matches. Keep typing.
-              </p>
+            {hasText ? (
+              searching ? (
+                <p className="px-4 py-4 text-sm text-gray-400 text-center">
+                  Searching places…
+                </p>
+              ) : predictions.length === 0 ? (
+                <p className="px-4 py-4 text-sm text-gray-400 text-center">
+                  No matches. Keep typing.
+                </p>
+              ) : (
+                predictions.map((p) => (
+                  <button
+                    key={p.placeId}
+                    type="button"
+                    title={p.text}
+                    onClick={() => pick(p)}
+                    className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 transition text-left"
+                  >
+                    <span className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                      <MapPin size={14} className="text-green-400" />
+                    </span>
+                    <span className="text-sm text-white truncate">
+                      {p.text}
+                    </span>
+                  </button>
+                ))
+              )
             ) : (
-              predictions.map((p) => (
-                <button
-                  key={p.placeId}
-                  type="button"
-                  title={p.text}
-                  onClick={() => pick(p)}
-                  className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/5 transition text-left"
-                >
-                  <span className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                    <MapPin size={14} className="text-green-400" />
-                  </span>
-                  <span className="text-sm text-white truncate">{p.text}</span>
-                </button>
-              ))
+              <div className="py-1">
+                {id === "drop" && (
+                  <ActionButton
+                    icon={<Plane size={16} className="text-sky-400" />}
+                    iconBg="bg-sky-500/10"
+                    title="Chennai International Airport"
+                    hint="MAA - Meenambakkam"
+                    onClick={handleAirportTap}
+                  />
+                )}
+                {id === "pickup" && (
+                  <ActionButton
+                    icon={<Navigation size={16} className="text-blue-500" />}
+                    iconBg="bg-blue-500/10"
+                    title="Use current location"
+                    hint="Auto-fill from your GPS position"
+                    onClick={handleCurrentLocationTap}
+                    loading={locationBusy === "pickup"}
+                  />
+                )}
+                <ActionButton
+                  icon={<Crosshair size={16} className="text-green-500" />}
+                  iconBg="bg-green-500/10"
+                  title={
+                    id === "pickup" ? "Set pickup on map" : "Set drop-off on map"
+                  }
+                  hint="Tap the map to pin the exact spot"
+                  onClick={handleSetOnMapTap}
+                />
+              </div>
             )}
           </Motion.div>
         )}
@@ -159,51 +327,86 @@ function PlaceField({ label, icon, placeholder, value, onPick, accent }) {
   );
 }
 
-/* Click-anywhere native date/time field. The whole control (label +
-   input box) opens the native picker via showPicker(), with focus/click
-   fallbacks for browsers without it. Typing stays fully native. */
-function DateTimeField({ id, label, value, min, onChange }) {
-  const inputRef = useRef(null);
+function DateTimeField({ id, label, value, minDate, minTime, onChange }) {
+  const [dateVal, setDateVal] = useState(null);
+  const [timeVal, setTimeVal] = useState("");
+  const valueRef = useRef(value);
 
-  const openPicker = () => {
-    const el = inputRef.current;
-    if (!el) return;
-    try {
-      if (typeof el.showPicker === "function") {
-        el.showPicker();
+  useEffect(() => {
+    if (valueRef.current === value) return;
+    valueRef.current = value;
+    if (value) {
+      const d = new Date(value);
+      // Invalid dates (bad draft/restored value) fall back to empty.
+      if (!Number.isNaN(d.getTime())) {
+        setDateVal(d);
+        setTimeVal(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
         return;
       }
-    } catch {
-      // Already open or not allowed — fall through to focus.
     }
-    try {
-      el.focus({ preventScroll: true });
-    } catch {
-      el.focus();
-    }
+    setDateVal(null);
+    setTimeVal("");
+  }, [value]);
+
+  const combine = (d, t) => {
+    if (!d) return "";
+    const [h, m] = (t || "00:00").split(":").map(Number);
+    const dt = new Date(d);
+    dt.setHours(h || 0, m || 0, 0, 0);
+    return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(
+      dt.getDate(),
+    )}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
   };
+
+  const handleDateChange = useCallback(
+    (d) => {
+      setDateVal(d);
+      onChange(combine(d, timeVal));
+    },
+    [onChange, timeVal],
+  );
+
+  const handleTimeChange = useCallback(
+    (t) => {
+      setTimeVal(t);
+      onChange(combine(dateVal, t));
+    },
+    [onChange, dateVal],
+  );
 
   return (
     <div>
       <label
         htmlFor={id}
-        onClick={openPicker}
-        className="text-sm font-medium text-gray-300 flex items-center gap-1.5 cursor-pointer w-fit"
+        className="text-sm font-medium text-gray-300 flex items-center gap-1.5"
       >
         <CalendarDays size={14} className="text-green-400" /> {label}
       </label>
-      <div onClick={openPicker} className="mt-1.5 cursor-pointer">
-        <input
-          ref={inputRef}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1.5">
+        <DateInput
           id={id}
-          type="datetime-local"
-          value={value}
-          min={min}
-          onChange={onChange}
-          onClick={openPicker}
-          className="w-full bg-white/5 border border-white/10 px-3 py-3 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 transition [color-scheme:dark] cursor-pointer touch-manipulation text-[15px]"
+          value={dateVal}
+          onChange={handleDateChange}
+          minDate={minDate}
+          placeholder="Pick a date"
+          valueFormat="DD MMM YYYY"
+          clearable
+          styles={mantineInputStyles}
+          popoverProps={{ withinPortal: true }}
+        />
+        <TimeInput
+          value={timeVal}
+          onChange={(e) => handleTimeChange(e.currentTarget.value)}
+          withSeconds={false}
+          format="24"
+          minTime={minTime}
+          placeholder="Pick a time"
+          styles={mantineInputStyles}
         />
       </div>
+      <p className="text-xs text-gray-500 mt-1.5">
+        Pickup must be at least 30 minutes from now.
+      </p>
     </div>
   );
 }
@@ -217,12 +420,129 @@ const GuestBookingForm = () => {
   const [pickupAt, setPickupAt] = useState("");
   const [tripDays, setTripDays] = useState(1);
 
-  const minDateTime = (() => {
-    const d = minPickupISO();
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  })();
+  const [selectingPin, setSelectingPin] = useState(null);
+  const [locationBusy, setLocationBusy] = useState(null);
+  const [resolvingPlace, setResolvingPlace] = useState(false);
+  const [locationError, setLocationError] = useState(null);
 
-  const buildPickupISO = () => pickupAt;
+  const [modeFlow, setModeFlow] = useState({ enter: -64, exit: 64 });
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  const switchMode = useCallback(
+    (mode) => {
+      if (mode === tripType) return;
+      const enter = mode === "Round Trip" ? -64 : 64;
+      setModeFlow({ enter, exit: -enter });
+      setTripType(mode);
+    },
+    [tripType],
+  );
+
+  const minDate = minPickupISO();
+  const minTime = `${pad(minDate.getHours())}:${pad(minDate.getMinutes())}`;
+
+  useEffect(() => {
+    if (!selectingPin) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e) => {
+      if (e.key === "Escape") setSelectingPin(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [selectingPin]);
+
+  const handleCurrentLocation = useCallback(
+    async (which) => {
+      if (locationBusy || which !== "pickup") return;
+      setLocationError(null);
+      if (!navigator.geolocation) {
+        const msg =
+          "Your browser does not support location. Please search for your pickup or set it on the map.";
+        setLocationError(msg);
+        toast.error(msg);
+        return;
+      }
+      setLocationBusy("pickup");
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const coords = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          };
+          setResolvingPlace(true);
+          const resolved = await resolvePlaceName(coords);
+          setResolvingPlace(false);
+          setLocationBusy(null);
+          if (resolved) {
+            setPickup({ address: resolved, lat: coords.lat, lng: coords.lng });
+            toast.success("Current location set as pickup");
+          } else {
+            const msg =
+              "Couldn't identify this place. Please search for it or set the pin on the map.";
+            setLocationError(msg);
+            toast.error(msg);
+          }
+        },
+        (err) => {
+          setLocationBusy(null);
+          const msg =
+            err.code === 1
+              ? "Location permission denied. Please enable location access in your browser settings, then try again."
+              : err.code === 2
+                ? "Unable to determine your location. Please try again."
+                : "Location request timed out. Please try again.";
+          setLocationError(msg);
+          toast.error(msg);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+      );
+    },
+    [locationBusy],
+  );
+
+  const handleSetOnMap = useCallback((which) => {
+    setSelectingPin(which);
+  }, []);
+
+  const handleCancelMapSelect = useCallback(() => {
+    setSelectingPin(null);
+  }, []);
+
+  const handlePinSelect = useCallback(
+    async (coords) => {
+      const which = selectingPin;
+      if (which !== "pickup" && which !== "drop") return;
+      setSelectingPin(null);
+      setResolvingPlace(true);
+      const resolved = await resolvePlaceName(coords);
+      setResolvingPlace(false);
+      if (resolved) {
+        const place = {
+          address: resolved,
+          lat: Number(coords.lat),
+          lng: Number(coords.lng),
+        };
+        if (which === "pickup") setPickup(place);
+        else setDrop(place);
+        toast.success(
+          `${which === "pickup" ? "Pickup" : "Drop"} location set`,
+        );
+      } else {
+        const msg =
+          "Couldn't identify this place. Please try a nearby landmark or search for it.";
+        setLocationError(msg);
+        toast.error(msg);
+      }
+    },
+    [selectingPin],
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -252,7 +572,7 @@ const GuestBookingForm = () => {
         toast.error("Please choose a pickup date and time.");
         return;
       }
-      pickupISO = buildPickupISO();
+      pickupISO = pickupAt;
     }
 
     if (new Date(pickupISO) <= new Date(Date.now() + 25 * 60 * 1000)) {
@@ -260,6 +580,9 @@ const GuestBookingForm = () => {
       return;
     }
 
+    // Keep any contact fields the customer already typed (name/email/phone/
+    // note) — only the trip address should reset to the fresh pickup.
+    const prevGuest = loadDraft()?.guest || {};
     saveDraft({
       tripType,
       pickup: { address: pickup.address, lat: pickup.lat, lng: pickup.lng },
@@ -268,123 +591,243 @@ const GuestBookingForm = () => {
       days: tripType === "Round Trip" ? parseInt(tripDays, 10) : 1,
       vehicleType: null,
       fareEstimate: null,
-      guest: { name: "", email: "", phone: "", address: pickup.address },
+      guest: {
+        name: prevGuest.name || "",
+        email: prevGuest.email || "",
+        phone: prevGuest.phone || "",
+        note: prevGuest.note || "",
+        address: pickup.address,
+      },
     });
     navigate("/booking/vehicles");
   };
 
-  const selectCls = (active) =>
-    `flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all duration-200 cursor-pointer ${
-      active
-        ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white"
-        : "text-gray-300 hover:bg-white/10"
+  const tabBtnCls = (active) =>
+    `relative flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-colors duration-200 cursor-pointer z-10 ${
+      active ? "text-white" : "text-gray-300 hover:text-white"
     }`;
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 items-end min-w-0">
-      <div className="flex border border-green-500/30 rounded-2xl overflow-hidden">
-        <button
-          type="button"
-          onClick={() => setTripType("One Way")}
-          className={`w-1/2 ${selectCls(tripType === "One Way")}`}
-        >
-          One Way
-        </button>
-        <button
-          type="button"
-          onClick={() => setTripType("Round Trip")}
-          className={`w-1/2 ${selectCls(tripType === "Round Trip")}`}
-        >
-          Round Trip
-        </button>
-      </div>
-
-      <PlaceField
-        label="Pickup Location"
-        icon={<MapPin size={16} />}
-        accent="text-green-400"
-        placeholder="Search pickup place"
-        value={pickup}
-        onPick={setPickup}
-      />
-      <PlaceField
-        label="Drop Location"
-        icon={<Navigation size={16} />}
-        accent="text-red-400"
-        placeholder="Search destination"
-        value={drop}
-        onPick={setDrop}
-      />
-
-      {tripType === "Round Trip" ? (
-        <>
-          <DateTimeField
-            id="guest-pickup-at"
-            label="Pickup Date & Time"
-            value={pickupAt}
-            min={minDateTime}
-            onChange={(e) => setPickupAt(e.target.value)}
+    <>
+      <form onSubmit={handleSubmit} className="min-w-0">
+        <div className="relative flex border border-green-500/30 rounded-2xl overflow-hidden bg-white/5">
+          <Motion.span
+            className="pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-[0_0_20px_rgba(34,197,94,0.35)]"
+            animate={{ left: tripType === "One Way" ? "0%" : "50%" }}
+            transition={{ type: "spring", stiffness: 420, damping: 34 }}
           />
-          <div>
-            <label
-              htmlFor="guest-trip-days"
-              className="text-sm font-medium text-gray-300 flex items-center gap-1.5"
-            >
-              <Hash size={14} className="text-green-400" /> Number of Days
-            </label>
+          <button
+            type="button"
+            onClick={() => switchMode("One Way")}
+            className={tabBtnCls(tripType === "One Way")}
+          >
+            One Way
+          </button>
+          <button
+            type="button"
+            onClick={() => switchMode("Round Trip")}
+            className={tabBtnCls(tripType === "Round Trip")}
+          >
+            Round Trip
+          </button>
+        </div>
 
-            <input
-              id="guest-trip-days"
-              type="number"
-              min="1"
-              max="30"
-              value={tripDays}
-              onChange={(e) => {
-                const raw = e.target.value;
-                setTripDays(raw); // let the user type freely, including empty
-
-                if (raw === "") return; // don't touch tripDays yet, just let field be empty
-
-                const v = parseInt(raw, 10);
-                if (!Number.isNaN(v)) {
-                  setTripDays(Math.max(1, Math.min(30, v)));
-                }
-              }}
-              onBlur={() => {
-                // when they click away, clean up: if empty or invalid, reset to 1
-                const v = parseInt(tripDays, 10);
-                const clamped = Number.isNaN(v)
-                  ? 1
-                  : Math.max(1, Math.min(30, v));
-                setTripDays(clamped);
-                setTripDays(String(clamped));
-              }}
-              className="mt-1.5 w-full bg-white/5 border border-white/10 px-3 py-3 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 transition [color-scheme:dark] text-[15px]"
+        <AnimatePresence mode="wait" custom={modeFlow}>
+          <Motion.div
+            key={tripType}
+            custom={modeFlow}
+            initial={hasMounted ? { opacity: 0, x: modeFlow.enter } : false}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: modeFlow.exit }}
+            transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+            className="grid gap-4 items-end min-w-0 mt-4"
+          >
+            <PlaceField
+              id="pickup"
+              label="Pickup Location"
+              icon={<MapPin size={16} />}
+              accent="text-green-400"
+              placeholder="Pickup place or set on map"
+              value={pickup}
+              onPick={setPickup}
+              onCurrentLocation={handleCurrentLocation}
+              onSetOnMap={handleSetOnMap}
+              locationBusy={locationBusy}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              How many days will this round trip take?
-            </p>
-          </div>
-        </>
-      ) : (
-        <DateTimeField
-          id="guest-pickup-at"
-          label="Pickup Date & Time"
-          value={pickupAt}
-          min={minDateTime}
-          onChange={(e) => setPickupAt(e.target.value)}
-        />
-      )}
+            <PlaceField
+              id="drop"
+              label="Drop Location"
+              icon={<Navigation size={16} />}
+              accent="text-red-400"
+              placeholder="Destination or set on map"
+              value={drop}
+              onPick={setDrop}
+              onCurrentLocation={handleCurrentLocation}
+              onSetOnMap={handleSetOnMap}
+              locationBusy={locationBusy}
+            />
 
-      <Motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
-        type="submit"
-        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold px-6 py-3.5 rounded-2xl hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
-      >
-        Choose Car Type <ArrowRight size={18} />
-      </Motion.button>
-    </form>
+            {tripType === "Round Trip" ? (
+              <>
+                <DateTimeField
+                  id="guest-pickup-at"
+                  label="Pickup Date & Time"
+                  value={pickupAt}
+                  minDate={minDate}
+                  minTime={minTime}
+                  onChange={setPickupAt}
+                />
+                <div>
+                  <label
+                    htmlFor="guest-trip-days"
+                    className="text-sm font-medium text-gray-300 flex items-center gap-1.5"
+                  >
+                    <Hash size={14} className="text-green-400" /> Number of Days
+                  </label>
+                  <NumberInput
+                    id="guest-trip-days"
+                    className="mt-1.5"
+                    min={1}
+                    max={30}
+                    step={1}
+                    clampBehavior="blur"
+                    value={tripDays}
+                    onChange={(v) =>
+                      setTripDays(
+                        typeof v === "number" ? v : parseInt(v, 10) || 1,
+                      )
+                    }
+                    styles={mantineInputStyles}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    How many days will this round trip take?
+                  </p>
+                </div>
+              </>
+            ) : (
+              <DateTimeField
+                id="guest-pickup-at"
+                label="Pickup Date & Time"
+                value={pickupAt}
+                minDate={minDate}
+                minTime={minTime}
+                onChange={setPickupAt}
+              />
+            )}
+
+            <AnimatePresence>
+              {locationError && (
+                <Motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  className="flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/30 px-3 py-2.5"
+                >
+                  <AlertTriangle
+                    size={14}
+                    className="text-red-400 mt-0.5 shrink-0"
+                  />
+                  <p className="text-xs text-red-300 flex-1">{locationError}</p>
+                  <button
+                    type="button"
+                    onClick={() => setLocationError(null)}
+                    className="p-0.5 rounded-full hover:bg-white/10 text-red-300 transition shrink-0"
+                    aria-label="Dismiss"
+                  >
+                    <X size={14} />
+                  </button>
+                </Motion.div>
+              )}
+            </AnimatePresence>
+
+            <Motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              type="submit"
+              disabled={resolvingPlace}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold px-6 py-3.5 rounded-2xl hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {resolvingPlace ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" /> Resolving…
+                </>
+              ) : (
+                <>
+                  Choose Car Type <ArrowRight size={18} />
+                </>
+              )}
+            </Motion.button>
+          </Motion.div>
+        </AnimatePresence>
+      </form>
+
+      <AnimatePresence>
+        {selectingPin && (
+          <Motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[140] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+            onClick={handleCancelMapSelect}
+          >
+            <Motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-2xl h-[72dvh] flex flex-col bg-[#0a0f0d]/95 border border-white/10 rounded-3xl shadow-[0_30px_100px_rgba(0,0,0,0.8)] overflow-hidden"
+            >
+              <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+                <div>
+                  <h3 className="text-white font-semibold flex items-center gap-2">
+                    <MapPinned
+                      size={18}
+                      className={
+                        selectingPin === "pickup"
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }
+                    />
+                    {selectingPin === "pickup"
+                      ? "Set pickup on map"
+                      : "Set drop-off on map"}
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Drag the pin or tap the map, then confirm.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCancelMapSelect}
+                  className="p-2 rounded-xl hover:bg-white/10 text-gray-300 transition"
+                  aria-label="Close map"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="flex-1 min-h-0">
+                <RideMap
+                  pickupCoords={
+                    pickup?.lat != null
+                      ? { lat: pickup.lat, lng: pickup.lng }
+                      : null
+                  }
+                  dropCoords={
+                    drop?.lat != null ? { lat: drop.lat, lng: drop.lng } : null
+                  }
+                  pickupAddress={pickup?.address || ""}
+                  dropAddress={drop?.address || ""}
+                  selectingPin={selectingPin}
+                  onPinSelect={handlePinSelect}
+                  className="h-full rounded-none"
+                />
+              </div>
+            </Motion.div>
+          </Motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

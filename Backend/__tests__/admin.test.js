@@ -148,6 +148,161 @@ describe("Admin Endpoints", () => {
     });
   });
 
+  describe("GET /api/admin/bookings search", () => {
+    // NOTE: the file-level beforeEach wipe demonstrably leaves bookings
+    // behind between tests, so each seed starts with an explicit cleanup.
+    let tag = 0;
+    const seedPair = async () => {
+      tag += 1;
+      const Vehicle = (await import("../src/models/Vehicle.js")).default;
+      const Booking = (await import("../src/models/Booking.js")).default;
+      await Booking.deleteMany({});
+      const hashed = await bcrypt.hash("Password123", 10);
+      const customer = await User.create({
+        name: `Search Customer ${tag}`,
+        email: `searchcust${tag}@test.com`,
+        phone: `98765432${String(tag).padStart(2, "0")}`,
+        password: hashed,
+        role: "customer",
+      });
+      const vehicle = await Vehicle.create({
+        name: `Search Sedan ${tag}`,
+        seats: 4,
+        oneWayBaseFare: 100,
+        roundTripBaseFare: 100,
+        oneWayBaseKm: 0,
+        roundTripBaseKm: 0,
+        oneWayPerKm: 12,
+        roundTripPerKm: 12,
+        minimumDistance: 1,
+        isActive: true,
+      });
+      const mk = (pickup, drop) =>
+        Booking.create({
+          customer: customer._id,
+          pickup: { address: pickup, latitude: 13.0, longitude: 80.2 },
+          drop: { address: drop, latitude: 9.9, longitude: 78.1 },
+          pickupDateTime: new Date(Date.now() + 86400000),
+          vehicleType: vehicle._id,
+          bookingStatus: "Pending",
+        });
+      const b1 = await mk("Trichy Airport, Trichy", "Chennai Central");
+      await mk("Madurai Temple", "Rameshwaram Beach");
+      return { customer, b1 };
+    };
+
+    const search = (q) =>
+      request(app)
+        .get("/api/admin/bookings")
+        .query({ search: q })
+        .set("Authorization", `Bearer ${adminToken}`);
+
+    it("matches pickup addresses case-insensitively + partially", async () => {
+      await seedPair();
+      const res = await search("trichy");
+      expect(res.status).toBe(200);
+      expect(res.body.bookings.length).toBe(1);
+      expect(res.body.bookings[0].pickup.address).toMatch(/Trichy/);
+    });
+
+    it("matches drop addresses", async () => {
+      await seedPair();
+      const res = await search("RAMESHWARAM");
+      expect(res.status).toBe(200);
+      expect(res.body.bookings.length).toBe(1);
+    });
+
+    it("matches customer name and email", async () => {
+      const { customer } = await seedPair();
+      const byName = await search(customer.name.toLowerCase());
+      expect(byName.body.bookings.length).toBe(2);
+      const byEmail = await search(customer.email);
+      expect(byEmail.body.bookings.length).toBe(2);
+    });
+
+    it("matches full booking ID", async () => {
+      const { b1 } = await seedPair();
+      const res = await search(String(b1._id));
+      expect(res.status).toBe(200);
+      expect(res.body.bookings.some((b) => b._id === String(b1._id))).toBe(true);
+    });
+
+    it("matches displayed '#LAST6' booking ID with hash prefix", async () => {
+      const { b1 } = await seedPair();
+      const shortId = `#${String(b1._id).slice(-6).toUpperCase()}`;
+      const res = await search(shortId);
+      expect(res.status).toBe(200);
+      expect(res.body.bookings.some((b) => b._id === String(b1._id))).toBe(true);
+    });
+
+    it("matches lowercase partial ID without hash", async () => {
+      const { b1 } = await seedPair();
+      const res = await search(String(b1._id).slice(-6).toLowerCase());
+      expect(res.status).toBe(200);
+      expect(res.body.bookings.some((b) => b._id === String(b1._id))).toBe(true);
+    });
+
+    it("matches trip types with or without spaces", async () => {
+      tag += 1;
+      const Vehicle = (await import("../src/models/Vehicle.js")).default;
+      const Booking = (await import("../src/models/Booking.js")).default;
+      await Booking.deleteMany({});
+      const hashed = await bcrypt.hash("Password123", 10);
+      const customer = await User.create({
+        name: `Trip Customer ${tag}`,
+        email: `tripcust${tag}@test.com`,
+        phone: `98865432${String(tag).padStart(2, "0")}`,
+        password: hashed,
+        role: "customer",
+      });
+      const vehicle = await Vehicle.create({
+        name: `Trip Sedan ${tag}`,
+        seats: 4,
+        oneWayBaseFare: 100,
+        roundTripBaseFare: 100,
+        oneWayBaseKm: 0,
+        roundTripBaseKm: 0,
+        oneWayPerKm: 12,
+        roundTripPerKm: 12,
+        minimumDistance: 1,
+        isActive: true,
+      });
+      const base = {
+        customer: customer._id,
+        pickup: { address: "Trip Pickup Point", latitude: 13.0, longitude: 80.2 },
+        drop: { address: "Trip Drop Point", latitude: 9.9, longitude: 78.1 },
+        pickupDateTime: new Date(Date.now() + 86400000),
+        vehicleType: vehicle._id,
+        bookingStatus: "Pending",
+      };
+      await Booking.create({ ...base, tripType: "One Way" });
+      await Booking.create({ ...base, tripType: "Round Trip" });
+      await Booking.create({ ...base, tripType: "Airport Drop" });
+
+      const one = await search("oneway");
+      expect(one.status).toBe(200);
+      expect(one.body.bookings.length).toBe(1);
+      expect(one.body.bookings[0].tripType).toBe("One Way");
+
+      const round = await search("round trip");
+      expect(round.status).toBe(200);
+      expect(round.body.bookings.length).toBe(1);
+      expect(round.body.bookings[0].tripType).toBe("Round Trip");
+
+      const air = await search("airport");
+      expect(air.status).toBe(200);
+      expect(air.body.bookings.length).toBe(1);
+      expect(air.body.bookings[0].tripType).toBe("Airport Drop");
+    });
+
+    it("returns empty for non-matching text", async () => {
+      await seedPair();
+      const res = await search("zzz-no-such-place-zzz");
+      expect(res.status).toBe(200);
+      expect(res.body.bookings.length).toBe(0);
+    });
+  });
+
   describe("PATCH /api/admin/drivers/:id/approve", () => {
     it("approving a driver verifies docs too (all-Approved together)", async () => {
       const Vehicle = (await import("../src/models/Vehicle.js")).default;

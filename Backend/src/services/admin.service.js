@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import User from "../models/User.js";
 import DriverProfile from "../models/DriverProfile.js";
 import Vehicle from "../models/Vehicle.js";
@@ -9,6 +10,11 @@ import { creditWallet } from "./wallet.service.js";
 import { notifyUser } from "./notification.service.js";
 import { updateDriverStats } from "./driverStatus.service.js";
 import { withCache, invalidateCache } from "../config/redis.js";
+
+// Guest bookings provision phone-keyed placeholder accounts. Those never
+// belong in Manage Customers — they surface only in the dashboard's
+// "Instant Bookers" widget (see getDashboardStats below).
+const GUEST_EMAIL_RE = /@guest\.letsgocab\.local$/;
 
 
 /* ===========================================================
@@ -31,7 +37,7 @@ export const getDashboardStats = async () => {
     completedBookings,
     cancelledBookings,
   ] = await Promise.all([
-    User.countDocuments({ role: "customer" }),
+    User.countDocuments({ role: "customer", email: { $nin: [GUEST_EMAIL_RE] } }),
     User.countDocuments({ role: "driver" }),
     Vehicle.countDocuments(),
     Booking.countDocuments(),
@@ -135,6 +141,20 @@ export const getDashboardStats = async () => {
     });
   }
 
+  /* ── Instant bookers (guest requests, no login) ───────────── */
+  // `guestName` is only set for guest bookings, so it cleanly separates the
+  // "Instant Bookers" feed from registered-customer reservations.
+  const guestMatch = { guestName: { $ne: null } };
+  const [instantBookers, instantBookersCount] = await Promise.all([
+    Booking.find(guestMatch)
+      .sort({ createdAt: -1 })
+      .limit(8)
+      .populate("vehicleType", "name")
+      .populate("customer", "name phone profileImage")
+      .lean(),
+    Booking.countDocuments(guestMatch),
+  ]);
+
   return {
     totalCustomers,
     totalDrivers,
@@ -166,6 +186,9 @@ export const getDashboardStats = async () => {
     roundTripCancelled: roundTripBookings.cancelled,
 
     weeklyData,
+
+    instantBookers,
+    instantBookersCount,
   };
   });
 };
@@ -179,6 +202,9 @@ export const getCustomers = async (page = 1, limit = 10, search = "") => {
 
   const query = {
     role: "customer",
+    // Guest-created placeholders never appear here — they are surfaced only
+    // in the dashboard "Instant Bookers" widget.
+    email: { $nin: [GUEST_EMAIL_RE] },
   };
 
   if (search && search.trim()) {
@@ -648,7 +674,7 @@ export const deleteVehicle = async (vehicleId) => {
    BOOKING MANAGEMENT
 =========================================================== */
 
-export const getBookings = async (page = 1, limit = 10, status = "", vehicleType = "") => {
+export const getBookings = async (page = 1, limit = 10, status = "", vehicleType = "", search = "") => {
   const skip = (page - 1) * limit;
 
   const query = {};
@@ -659,6 +685,62 @@ export const getBookings = async (page = 1, limit = 10, status = "", vehicleType
 
   if (vehicleType) {
     query.vehicleType = vehicleType;
+  }
+
+  // Case-insensitive partial search across customer identity, booking ID
+  // and route addresses. Customer name/email live on the User doc, so
+  // matching users are resolved first and filtered via $in — the same
+  // two-step pattern used by getCustomers/getDrivers.
+  // Booking IDs are displayed as "#<last-6-hex>" (e.g. "#3FE8A01E"), so the
+  // search strips a leading "#" and suffix-matches the ID hex for short
+  // hex queries (Mongo cannot suffix-match ObjectIds natively).
+  const q = String(search || "").trim().replace(/^#+/, "");
+  if (q) {
+    const safe = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const rx = { $regex: safe, $options: "i" };
+    const or = [
+      { "pickup.address": rx },
+      { "drop.address": rx },
+      { guestName: rx },
+      { guestEmail: rx },
+      { guestPhone: rx },
+    ];
+    // Trip-type matching: values are stored with spaces ("One Way",
+    // "Round Trip", "Airport Pickup", "Airport Drop"), so "oneway" or
+    // "roundtrip" typed without spaces never matches a plain regex.
+    // Compare space-stripped forms instead.
+    const nq = q.toLowerCase().replace(/[\s_-]+/g, "");
+    if (nq.length >= 2) {
+      const matched = ["One Way", "Round Trip", "Airport Pickup", "Airport Drop"].filter((t) =>
+        t.toLowerCase().replace(/[\s_-]+/g, "").includes(nq)
+      );
+      if (matched.length) or.push({ tripType: { $in: matched } });
+    }
+    if (mongoose.isValidObjectId(q)) {
+      or.push({ _id: new mongoose.Types.ObjectId(q) });
+    } else {
+      const matchedUsers = await User.find({
+        $or: [{ name: rx }, { email: rx }, { phone: rx }],
+      })
+        .select("_id")
+        .lean();
+      or.push({ customer: { $in: matchedUsers.map((u) => u._id) } });
+      // Short hex strings (the displayed "#ABC123" form) match the tail of
+      // the ObjectId hex. Gated to 4+ hex chars so ordinary words that
+      // happen to be hex ("cab", "ace") never trigger ID matching.
+      if (/^[0-9a-fA-F]{4,}$/.test(q)) {
+        or.push({
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$_id" },
+              regex: `${safe}$`,
+              options: "i",
+            },
+          },
+        });
+      }
+    }
+    query.$or = or;
   }
 
   const [bookings, total] = await Promise.all([

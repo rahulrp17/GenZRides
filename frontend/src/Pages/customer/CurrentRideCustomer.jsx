@@ -10,6 +10,7 @@ import { MapPin, Navigation, Car, Clock, Phone, User, CheckCircle, X, Download, 
 import { bookingAPI, invoiceAPI, reviewAPI, mapsAPI } from '../../services/endpoints';
 import { useSocket } from '../../Context/SocketContext';
 import { CardSkeleton } from '../../components/shared/Skeleton';
+import { formatTripDuration } from '../../utils/formatDuration';
 import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import RideTimeline from '../../components/shared/RideTimeline';
@@ -620,7 +621,7 @@ const CurrentRideCustomer = () => {
               </div>
               <p className="text-lg font-bold text-white">{rideTime.display}</p>
               {rideTime.label === 'Waiting' && booking.duration ? (
-                <p className="text-[11px] text-gray-500 mt-0.5">Est. trip: {Math.ceil(Number(booking.duration))} min</p>
+                <p className="text-[11px] text-gray-500 mt-0.5">Est. trip: {formatTripDuration(booking.duration)}</p>
               ) : null}
             </div>
             <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-4 shadow-sm border border-white/10">

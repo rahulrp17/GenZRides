@@ -7,6 +7,7 @@ import Booking from "../src/models/Booking.js";
 import {
   findEligibleDrivers,
   acceptBooking,
+  dispatchBooking,
 } from "../src/services/dispatch.service.js";
 import { assignDriver } from "../src/services/admin.service.js";
 import { getAvailableBookings } from "../src/services/booking.service.js";
@@ -16,9 +17,11 @@ let suvVehicle;
 let sedanVehicle;
 let suvDriverUser;
 let sedanDriverUser;
+let noTypeDriverUser;
 let customer;
 let suvBooking;
 let sedanBooking;
+let danglingTypeBooking;
 
 const point = { address: "Test Point", latitude: 13.08, longitude: 80.27 };
 
@@ -129,6 +132,37 @@ beforeAll(async () => {
     vehicleType: sedanVehicle._id,
     bookingStatus: "Pending",
   });
+
+  // Booking whose vehicleType ref is dangling (the vehicle was deleted):
+  // populate() resolves it to null and dispatch must NOT fan out to every
+  // driver as if there were no type.
+  danglingTypeBooking = await Booking.create({
+    customer: customer._id,
+    pickup: point,
+    drop: point,
+    pickupDateTime: new Date(Date.now() + 86400000),
+    vehicleType: new mongoose.Types.ObjectId(),
+    bookingStatus: "Pending",
+  });
+
+  // Legacy driver row with NO cab type (pre-validation data). Simulated via
+  // insertOne (bypasses mongoose schema) because current schema requires it —
+  // such a driver must never see every booking type in the available feed.
+  noTypeDriverUser = await User.create({
+    name: "No Type Driver",
+    email: "notype@test.com",
+    phone: "9876543293",
+    password: "Password123",
+    role: "driver",
+  });
+
+  await DriverProfile.collection.insertOne({
+    user: noTypeDriverUser._id,
+    ...baseProfile,
+    aadhaarNumber: "333333333333",
+    licenseNumber: "NTDL0000001",
+    vehicleNumber: "TN01NT0001",
+  });
 });
 
 afterAll(async () => {
@@ -187,5 +221,28 @@ describe("Vehicle-type dispatch filtering", () => {
           suvVehicle._id.toString()
       )
     ).toBe(false);
+  });
+
+  it("dispatchBooking never fans out a booking with a dangling cab type", async () => {
+    const result = await dispatchBooking(
+      danglingTypeBooking._id,
+      danglingTypeBooking.pickup.latitude,
+      danglingTypeBooking.pickup.longitude
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toMatch(/no vehicle type/i);
+
+    const after = await Booking.findById(danglingTypeBooking._id);
+    expect(after.driverQueue.length).toBe(0);
+  });
+
+  it("getAvailableBookings shows nothing to a driver with no cab type", async () => {
+    const result = await getAvailableBookings({
+      driverUserId: noTypeDriverUser._id,
+    });
+
+    expect(result.total).toBe(0);
+    expect(result.bookings).toEqual([]);
   });
 });

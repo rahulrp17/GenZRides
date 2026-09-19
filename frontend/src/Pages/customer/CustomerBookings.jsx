@@ -10,6 +10,7 @@ import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import Modal from '../../components/shared/Modal';
+import { formatTripDuration } from '../../utils/formatDuration';
 import CancelReasonDialog from '../../components/shared/CancelReasonDialog';
 import { motion as Motion } from 'framer-motion';
 
@@ -361,7 +362,7 @@ const CustomerBookings = () => {
               </div>
               <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg p-3">
                 <p className="text-gray-500 text-xs">Duration</p>
-                <p className="font-medium text-white">{selectedBooking.duration != null ? `${Math.ceil(Number(selectedBooking.duration))} min` : 'N/A'}</p>
+                <p className="font-medium text-white">{formatTripDuration(selectedBooking.duration)}</p>
               </div>
               <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg p-3">
                 <p className="text-gray-500 text-xs">Date</p>

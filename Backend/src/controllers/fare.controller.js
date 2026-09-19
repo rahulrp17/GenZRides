@@ -67,6 +67,12 @@ export const estimateFare = async (req, res) => {
         distance: route.distance,
         duration: route.duration,
         estimatedFare: fare.estimatedFare,
+        // Per-km tariff (oneWayPerKm / roundTripPerKm) so the UI can show
+        // "₹X/km" on the trip summary — matches how the fare was computed.
+        perKm:
+          (tripType === "Round Trip"
+            ? Number(fare.vehicle?.roundTripPerKm ?? 0)
+            : Number(fare.vehicle?.oneWayPerKm ?? 0)) || 0,
         fareBreakdown: fare.fareBreakdown,
       },
     });

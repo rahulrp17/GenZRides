@@ -82,13 +82,24 @@ export const dispatchBooking = async (
     };
   }
 
+  // A booking with no resolvable cab type must be assigned manually —
+  // dispatching it would reach EVERY online driver (a Sedan driver would
+  // get an SUV/Innova ride request). Never fan out a type-less booking.
+  if (!booking.vehicleType) {
+    return {
+      success: false,
+      message:
+        "Booking has no vehicle type. Assign a driver manually.",
+    };
+  }
+
   // Only drivers whose registered cab type matches the booking's
   // vehicleType are eligible — never send an SUV booking to a Sedan
   // driver (or any other cross-type assignment). No distance filter:
   // every matching online driver is offered, wherever they are.
   const nearbyDrivers =
     await findEligibleDrivers(
-      booking.vehicleType?._id || booking.vehicleType
+      booking.vehicleType._id || booking.vehicleType
     );
 
   if (!nearbyDrivers.length) {

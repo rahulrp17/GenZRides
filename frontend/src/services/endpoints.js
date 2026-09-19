@@ -25,6 +25,7 @@ export const userAPI = {
 export const guestAPI = {
   autocomplete: (params) => api.get('/maps/guest/autocomplete', { params }),
   placeDetails: (params) => api.get('/maps/guest/place-details', { params }),
+  reverseGeocode: (data) => api.post('/maps/guest/reverse-geocode', data),
   estimateFare: (data) => api.post('/fares/guest/estimate', data),
   create: (data) => api.post('/bookings/guest', data),
 };

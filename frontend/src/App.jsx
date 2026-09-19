@@ -35,6 +35,7 @@ const BookingDetailsPage = lazy(() => import("./Pages/booking/BookingDetailsPage
 
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const AdminDashboard = lazy(() => import("./Pages/admin/AdminDashboard"));
+const InstantCustomers = lazy(() => import("./Pages/admin/InstantCustomers"));
 const ManageCustomers = lazy(() => import("./Pages/admin/ManageCustomers"));
 const ManageDrivers = lazy(() => import("./Pages/admin/ManageDrivers"));
 const ManageVehicles = lazy(() => import("./Pages/admin/ManageVehicles"));
@@ -172,6 +173,7 @@ function App() {
         {/* Admin dashboard */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
+          <Route path="instant-customers" element={<InstantCustomers />} />
           <Route path="customers" element={<ManageCustomers />} />
           <Route path="drivers" element={<ManageDrivers />} />
           <Route path="vehicles" element={<ManageVehicles />} />

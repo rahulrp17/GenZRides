@@ -2,8 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
 import { toast } from "react-hot-toast";
-import { ArrowLeft, MapPin, Navigation, CalendarDays, CarFront, Loader2, User, Mail, Phone, Home, StickyNote, Info } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, CalendarDays, CarFront, Loader2, Repeat, ArrowRight, User, Mail, Phone, Home, StickyNote, Info } from "lucide-react";
 import SEO from "../../components/SEO";
+import { formatTripDuration } from "../../utils/formatDuration";
 import Navbar from "../../Component/Navbar/Navbar";
 import Footer from "../../Component/Footer/Footer";
 import Modal from "../../components/shared/Modal";
@@ -11,10 +12,15 @@ import FareNotes from "../../components/shared/FareNotes";
 import PageHero from "../../Component/Landing/PageHero";
 import { bookingAPI, guestAPI, vehicleAPI } from "../../services/endpoints";
 import { hero8 } from "../../assets/images";
-import { loadDraft, clearDraft } from "./guestDraft";
+import { loadDraft, saveDraft, clearDraft } from "./guestDraft";
 import { Reveal } from "../../Component/Landing/Reveal";
 
 const formatCurrency = (n) => `₹${Number(n ?? 0).toFixed(2)}`;
+
+const perKmLabel = (n) =>
+  n == null
+    ? "—"
+    : `₹${Number(n) % 1 === 0 ? Number(n).toFixed(0) : Number(n).toFixed(2)}/km`;
 
 const fmtWhen = (iso) =>
   iso
@@ -35,7 +41,7 @@ const ConfirmPage = () => {
   const [email, setEmail] = useState(draft?.guest?.email || "");
   const [phone, setPhone] = useState(draft?.guest?.phone || "");
   const [pickupAddress, setPickupAddress] = useState(draft?.guest?.address || draft?.pickup?.address || "");
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(draft?.guest?.note || "");
   const [booking, setBooking] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -54,10 +60,36 @@ const ConfirmPage = () => {
     })();
   }, [draft, navigate]);
 
+  // Keep the customer's inputs across a page refresh — every keystroke is
+  // written back into the draft so a refresh never empties the fields.
+  useEffect(() => {
+    if (!draft) return;
+    saveDraft({
+      ...draft,
+      guest: {
+        ...(draft.guest || {}),
+        name,
+        email,
+        phone,
+        note,
+        address: pickupAddress,
+      },
+    });
+  }, [draft, name, email, phone, note, pickupAddress]);
+
   if (!draft?.fareEstimate) return null;
 
   const fare = draft.fareEstimate;
   const days = draft.tripType === "Round Trip" ? (draft.days || 1) : 1;
+
+  // Per-km tariff straight from the estimate (oneWayPerKm / roundTripPerKm).
+  // Fallback derives it from the breakdown for drafts made before the API
+  // started returning perKm, so old in-memory drafts never show a dash.
+  const perKm =
+    fare?.perKm ||
+    (fare?.fareBreakdown?.chargeableDistance > 0
+      ? fare.fareBreakdown.distanceFare / fare.fareBreakdown.chargeableDistance
+      : null);
 
   const validateDetails = () => {
     const cleanName = name.trim();
@@ -111,12 +143,14 @@ const ConfirmPage = () => {
 
       let bookingRef;
       let duplicate = false;
+      let createdResponse = null;
       const token = localStorage.getItem("accessToken");
       if (token) {
         // Logged-in guest-flow users keep the booking on their account
         const { data } = await bookingAPI.create(payload);
         if (!data.success) throw new Error(data.message || "Booking failed.");
         bookingRef = data.booking?._id || data.data?._id;
+        createdResponse = data;
       } else {
         const { data } = await guestAPI.create({
           ...payload,
@@ -127,12 +161,40 @@ const ConfirmPage = () => {
         if (!data.success) throw new Error(data.message || "Booking failed.");
         bookingRef = data.booking?._id;
         duplicate = !!data.duplicate;
+        createdResponse = data;
       }
 
       if (duplicate) toast.success("Booking already received — showing its status.");
       else toast.success("Booking confirmed! Waiting for approval.");
+
+      // Snapshot the confirmed trip so the Waiting page can show full booking
+      // details — and survives a refresh (the guest has no account to fetch
+      // the booking from).
+      const bookingInfo = createdResponse?.booking || createdResponse?.data || null;
+      const summary = {
+        ref: bookingRef,
+        pickupAddress: pickupAddress.trim(),
+        dropAddress: draft.drop.address,
+        pickupDateTime: new Date(draft.pickupDateTime).toISOString(),
+        tripType: draft.tripType,
+        days,
+        vehicleName: bookingInfo?.vehicleType?.name || vehicle?.name || "Selected car",
+        distance: bookingInfo?.distance ?? fare?.distance ?? null,
+        duration: bookingInfo?.duration ?? fare?.duration ?? null,
+        estimatedFare: bookingInfo?.estimatedFare ?? fare?.estimatedFare ?? null,
+        guestName: cleanName,
+        guestEmail: cleanEmail,
+        guestPhone: cleanPhone,
+        note: note.trim(),
+      };
+      try {
+        sessionStorage.setItem("guestBookingSummary", JSON.stringify(summary));
+      } catch {
+        // ignore — details just won't survive a refresh
+      }
+
       clearDraft();
-      navigate("/booking/waiting", { state: { ref: bookingRef, name: cleanName, note: note.trim() } });
+      navigate("/booking/waiting", { state: { ref: bookingRef, name: cleanName, note: note.trim(), booking: summary } });
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || "Booking failed. Please try again.");
     } finally {
@@ -214,8 +276,14 @@ const ConfirmPage = () => {
               <div className="border-t border-white/10 mt-6 pt-5 space-y-2 text-sm">
                 <div className="flex justify-between text-gray-400">
                   <span>Distance</span>
-                  <span className="text-white">{fare.distance?.toFixed(1)} km · {Math.ceil(fare.duration)} min</span>
+                  <span className="text-white">{fare.distance?.toFixed(1)} km · {formatTripDuration(fare.duration)}</span>
                 </div>
+                {perKm != null && (
+                  <div className="flex justify-between text-gray-400">
+                    <span>Per km rate ({draft.tripType === "Round Trip" ? "Round Trip" : "One Way"})</span>
+                    <span className="text-white">{perKmLabel(perKm)}</span>
+                  </div>
+                )}
                 {draft.tripType === "Round Trip" && days > 1 && (
                   <div className="flex justify-between text-gray-400">
                     <span>Total distance ({days} days)</span>
@@ -341,10 +409,68 @@ const ConfirmPage = () => {
       {/* Premium glass confirm popup — Confirm uses the existing booking
           API; Cancel just closes. Submit is disabled while booking so no
           duplicate booking can be created. */}
-      <Modal isOpen={confirmOpen} onClose={() => !booking && setConfirmOpen(false)} title="Confirm your booking" maxWidth="max-w-lg">
-        <div className="space-y-4">
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2.5 text-sm">
-            {/* Fare breakdown */}
+      <Modal isOpen={confirmOpen} onClose={() => !booking && setConfirmOpen(false)} title="Confirm your booking" maxWidth="max-w-md">
+        <div className="space-y-3">
+          {/* Guest details — compact contact strip */}
+          <div className="bg-white/5 border border-white/10 rounded-xl divide-y divide-white/10">
+            {[
+              ["Guest", name.trim() || "—"],
+              ["Email", email.trim() || "—"],
+              ["Phone", phone.trim() || "—"],
+            ].map(([label, value]) => (
+              <div key={label} className="flex items-center justify-between gap-3 px-3.5 py-2 text-[13px] min-w-0">
+                <span className="shrink-0 text-[10px] uppercase tracking-widest text-gray-500 font-semibold">{label}</span>
+                <span className="text-white font-medium truncate">{value}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Trip card — route, schedule, vehicle */}
+          <div className="bg-gradient-to-br from-emerald-500/15 via-white/5 to-transparent border border-emerald-500/20 rounded-xl p-3.5">
+            <div className="relative pl-4 space-y-2 text-[13px]">
+              <span aria-hidden className="absolute left-[4px] top-1 bottom-1 w-px bg-gradient-to-b from-green-400/70 via-white/15 to-red-400/70" />
+              <div className="relative min-w-0">
+                <span aria-hidden className="absolute  left-[-15px] top-1 w-[9px] h-[9px] rounded-full bg-green-400 ring-4 ring-green-400/20" />
+                <p className="text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Pickup</p>
+                <p className="text-white font-medium break-words">{draft.pickup.address}</p>
+              </div>
+              <div className="relative min-w-0">
+                <span aria-hidden className="absolute  left-[-15px] top-3 w-[9px] h-[9px] rounded-full bg-red-400 ring-4 ring-red-400/20" />
+                <p className="text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Drop</p>
+                <p className="text-white font-medium break-words">{draft.drop.address}</p>
+              </div>
+            </div>
+
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[12px]">
+              <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                <CalendarDays size={12} className="text-blue-400 shrink-0" />
+                <span className="truncate">{fmtWhen(draft.pickupDateTime)}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                <CarFront size={12} className="text-green-400 shrink-0" />
+                <span className="truncate">{vehicle?.name || "Selected car"}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                <Navigation size={12} className="text-sky-400 shrink-0" />
+                <span className="truncate">{fare.distance?.toFixed(1)} km · {formatTripDuration(fare.duration)}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                {draft.tripType === "Round Trip"
+                  ? <Repeat size={12} className="text-emerald-400 shrink-0" />
+                  : <ArrowRight size={12} className="text-emerald-400 shrink-0" />}
+                <span className="truncate">{draft.tripType}{draft.tripType === "Round Trip" ? ` · ${days} day${days > 1 ? "s" : ""}` : ""}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Fare breakdown */}
+          <div className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 space-y-1.5 text-[13px]">
+            {perKm != null && (
+              <div className="flex justify-between gap-3">
+                <span className="text-gray-500">Per km ({draft.tripType === "Round Trip" ? "round trip" : "one way"})</span>
+                <span className="text-white font-medium">{perKmLabel(perKm)}</span>
+              </div>
+            )}
             <div className="flex justify-between gap-3">
               <span className="text-gray-500">Base fare</span>
               <span className="text-white font-medium">{formatCurrency(fare.fareBreakdown?.baseFare)}</span>
@@ -355,7 +481,9 @@ const ConfirmPage = () => {
             </div>
             {fare.fareBreakdown?.driverAllowance > 0 && (
               <div className="flex justify-between gap-3">
-                <span className="text-gray-500">Driver bata</span>
+                <span className="text-gray-500">
+                  Driver bata{draft.tripType === "Round Trip" ? ` × ${fare.fareBreakdown.billableDays || days} day(s)` : ""}
+                </span>
                 <span className="text-white font-medium">{formatCurrency(fare.fareBreakdown?.driverAllowance)}</span>
               </div>
             )}
@@ -371,41 +499,33 @@ const ConfirmPage = () => {
                 <span className="text-white font-medium">{formatCurrency(fare.fareBreakdown?.permitCharges)}</span>
               </div>
             )}
-            {draft.tripType === "One Way" && (
-              <div className="flex justify-between gap-3">
-                <span className="text-gray-500">Waiting charge</span>
-                <span className="text-white font-medium">₹2.5/min after 30 min</span>
-              </div>
-            )}
             {fare.fareBreakdown?.waitingCharge > 0 && (
               <div className="flex justify-between gap-3">
-                <span className="text-gray-500">Waiting fee</span>
+                <span className="text-gray-500">Waiting fee (first 30 min free)</span>
                 <span className="text-white font-medium">{formatCurrency(fare.fareBreakdown?.waitingCharge)}</span>
               </div>
             )}
-            {/* {fare.fareBreakdown?.nightCharge > 0 && (
-              <div className="flex justify-between gap-3">
-                <span className="text-gray-500">Night charge</span>
-                <span className="text-white font-medium">{formatCurrency(fare.fareBreakdown?.nightCharge)}</span>
-              </div>
-            )} */}
             <div className="flex justify-between items-center gap-3 pt-2 border-t border-white/10">
               <span className="text-gray-300 font-semibold">Total fare</span>
-              <span className="font-display text-2xl font-bold text-green-400">₹{fare.estimatedFare}</span>
+              <span className="font-display text-xl font-bold text-green-400">₹{fare.estimatedFare}</span>
             </div>
           </div>
-          {/* Notes */}
-          <div className="bg-red-800 border border-white/10 rounded-2xl p-4 text-xs text-white space-y-1.5">
-            <p> <strong>Note:</strong> Pay cash to the driver. Tolls &amp; permits extra at actuals.</p>
-            {draft.tripType === "One Way" && <p>Waiting charge ₹2.5/min applies after 30 min free waiting.</p>}
-            {note.trim() && <p className="text-gray-300">Note: {note.trim()}</p>}
-          </div>
+
+          {/* Notes — single line */}
+          <p className="text-[11px] leading-5 bg-red-700 border border-white/10 text-200 rounded-md px-2.5 py-1.5 text-gray-400">
+            <span className="text-black font-bold">Note:</span> <span className="text-white">Pay cash to the driver. Tolls &amp; permits at actuals.{""} {draft.tripType === "One Way" && " Waiting ₹2.5/min after 30 min free."}</span> 
+            
+            <br />
+            {note.trim() && <span className="text-black font-bold">Customer note:</span>}{note.trim() && <span className="text-white"> {note.trim()}</span>}
+          </p>
+
+          {/* Actions */}
           <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"
               onClick={() => setConfirmOpen(false)}
               disabled={booking}
-              className="py-3 min-h-[48px border bg-red-400/60 border-white/10 text-gray-200 rounded-2xl text-sm font-semibold hover:bg-white/10 transition disabled:opacity-50"
+              className="py-2.5 min-h-[44px] border bg-red-400/60 border-white/10 text-gray-200 rounded-xl text-sm font-semibold hover:bg-white/10 transition disabled:opacity-50"
             >
               Cancel
             </button>
@@ -413,9 +533,9 @@ const ConfirmPage = () => {
               type="button"
               onClick={handleBook}
               disabled={booking}
-              className="py-3 min-h-[48px] bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-sm font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="py-2.5 min-h-[44px] bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-sm font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {booking ? (<><Loader2 size={16} className="animate-spin" /> Booking…</>) : "Confirm Booking"}
+              {booking ? (<><Loader2 size={15} className="animate-spin" /> Booking…</>) : "Confirm Booking"}
             </button>
           </div>
         </div>

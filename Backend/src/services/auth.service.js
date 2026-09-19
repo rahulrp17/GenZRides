@@ -6,6 +6,12 @@ import { generateToken, generateTokenPair, hashToken } from "./jwt.service.js";
 
 const REFRESH_TOKEN_EXPIRY_DAYS = 30;
 
+// Guest bookings provision a phone-keyed placeholder account
+// (`guest-<phone>@guest.letsgocab.local`). Registering the same phone
+// upgrades that record in place instead of failing — a guest who
+// booked first should never hit "email/phone already exists".
+const GUEST_EMAIL_RE = /^guest-\d+@guest\.letsgocab\.local$/;
+
 /**
  * Compare a presented (raw) refresh token against a stored value.
  * Stored values are SHA-256 hashes; a legacy raw value may also match
@@ -22,20 +28,39 @@ export const registerCustomer = async (data) => {
   phone = phone.trim();
 
   const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
-  if (existingUser) {
+
+  // Same phone + placeholder account = the user only ever booked as a guest.
+  // Upgrade it in place (real email + password) rather than erroring out.
+  const isGuestTakeover =
+    existingUser &&
+    existingUser.phone === phone &&
+    existingUser.role === "customer" &&
+    GUEST_EMAIL_RE.test(existingUser.email || "");
+
+  if (existingUser && !isGuestTakeover) {
     if (existingUser.email === email) throw new Error("Email already exists.");
     if (existingUser.phone === phone) throw new Error("Phone number already exists.");
   }
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  const user = await User.create({
-    name,
-    email,
-    phone,
-    password: hashedPassword,
-    role: "customer",
-  });
+  const user = isGuestTakeover
+    ? existingUser
+    : await User.create({
+        name,
+        email,
+        phone,
+        password: hashedPassword,
+        role: "customer",
+      });
+
+  if (isGuestTakeover) {
+    user.name = name;
+    user.email = email;
+    user.password = hashedPassword;
+    user.isVerified = true;
+    await user.save();
+  }
 
   const tokenPair = generateTokenPair(user);
 

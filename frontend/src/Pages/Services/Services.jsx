@@ -38,7 +38,7 @@ const SERVICES = [
   {
     icon: Building2,
     img: hero2,
-    name: "City Rides",
+    name: "One Way",
     tag: "One-Way",
     desc: "Swift doorstep pickups across town — commutes, errands, dinners and nights out with upfront fares and live tracking.",
     points: [

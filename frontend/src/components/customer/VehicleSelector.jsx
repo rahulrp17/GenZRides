@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion as Motion } from "framer-motion";
 import { Car, Users, Luggage, Snowflake, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { sedan, innova } from "../../assets/images";
+import { formatTripDuration } from "../../utils/formatDuration";
 
 // Real vehicle imagery: backend `image` first, then a local asset matched
 // by cab type (sedan.jpg for Mini/Sedan, innova.jpg for SUV/Innova/MUV and
@@ -54,6 +55,11 @@ const FareBreakdownRow = ({ label, value, bold = false, large = false }) => (
 );
 
 const formatCurrency = (n) => `₹${Number(n ?? 0).toFixed(2)}`;
+
+const perKmLabel = (n) =>
+  n == null
+    ? "—"
+    : `₹${Number(n) % 1 === 0 ? Number(n).toFixed(0) : Number(n).toFixed(2)}/km`;
 
 const VehicleSelector = ({
   vehicles = [],
@@ -171,10 +177,10 @@ const VehicleSelector = ({
 
               <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
                 <span className="inline-flex items-center gap-1">
-                  <Users size={12} /> {vehicle.seats}
+                  <Users size={12} /> {vehicle.seats}{""} Seats
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <Luggage size={12} /> {vehicle.luggage}
+                  <Luggage size={12} /> {vehicle.luggage}{""} Luggage
                 </span>
               </div>
 
@@ -233,6 +239,16 @@ const VehicleSelector = ({
               className="px-4 pb-4 space-y-2"
             >
               <FareBreakdownRow label="Base fare" value={formatCurrency(fareBreakdown.baseFare)} />
+              {fareEstimate.perKm != null && (
+                <FareBreakdownRow
+                  label={
+                    tripType === "Round Trip"
+                      ? "Round trip base fare per km"
+                      : "One way base fare per km"
+                  }
+                  value={perKmLabel(fareEstimate.perKm)}
+                />
+              )}
               <FareBreakdownRow
                 label={fareBreakdown.baseKm > 0 && fareBreakdown.chargeableDistance < fareBreakdown.billedDistanceKm
                   ? `Distance fare (${fareBreakdown.chargeableDistance} km billed · ${fareBreakdown.baseKm} km included in base fare)`
@@ -276,7 +292,7 @@ const VehicleSelector = ({
                   value={`${(fareEstimate.distance * days).toFixed(1)} km`}
                 />
               )}
-              <FareBreakdownRow label="Duration" value={`${Math.ceil(fareEstimate.duration)} min`} />
+              <FareBreakdownRow label="Duration" value={formatTripDuration(fareEstimate.duration)} />
               <FareBreakdownRow label="Total" value={formatCurrency(fareBreakdown.total)} bold large />
             </Motion.div>
           )}
