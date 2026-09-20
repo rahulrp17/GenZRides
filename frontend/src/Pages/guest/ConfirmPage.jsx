@@ -193,6 +193,20 @@ const ConfirmPage = () => {
         // ignore — details just won't survive a refresh
       }
 
+      // Backend is the source of truth: the booking (with guestName/guestPhone)
+      // is stored server-side and fetched live by the My Booking page. These
+      // keys are just the reference handle that lets the page auto-fill the
+      // lookup form on this device.
+      if (!token) {
+        try {
+          localStorage.setItem("guestBookingRef", String(bookingRef || ""));
+          localStorage.setItem("guestBookingPhone", cleanPhone);
+          localStorage.setItem("guestBookingName", cleanName);
+        } catch {
+          // ignore — the guest can type ref + phone manually on My Booking
+        }
+      }
+
       clearDraft();
       navigate("/booking/waiting", { state: { ref: bookingRef, name: cleanName, note: note.trim(), booking: summary } });
     } catch (err) {

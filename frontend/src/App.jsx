@@ -19,6 +19,7 @@ const GuestBookingPage = lazy(() => import("./Pages/guest/GuestBookingPage"));
 const CarTypePage = lazy(() => import("./Pages/guest/CarTypePage"));
 const ConfirmPage = lazy(() => import("./Pages/guest/ConfirmPage"));
 const WaitingPage = lazy(() => import("./Pages/guest/WaitingPage"));
+const GuestBookingLookup = lazy(() => import("./Pages/guest/GuestBookingLookup"));
 const Login = lazy(() => import("./Component/Login/Login"));
 const About = lazy(() => import("./Pages/AboutUs/About"));
 const TariffChart = lazy(() => import("./Pages/Tariff_Chart/TariffChart"));
@@ -146,6 +147,7 @@ function App() {
         <Route path="/booking/vehicles" element={<CarTypePage />} />
         <Route path="/booking/confirm" element={<ConfirmPage />} />
         <Route path="/booking/waiting" element={<WaitingPage />} />
+        <Route path="/booking/my-booking" element={<GuestBookingLookup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

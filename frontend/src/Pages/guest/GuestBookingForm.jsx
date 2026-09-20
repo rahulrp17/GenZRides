@@ -14,11 +14,13 @@ import {
   MapPinned,
   AlertTriangle,
   Plane,
+  Search,
 } from "lucide-react";
 import { DateInput, TimeInput } from "@mantine/dates";
 import { NumberInput } from "@mantine/core";
 import { guestAPI } from "../../services/endpoints";
 import { loadDraft, saveDraft, minPickupISO } from "./guestDraft";
+import TrackRidePanel from "./TrackRidePanel";
 import RideMap from "../../components/customer/RideMap";
 import { toDisplayAddress } from "../../utils/locationFormat";
 
@@ -413,6 +415,7 @@ function DateTimeField({ id, label, value, minDate, minTime, onChange }) {
 
 const GuestBookingForm = () => {
   const navigate = useNavigate();
+  const MODES = ["One Way", "Round Trip", "Track Ride"];
   const [tripType, setTripType] = useState("One Way");
   const [pickup, setPickup] = useState(null);
   const [drop, setDrop] = useState(null);
@@ -546,6 +549,8 @@ const GuestBookingForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (tripType === "Track Ride") return;
+
     if (!pickup?.lat || !pickup?.lng) {
       toast.error("Please choose a pickup suggestion from the list.");
       return;
@@ -603,7 +608,7 @@ const GuestBookingForm = () => {
   };
 
   const tabBtnCls = (active) =>
-    `relative flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-colors duration-200 cursor-pointer z-10 ${
+    `relative flex-1 flex items-center justify-center gap-2  py-3 text-sm font-semibold transition-colors duration-200 cursor-pointer z-10 ${
       active ? "text-white" : "text-gray-300 hover:text-white"
     }`;
 
@@ -612,24 +617,26 @@ const GuestBookingForm = () => {
       <form onSubmit={handleSubmit} className="min-w-0">
         <div className="relative flex border border-green-500/30 rounded-2xl overflow-hidden bg-white/5">
           <Motion.span
-            className="pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-[0_0_20px_rgba(34,197,94,0.35)]"
-            animate={{ left: tripType === "One Way" ? "0%" : "50%" }}
+            className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-[0_0_20px_rgba(34,197,94,0.35)]"
+            animate={{ left: `${(MODES.indexOf(tripType) * 100) / MODES.length}%` }}
             transition={{ type: "spring", stiffness: 420, damping: 34 }}
           />
-          <button
-            type="button"
-            onClick={() => switchMode("One Way")}
-            className={tabBtnCls(tripType === "One Way")}
-          >
-            One Way
-          </button>
-          <button
-            type="button"
-            onClick={() => switchMode("Round Trip")}
-            className={tabBtnCls(tripType === "Round Trip")}
-          >
-            Round Trip
-          </button>
+          {MODES.map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => switchMode(mode)}
+              className={tabBtnCls(tripType === mode)}
+            >
+              {mode === "Track Ride" ? (
+                <>
+                  Track Ride
+                </>
+              ) : (
+                mode
+              )}
+            </button>
+          ))}
         </div>
 
         <AnimatePresence mode="wait" custom={modeFlow}>
@@ -642,6 +649,10 @@ const GuestBookingForm = () => {
             transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
             className="grid gap-4 items-end min-w-0 mt-4"
           >
+            {tripType === "Track Ride" ? (
+              <TrackRidePanel />
+            ) : (
+              <>
             <PlaceField
               id="pickup"
               label="Pickup Location"
@@ -757,6 +768,8 @@ const GuestBookingForm = () => {
                 </>
               )}
             </Motion.button>
+              </>
+            )}
           </Motion.div>
         </AnimatePresence>
       </form>

@@ -246,6 +246,17 @@ const WaitingPage = () => {
           {/* Actions */}
           <Reveal delay={0.14} className="mt-5 md:mt-6 bg-white/5 backdrop-blur-lg rounded-[30px] border border-white/10 p-6 sm:p-8 text-center">
             <div className="flex flex-col sm:flex-row justify-center gap-3">
+              {ref && (
+                <Link to="/booking/my-booking">
+                  <Motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-white/5 border border-emerald-500/40 text-emerald-300 font-semibold hover:border-emerald-400 hover:text-emerald-200 transition-all"
+                  >
+                    <Clock3 size={18} /> Track My Booking
+                  </Motion.button>
+                </Link>
+              )}
               <Link to="/booking">
                 <Motion.button
                   whileHover={{ scale: 1.04 }}

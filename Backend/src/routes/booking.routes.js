@@ -2,6 +2,8 @@ import express from "express";
 import {
   createBooking,
   createGuestBooking,
+  lookupGuestBooking,
+  guestCancelBooking,
   getMyBookings,
   getBookingById,
   cancelBooking,
@@ -23,6 +25,8 @@ import { paginationQuerySchema } from "../validators/common.validator.js";
 import {
   createBookingSchema,
   guestCreateBookingSchema,
+  guestLookupSchema,
+  guestCancelSchema,
   cancelBookingSchema,
   driverCancelBookingSchema,
   updatePaymentSchema,
@@ -35,6 +39,10 @@ const router = express.Router();
 
 // Public guest booking (no JWT; strict per-IP rate limit + validation)
 router.post("/guest", guestBookingLimiter, validate(guestCreateBookingSchema), createGuestBooking);
+
+// Public guest self-service (no JWT): ref + phone prove ownership.
+router.post("/guest/lookup", guestBookingLimiter, validate(guestLookupSchema), lookupGuestBooking);
+router.patch("/guest/:id/cancel", guestBookingLimiter, validateParams(bookingIdSchema), validate(guestCancelSchema), guestCancelBooking);
 
 // Customer routes
 router.post("/", authenticate, authorize("customer"), validate(createBookingSchema), createBooking);

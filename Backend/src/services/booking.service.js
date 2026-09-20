@@ -387,10 +387,197 @@ export const createGuestBooking = async (guestData) => {
     guestPhone,
   });
 
-  return {
+return {
     ...result,
     duplicate: false,
     isGuest: true,
+  };
+};
+
+/* ===========================================================
+   GUEST BOOKING LOOKUP
+   A guest has no account, so the booking reference (last 8 of the
+   _id) plus the guest's phone number is the identity proof. The
+   backend is the source of truth — localStorage on the client is
+   only a convenience key that auto-fills these two values.
+=========================================================== */
+
+export const lookupGuestBooking = async (ref, phone) => {
+  const cleanPhone = String(phone).trim();
+  const cleanRef = String(ref).trim().replace(/^#/, "").toLowerCase();
+
+  if (!cleanRef || cleanRef.length < 6) {
+    throw new Error("Booking reference is invalid.");
+  }
+
+  const isObjectId = /^[0-9a-fA-F]{24}$/.test(cleanRef);
+
+  const query = isObjectId
+    ? { _id: cleanRef }
+    : {
+        $expr: {
+          $regexMatch: {
+            input: { $toString: "$_id" },
+            regex: `${cleanRef.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+          },
+        },
+      };
+
+  const booking = await Booking.findOne(query)
+    .populate("vehicleType", "name image")
+    .populate({
+      path: "driver",
+      select: "user vehicleBrand vehicleModel vehicleNumber vehicleColor vehicleType",
+      populate: [
+        { path: "user", select: "name phone" },
+        { path: "vehicleType", select: "name" },
+      ],
+    })
+    .lean();
+
+  if (!booking || !booking.guestPhone) {
+    throw Object.assign(new Error("Booking not found."), { code: 404 });
+  }
+
+  if (booking.guestPhone !== cleanPhone) {
+    throw Object.assign(new Error("Booking reference and phone don't match."), {
+      code: 404,
+    });
+  }
+
+  return {
+    _id: booking._id,
+    ref: String(booking._id).slice(-8).toUpperCase(),
+    guestName: booking.guestName,
+    guestPhone: booking.guestPhone,
+    bookingStatus: booking.bookingStatus,
+    pickup: booking.pickup,
+    drop: booking.drop,
+    pickupDateTime: booking.pickupDateTime,
+    tripType: booking.tripType || "One Way",
+    days: booking.days || 1,
+    vehicleType: booking.vehicleType?.name || "—",
+    estimatedFare: booking.estimatedFare,
+    finalFare: booking.finalFare || booking.estimatedFare,
+    distance: booking.distance,
+    duration: booking.duration,
+    paymentMethod: booking.paymentMethod || "Cash",
+    paymentStatus: booking.paymentStatus || "Pending",
+    driver: booking.driver
+      ? {
+          name: booking.driver.user?.name,
+          phone: booking.driver.user?.phone,
+          vehicleBrand: booking.driver.vehicleBrand,
+          vehicleModel: booking.driver.vehicleModel,
+          vehicleNumber: booking.driver.vehicleNumber,
+          vehicleColor: booking.driver.vehicleColor,
+          vehicleType: booking.driver.vehicleType?.name,
+        }
+      : null,
+    cancelledBy: booking.cancelledBy,
+    cancelledAt: booking.cancelledAt,
+    cancelReason: booking.cancelReason,
+    createdAt: booking.createdAt,
+  };
+};
+
+/* ===========================================================
+   GUEST BOOKING CANCEL
+   Same guard logic as the customer cancel, but the phone number
+   (snapshotted on the booking) stands in for the JWT session.
+=========================================================== */
+
+export const guestCancelBooking = async (
+  bookingId,
+  phone,
+  cancelReason = "No reason provided"
+) => {
+  const booking = await Booking.findById(bookingId);
+
+  if (!booking || !booking.guestPhone) {
+    throw Object.assign(new Error("Booking not found."), { code: 404 });
+  }
+
+  if (booking.guestPhone !== String(phone).trim()) {
+    throw new Error("Unauthorized.");
+  }
+
+  if (booking.bookingStatus === "Completed") {
+    throw new Error("Completed ride cannot be cancelled.");
+  }
+
+  if (booking.bookingStatus === "Cancelled") {
+    throw new Error("Booking already cancelled.");
+  }
+
+  /* ==========================================
+      UPDATE BOOKING
+  ========================================== */
+
+  booking.bookingStatus = "Cancelled";
+  booking.cancelledAt = new Date();
+  booking.cancelReason = cancelReason;
+  booking.cancelledBy = "Customer";
+  booking.driverRequestStatus = "Rejected";
+  booking.driverQueue = [];
+  booking.currentDriverIndex = 0;
+  booking.requestExpiresAt = null;
+
+  await booking.save();
+
+  /* ==========================================
+      RELEASE DRIVER
+  ========================================== */
+
+  if (booking.driver) {
+    const driver = await DriverProfile.findById(booking.driver);
+
+    if (driver) {
+      driver.currentRide = null;
+      driver.isAvailable = driver.isOnline;
+      driver.totalTrips += 1;
+      driver.cancelledTrips += 1;
+
+      await driver.save();
+
+      // Notify driver
+      await notifyUser({
+        user: driver.user,
+        title: "Booking Cancelled",
+        message: "The guest cancelled the booking.",
+        type: "Booking",
+        booking: booking._id,
+      });
+    }
+  }
+
+  /* ==========================================
+      NOTIFY CUSTOMER (guest account)
+  ========================================== */
+
+  await notifyUser({
+    user: booking.customer,
+    title: "Booking Cancelled",
+    message: "Your booking has been cancelled successfully.",
+    type: "Booking",
+    booking: booking._id,
+  });
+
+  const updatedBooking = await Booking.findById(booking._id)
+    .populate("vehicleType", "name image")
+    .populate({
+      path: "driver",
+      select: "user vehicleBrand vehicleModel vehicleNumber vehicleColor vehicleType",
+      populate: [
+        { path: "user", select: "name phone" },
+        { path: "vehicleType", select: "name" },
+      ],
+    });
+
+  return {
+    success: true,
+    message: "Booking cancelled successfully.",
+    booking: updatedBooking,
   };
 };
 

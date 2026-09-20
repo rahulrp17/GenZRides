@@ -51,6 +51,51 @@ export const createGuestBooking = async (req, res) => {
 };
 
 /* ===========================================================
+   GUEST BOOKING LOOKUP (no JWT; ref + phone as identity proof)
+=========================================================== */
+
+export const lookupGuestBooking = async (req, res) => {
+  try {
+    const result = await bookingService.lookupGuestBooking(
+      req.body.ref,
+      req.body.phone
+    );
+
+    res.status(200).json({ success: true, booking: result });
+  } catch (error) {
+    console.error(error);
+
+    res.status(error.code === 404 ? 404 : 400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/* ===========================================================
+   GUEST BOOKING CANCEL (no JWT; phone-verified)
+=========================================================== */
+
+export const guestCancelBooking = async (req, res) => {
+  try {
+    const result = await bookingService.guestCancelBooking(
+      req.params.id,
+      req.body.phone,
+      req.body.cancelReason
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+
+    res.status(error.code === 404 ? 404 : 400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/* ===========================================================
    MY BOOKINGS
    =========================================================== */
 

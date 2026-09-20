@@ -160,3 +160,81 @@ describe("Guest repeat bookings & admin separation", () => {
     expect(stats.totalCustomers).toBe(0);
   });
 });
+
+describe("Guest booking self-service (lookup + cancel via backend)", () => {
+  async function createGuestBooking(payload = {}) {
+    const res = await request(app)
+      .post("/api/bookings/guest")
+      .send(guestPayload(payload));
+    expect(res.status).toBe(201);
+    return res.body.booking;
+  }
+
+  it("looks up a guest booking by ref + phone and returns sanitized details", async () => {
+    const booking = await createGuestBooking();
+
+    const res = await request(app)
+      .post("/api/bookings/guest/lookup")
+      .send({ ref: String(booking._id).slice(-8).toUpperCase(), phone: "9876543200" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.booking._id).toBe(booking._id.toString());
+    expect(res.body.booking.ref).toBe(String(booking._id).slice(-8).toUpperCase());
+    expect(res.body.booking.guestName).toBe("Kavin M");
+    expect(res.body.booking.guestPhone).toBe("9876543200");
+    expect(res.body.booking.bookingStatus).toBe("Pending");
+    expect(res.body.booking.vehicleType).toBe("Sedan");
+    expect(res.body.booking.pickup.address).toContain("Trichy");
+    expect(res.body.booking.drop.address).toContain("Chennai");
+  });
+
+  it("rejects lookup when the phone does not match the booking ref", async () => {
+    const booking = await createGuestBooking();
+
+    const res = await request(app)
+      .post("/api/bookings/guest/lookup")
+      .send({ ref: String(booking._id).slice(-8).toUpperCase(), phone: "9123456780" });
+
+    expect(res.status).toBe(404);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toMatch(/don't match/i);
+  });
+
+  it("cancels a guest booking with the correct phone (backend is source of truth)", async () => {
+    const booking = await createGuestBooking();
+
+    const res = await request(app)
+      .patch(`/api/bookings/guest/${booking._id}/cancel`)
+      .send({ phone: "9876543200", cancelReason: "Changed plans" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.booking.bookingStatus).toBe("Cancelled");
+    expect(res.body.booking.cancelledBy).toBe("Customer");
+
+    const inDb = await Booking.findById(booking._id);
+    expect(inDb.bookingStatus).toBe("Cancelled");
+    expect(inDb.cancelReason).toBe("Changed plans");
+  });
+
+  it("refuses guest cancel with a wrong phone and cannot cancel twice", async () => {
+    const booking = await createGuestBooking();
+
+    const wrongPhone = await request(app)
+      .patch(`/api/bookings/guest/${booking._id}/cancel`)
+      .send({ phone: "9123456780" });
+    expect(wrongPhone.status).toBe(400);
+
+    const ok = await request(app)
+      .patch(`/api/bookings/guest/${booking._id}/cancel`)
+      .send({ phone: "9876543200" });
+    expect(ok.status).toBe(200);
+
+    const again = await request(app)
+      .patch(`/api/bookings/guest/${booking._id}/cancel`)
+      .send({ phone: "9876543200" });
+    expect(again.status).toBe(400);
+    expect(again.body.message).toMatch(/already cancelled/i);
+  });
+});

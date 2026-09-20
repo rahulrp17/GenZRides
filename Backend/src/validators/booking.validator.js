@@ -96,6 +96,17 @@ const guestCreateBookingSchema = z.object({
   { message: 'Return date must be after pickup date', path: ['returnDateTime'] }
 );
 
+// Guests prove ownership of a booking with reference (+ phone); no JWT involved.
+const guestLookupSchema = z.object({
+  ref: z.string().min(6, 'Booking reference is too short').max(28, 'Booking reference is too long'),
+  phone: z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit Indian mobile number'),
+});
+
+const guestCancelSchema = z.object({
+  phone: z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit Indian mobile number'),
+  cancelReason: z.string().max(500, 'Cancel reason must be at most 500 characters').optional(),
+});
+
 export {
   createBookingSchema,
   guestCreateBookingSchema,
@@ -104,4 +115,6 @@ export {
   updatePaymentSchema,
   addTipSchema,
   bookingIdSchema,
+  guestLookupSchema,
+  guestCancelSchema,
 };

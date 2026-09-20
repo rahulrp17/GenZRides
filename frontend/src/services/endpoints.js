@@ -28,6 +28,8 @@ export const guestAPI = {
   reverseGeocode: (data) => api.post('/maps/guest/reverse-geocode', data),
   estimateFare: (data) => api.post('/fares/guest/estimate', data),
   create: (data) => api.post('/bookings/guest', data),
+  lookup: (data) => api.post('/bookings/guest/lookup', data),
+  cancel: (id, data) => api.patch(`/bookings/guest/${id}/cancel`, data),
 };
 
 // ==================== BOOKINGS ====================
