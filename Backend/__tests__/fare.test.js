@@ -107,8 +107,8 @@ describe("Fare policy (calculateFare)", () => {
     // max(200, 1*300) = 300, doubled legs = 600 totalRunningKm
     // chargeableDistance = 600 - 0 = 600, distanceFare = 600 * 12 = 7200
     expect(fare.fareBreakdown.distanceFare).toBe(600 * 12);
-    // 600 > 400 threshold but round trips always use standard bata
-    expect(fare.fareBreakdown.driverAllowance).toBe(300);
+    // 600 > 400 threshold but round trips always use the flat bata rate
+    expect(fare.fareBreakdown.driverAllowance).toBe(400);
   });
 
   it("round trip to Bengaluru also matches the Bangalore spelling and the flag", async () => {
@@ -140,8 +140,8 @@ describe("Fare policy (calculateFare)", () => {
     // max(100, 2*250) = 500 km, doubled legs = 1000 totalRunningKm
     // chargeableDistance = 1000 - 0 = 1000, distanceFare = 1000 * 12 = 12000
     expect(fare.fareBreakdown.distanceFare).toBe(1000 * 12);
-    // 1000 > 400 but round trips always use standard bata, 2 days
-    expect(fare.fareBreakdown.driverAllowance).toBe(300 * 2);
+    // 1000 > 400 but round trips always use the flat bata rate, 2 days
+    expect(fare.fareBreakdown.driverAllowance).toBe(400 * 2);
   });
 
   it("waiting under 30 min is free; 45 min bills 15 min", async () => {
@@ -235,8 +235,8 @@ describe("Fare policy (calculateFare)", () => {
 
     expect(fare.fareBreakdown.billedDistanceKm).toBe(600);
     expect(fare.fareBreakdown.billableDays).toBe(2);
-    // Round trips always use standard bata (300), not high-distance
-    expect(fare.fareBreakdown.bataPerDay).toBe(300);
+    // Round trips always use the flat bata rate (400), not high-distance
+    expect(fare.fareBreakdown.bataPerDay).toBe(400);
   });
 
   it("uses the per-vehicle high-distance bata override when set", async () => {

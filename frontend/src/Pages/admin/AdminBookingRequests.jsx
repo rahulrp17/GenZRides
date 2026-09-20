@@ -526,7 +526,7 @@ const AdminBookingRequests = () => {
                       Est. fare
                     </p>
                     <p className="text-2xl sm:text-[26px] font-bold bg-gradient-to-r from-green-300 via-green-200 to-green-400 bg-clip-text text-transparent leading-tight">
-                      ₹{b.estimatedFare ?? 0}
+                      ₹{(b.estimatedFare ?? 0).toLocaleString('en-IN')}
                     </p>
                   </div>
                   <div className="flex sm:flex-col gap-1.5 shrink-0 sm:shrink">

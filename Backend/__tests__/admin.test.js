@@ -303,6 +303,228 @@ describe("Admin Endpoints", () => {
     });
   });
 
+  describe("GET /api/admin/instant-customers", () => {
+    // NOTE: same pattern as the bookings search describe — bookings from other
+    // describe blocks survive between tests, so each seed cleans up first.
+    let tag = 0;
+    const seed = async () => {
+      tag += 1;
+      const Vehicle = (await import("../src/models/Vehicle.js")).default;
+      const Booking = (await import("../src/models/Booking.js")).default;
+      await Booking.deleteMany({});
+      const hashed = await bcrypt.hash("Password123", 10);
+      const customer = await User.create({
+        name: `Guest Host ${tag}`,
+        email: `guesthost${tag}@test.com`,
+        phone: `97965432${String(tag).padStart(2, "0")}`,
+        password: hashed,
+        role: "customer",
+      });
+      const vehicle = await Vehicle.create({
+        name: `Instant Sedan ${tag}`,
+        seats: 4,
+        oneWayBaseFare: 100,
+        roundTripBaseFare: 100,
+        oneWayBaseKm: 0,
+        roundTripBaseKm: 0,
+        oneWayPerKm: 12,
+        roundTripPerKm: 12,
+        minimumDistance: 1,
+        isActive: true,
+      });
+      const mk = async (guestName, guestPhone, pickupAddr, dropAddr) =>
+        Booking.create({
+          customer: customer._id,
+          guestName,
+          guestEmail: `${guestName.toLowerCase()}@guest.test`,
+          guestPhone,
+          pickup: { address: pickupAddr, latitude: 13.0, longitude: 80.2 },
+          drop: { address: dropAddr, latitude: 9.9, longitude: 78.1 },
+          pickupDateTime: new Date(Date.now() + 86400000),
+          vehicleType: vehicle._id,
+          bookingStatus: "Pending",
+          estimatedFare: 1200,
+          distance: 100,
+          duration: 150,
+        });
+      // Logged-in (non-guest) booking must NOT appear in this feed.
+      await Booking.create({
+        customer: customer._id,
+        pickup: { address: "Registered Pickup", latitude: 13.0, longitude: 80.2 },
+        drop: { address: "Registered Drop", latitude: 9.9, longitude: 78.1 },
+        pickupDateTime: new Date(Date.now() + 86400000),
+        vehicleType: vehicle._id,
+        bookingStatus: "Pending",
+      });
+      return mk;
+    };
+
+    const list = (params = {}) =>
+      request(app)
+        .get("/api/admin/instant-customers")
+        .query(params)
+        .set("Authorization", `Bearer ${adminToken}`);
+
+    it("requires admin authentication", async () => {
+      const res = await request(app).get("/api/admin/instant-customers");
+      expect(res.status).toBe(401);
+    });
+
+    it("returns only guest bookings, latest first", async () => {
+      const mk = await seed();
+      const older = await mk("Kavi", "9896543001", "Trichy Airport, Trichy", "Chennai Central");
+      const newer = await mk("Priya", "9896543002", "Madurai Temple", "Rameshwaram Beach");
+
+      const res = await list();
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.total).toBe(2);
+      expect(res.body.guests.length).toBe(2);
+      // Newest first — "Priya" was created after "Kavi".
+      expect(res.body.guests[0]._id).toBe(String(newer._id));
+      expect(res.body.guests[1]._id).toBe(String(older._id));
+    });
+
+    it("searches by guest name case-insensitively", async () => {
+      const mk = await seed();
+      await mk("Kavitha", "9896543010", "Trichy Airport, Trichy", "Chennai Central");
+      await mk("Priya", "9896543011", "Madurai Temple", "Rameshwaram Beach");
+
+      const res = await list({ search: "kavitha" });
+      expect(res.status).toBe(200);
+      expect(res.body.total).toBe(1);
+      expect(res.body.guests[0].guestName).toBe("Kavitha");
+    });
+
+    it("searches by guest phone", async () => {
+      const mk = await seed();
+      await mk("Kavitha", "9896543020", "Trichy Airport, Trichy", "Chennai Central");
+      await mk("Priya", "9896543021", "Madurai Temple", "Rameshwaram Beach");
+
+      const res = await list({ search: "3021" });
+      expect(res.status).toBe(200);
+      expect(res.body.total).toBe(1);
+      expect(res.body.guests[0].guestPhone).toBe("9896543021");
+    });
+
+    it("searches by pickup/drop route text", async () => {
+      const mk = await seed();
+      await mk("Kavitha", "9896543030", "Trichy Airport, Trichy", "Chennai Central");
+      await mk("Priya", "9896543031", "Madurai Temple", "Rameshwaram Beach");
+
+      const res = await list({ search: "madurai" });
+      expect(res.status).toBe(200);
+      expect(res.body.total).toBe(1);
+      expect(res.body.guests[0].pickup.address).toMatch(/Madurai/);
+    });
+
+    it("paginates results", async () => {
+      const mk = await seed();
+      for (let i = 0; i < 5; i += 1) {
+        await mk(`Pager Guest ${i}`, `97965430${i}`, `Pickup ${i}`, `Drop ${i}`);
+      }
+
+      const page1 = await list({ page: 1, limit: 2 });
+      expect(page1.body.guests.length).toBe(2);
+      expect(page1.body.total).toBe(5);
+      expect(page1.body.totalPages).toBe(3);
+      expect(page1.body.page).toBe(1);
+
+      const page3 = await list({ page: 3, limit: 2 });
+      expect(page3.body.guests.length).toBe(1);
+    });
+
+    it("filters by booking status", async () => {
+      const mk = await seed();
+      const Booking = (await import("../src/models/Booking.js")).default;
+      await mk("Stu Kavitha", "9896543040", "Trichy Airport, Trichy", "Chennai Central");
+      const cancelled = await mk(
+        "Stu Priya",
+        "9896543041",
+        "Madurai Temple",
+        "Rameshwaram Beach"
+      );
+      await Booking.findByIdAndUpdate(cancelled._id, {
+        bookingStatus: "Cancelled",
+      });
+
+      const pending = await list({ status: "Pending" });
+      expect(pending.status).toBe(200);
+      expect(pending.body.total).toBe(1);
+      expect(pending.body.guests[0].guestName).toBe("Stu Kavitha");
+
+      const cancelledRes = await list({ status: "Cancelled" });
+      expect(cancelledRes.body.total).toBe(1);
+      expect(cancelledRes.body.guests[0].guestName).toBe("Stu Priya");
+    });
+
+    it("filters by vehicle type", async () => {
+      const mk = await seed();
+      const Vehicle = (await import("../src/models/Vehicle.js")).default;
+      const Booking = (await import("../src/models/Booking.js")).default;
+      const suv = await Vehicle.create({
+        name: "Instant SUV Filter",
+        seats: 7,
+        oneWayBaseFare: 200,
+        roundTripBaseFare: 200,
+        oneWayBaseKm: 0,
+        roundTripBaseKm: 0,
+        oneWayPerKm: 16,
+        roundTripPerKm: 16,
+        minimumDistance: 1,
+        isActive: true,
+      });
+      const sedanBooking = await mk(
+        "VK Kavitha",
+        "9896543050",
+        "Trichy Airport, Trichy",
+        "Chennai Central"
+      );
+      const suvBooking = await Booking.create({
+        customer: sedanBooking.customer,
+        guestName: "VK Priya",
+        guestEmail: "vkpriya@guest.test",
+        guestPhone: "9896543051",
+        pickup: { address: "Madurai Temple", latitude: 9.9, longitude: 78.1 },
+        drop: { address: "Rameshwaram Beach", latitude: 9.3, longitude: 79.3 },
+        pickupDateTime: new Date(Date.now() + 86400000),
+        vehicleType: suv._id,
+        bookingStatus: "Pending",
+        estimatedFare: 2500,
+        distance: 180,
+        duration: 210,
+      });
+
+      const sedan = await list({ vehicleType: String(sedanBooking.vehicleType) });
+      expect(sedan.status).toBe(200);
+      expect(sedan.body.total).toBe(1);
+      expect(sedan.body.guests[0].guestName).toBe("VK Kavitha");
+
+      const suvRes = await list({ vehicleType: String(suv._id) });
+      expect(suvRes.body.total).toBe(1);
+      expect(suvRes.body.guests[0].guestName).toBe("VK Priya");
+    });
+
+    it("combines status + search", async () => {
+      const mk = await seed();
+      const Booking = (await import("../src/models/Booking.js")).default;
+      const cancelled = await mk(
+        "Comb Raksha",
+        "9896543060",
+        "Trichy Airport, Trichy",
+        "Chennai Central"
+      );
+      await mk("Comb Meena", "9896543061", "Madurai Temple", "Rameshwaram Beach");
+      await Booking.findByIdAndUpdate(cancelled._id, {
+        bookingStatus: "Cancelled",
+      });
+
+      const res = await list({ status: "Cancelled", search: "raksha" });
+      expect(res.body.total).toBe(1);
+      expect(res.body.guests[0].guestName).toBe("Comb Raksha");
+    });
+  });
+
   describe("PATCH /api/admin/drivers/:id/approve", () => {
     it("approving a driver verifies docs too (all-Approved together)", async () => {
       const Vehicle = (await import("../src/models/Vehicle.js")).default;

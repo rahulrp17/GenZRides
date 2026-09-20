@@ -622,7 +622,7 @@ const ManageBookings = () => {
                         Fare
                       </p>
                       <p className="text-2xl sm:text-[26px] font-bold bg-gradient-to-r from-violet-200 to-violet-400 bg-clip-text text-transparent leading-tight">
-                        ₹{fareOf(b) ?? 0}
+                        ₹{(fareOf(b) ?? 0).toLocaleString('en-IN')}
                       </p>
                     </div>
                     <div className="flex sm:flex-col gap-1.5 shrink-0 sm:shrink">

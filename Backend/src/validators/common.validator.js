@@ -33,6 +33,7 @@ export const paginationQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional(),
   search: z.string().optional(),
   status: z.string().optional(),
+  vehicleType: z.string().optional(),
   sortBy: z.string().optional(),
   order: z.enum(["asc", "desc"]).optional(),
   rating: z.string().optional(),

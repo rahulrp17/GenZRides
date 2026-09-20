@@ -248,6 +248,58 @@ export const getCustomers = async (page = 1, limit = 10, search = "") => {
   };
 };
 
+export const getInstantCustomers = async (
+  page = 1,
+  limit = 10,
+  search = "",
+  status = "",
+  vehicleType = ""
+) => {
+  const skip = (page - 1) * limit;
+
+  // `guestName` is only set for guest bookings, so it cleanly separates the
+  // "Instant Customers" feed from registered-customer reservations.
+  const query = { guestName: { $ne: null } };
+
+  if (status && status.trim()) {
+    query.bookingStatus = status;
+  }
+
+  if (vehicleType && vehicleType.trim()) {
+    query.vehicleType = vehicleType;
+  }
+
+  if (search && search.trim()) {
+    query.$or = [
+      { guestName: { $regex: search, $options: "i" } },
+      { guestEmail: { $regex: search, $options: "i" } },
+      { guestPhone: { $regex: search, $options: "i" } },
+      { "customer.name": { $regex: search, $options: "i" } },
+      { "pickup.address": { $regex: search, $options: "i" } },
+      { "drop.address": { $regex: search, $options: "i" } },
+    ];
+  }
+
+  const [guests, total] = await Promise.all([
+    Booking.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit))
+      .populate("vehicleType", "name")
+      .populate("customer", "name phone profileImage")
+      .populate({ path: "driver", select: "user vehicleBrand vehicleModel vehicleNumber", populate: { path: "user", select: "name phone" } })
+      .lean(),
+    Booking.countDocuments(query),
+  ]);
+
+  return {
+    guests,
+    total,
+    page: Number(page),
+    totalPages: Math.ceil(total / limit),
+  };
+};
+
 export const getCustomerById = async (customerId) => {
   const customer = await User.findOne({
     _id: customerId,

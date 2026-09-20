@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getDashboardStats,
+  getInstantCustomers,
   getCustomers,
   getCustomerById,
   blockCustomer,
@@ -63,6 +64,7 @@ router.use(authorize("admin"));
 router.get("/dashboard", getDashboardStats);
 
 // Customers
+router.get("/instant-customers", validateQuery(paginationQuerySchema), getInstantCustomers);
 router.get("/customers", validateQuery(paginationQuerySchema), getCustomers);
 router.get("/customers/:id", validateParams(idParamSchema), getCustomerById);
 router.patch("/customers/:id/block", validateParams(idParamSchema), blockCustomer);

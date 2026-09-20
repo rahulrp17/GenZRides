@@ -62,6 +62,42 @@ export const getCustomers = async (req, res) => {
 };
 
 /**
+ * GET INSTANT CUSTOMERS (guest bookings)
+ */
+export const getInstantCustomers = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      status = "",
+      vehicleType = "",
+    } = req.query;
+
+    const guests = await adminService.getInstantCustomers(
+      Number(page),
+      Number(limit),
+      search,
+      status,
+      vehicleType
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Instant customers fetched successfully.",
+      ...guests,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
  * GET CUSTOMER BY ID
  */
 export const getCustomerById = async (req, res) => {

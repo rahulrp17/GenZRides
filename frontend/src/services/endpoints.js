@@ -106,6 +106,7 @@ export const driverUploadAPI = {
 // ==================== ADMIN ====================
 export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
+  getInstantCustomers: (params) => api.get('/admin/instant-customers', { params }),
   getCustomers: (params) => api.get('/admin/customers', { params }),
   getCustomer: (id) => api.get(`/admin/customers/${id}`),
   blockCustomer: (id) => api.patch(`/admin/customers/${id}/block`),

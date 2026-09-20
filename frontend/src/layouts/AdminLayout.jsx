@@ -213,7 +213,7 @@ const AdminLayout = () => {
           </div>
         </header>
 
-        <main className="flex-1 min-w-0 w-full max-w-full overflow-x-clip p-4 sm:p-6">
+        <main className="@container flex-1 min-w-0 w-full max-w-full overflow-x-clip p-4 sm:p-6">
           <PushListener />
           <AutoPushSync />
           <Outlet />
