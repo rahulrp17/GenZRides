@@ -70,7 +70,18 @@ const DriverBookingDetail = () => {
   // Location gate: accepting requires a live GPS fix (used for dispatch
   // accuracy and trip tracking). 'needed' shows the enable-location prompt.
   const [locCheck, setLocCheck] = useState('idle');
-
+   const statusColors = {
+    Pending: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
+    Accepted: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
+    "On The Way":
+      "bg-purple-500/20 text-purple-400 border border-purple-500/30",
+    Arrived: "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30",
+    Started: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30",
+    Reached: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
+    Completed:
+      "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+    Cancelled: "bg-red-500/20 text-red-400 border border-red-500/30",
+  };
   const handleAccept = () => {
     if (acceptMutation.isPending || locCheck === 'checking') return;
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
@@ -149,12 +160,12 @@ const DriverBookingDetail = () => {
                 onClick={() => copyBooking(booking)}
                 title="Copy booking details"
                 aria-label="Copy booking details"
-                className="inline-flex items-center gap-1.5 p-2 min-w-[40px] min-h-[40px] justify-center bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs font-medium hover:bg-white/10 hover:text-white transition"
+                className="hidden items-center gap-1.5 p-2 min-w-[40px] min-h-[40px] justify-center bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs font-medium hover:bg-white/10 hover:text-white transition"
               >
                 {copied ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
                 <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
               </button>
-              <span className="px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full text-xs font-medium">
+              <span className={`px-3 py-1 rounded-full text-md font-medium ${statusColors[booking.bookingStatus]}`}>
                 {booking.bookingStatus}
               </span>
             </div>

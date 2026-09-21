@@ -192,7 +192,7 @@ const Hero = () => {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 
-                className="group px-9 py-4 rounded-full bg-green-300 text-black font-bold flex items-center gap-2 hover:bg-green-400 hover:shadow-[0_0_40px_rgba(74,222,128,0.45)] transition-all"
+                className="group px-9 py-4 rounded-full cursor-pointer bg-green-300 text-black !font-extrabold flex items-center gap-2 hover:bg-green-400 hover:shadow-[0_0_40px_rgba(74,222,128,0.45)] transition-all"
               >
                 Book Now
                 <ArrowRight
@@ -206,7 +206,7 @@ const Hero = () => {
                 <Motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="px-9 py-4 rounded-full border border-white/25 text-white font-semibold hover:border-green-400/70 hover:text-green-300 backdrop-blur-sm transition-all"
+                  className="px-9 py-4 cursor-pointer rounded-full border border-white/25 text-white !font-extrabold hover:border-green-400/70 hover:text-green-300 backdrop-blur-sm transition-all"
                 >
                   View Tariff
                 </Motion.button>

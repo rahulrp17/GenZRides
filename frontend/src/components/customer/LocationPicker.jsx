@@ -14,6 +14,7 @@ import {
   Crosshair,
 } from "lucide-react";
 import { mapsAPI } from "../../services/endpoints";
+import { buildPlaceDisplayName } from "../../utils/locationFormat";
 
 const SAVED_PLACES_KEY = "rideSavedPlaces";
 const RECENT_SEARCHES_KEY = "rideRecentSearches";
@@ -241,7 +242,11 @@ export default function LocationPicker({
           const place = {
             place_id: data.data.placeId,
             name: data.data.name,
-            formatted_address: data.data.formattedAddress,
+            formatted_address: buildPlaceDisplayName({
+              name: data.data.name,
+              formattedAddress: data.data.formattedAddress,
+              fallback: prediction.text,
+            }),
             lat: data.data.lat,
             lng: data.data.lng,
           };
@@ -649,7 +654,11 @@ function SavedPlaceButton({
         onSave(type, {
           place_id: data.data.placeId,
           name: type === "home" ? "Home" : "Work",
-          formatted_address: data.data.formattedAddress,
+          formatted_address: buildPlaceDisplayName({
+            name: data.data.name,
+            formattedAddress: data.data.formattedAddress,
+            fallback: prediction.text,
+          }),
           lat: data.data.lat,
           lng: data.data.lng,
         });

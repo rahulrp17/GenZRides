@@ -22,7 +22,10 @@ import { guestAPI } from "../../services/endpoints";
 import { loadDraft, saveDraft, minPickupISO } from "./guestDraft";
 import TrackRidePanel from "./TrackRidePanel";
 import RideMap from "../../components/customer/RideMap";
-import { toDisplayAddress } from "../../utils/locationFormat";
+import {
+  toDisplayAddress,
+  buildPlaceDisplayName,
+} from "../../utils/locationFormat";
 
 const DEBOUNCE_MS = 300;
 
@@ -186,8 +189,11 @@ function PlaceField({
         });
         if (data.success && data.data?.lat != null && data.data?.lng != null) {
           finishPick({
-            address:
-              data.data.formattedAddress || data.data.name || prediction.text,
+            address: buildPlaceDisplayName({
+              name: data.data.name,
+              formattedAddress: data.data.formattedAddress,
+              fallback: prediction.text,
+            }),
             lat: data.data.lat,
             lng: data.data.lng,
           });
@@ -780,7 +786,7 @@ const GuestBookingForm = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[140] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+            className="fixed inset-0 z-[140] bg-black/75 backdrop-blur-sm flex items-center justify-center p-0 sm:p-0"
             onClick={handleCancelMapSelect}
           >
             <Motion.div
@@ -789,7 +795,7 @@ const GuestBookingForm = () => {
               exit={{ opacity: 0, scale: 0.96, y: 8 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl h-[72dvh] flex flex-col bg-[#0a0f0d]/95 border border-white/10 rounded-3xl shadow-[0_30px_100px_rgba(0,0,0,0.8)] overflow-hidden"
+              className="w-full max-w-2xl h-[73dvh] flex flex-col bg-[#0a0f0d]/95 border border-white/10 rounded-3xl shadow-[0_30px_100px_rgba(0,0,0,0.8)] overflow-hidden"
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
                 <div>
@@ -806,7 +812,7 @@ const GuestBookingForm = () => {
                       ? "Set pickup on map"
                       : "Set drop-off on map"}
                   </h3>
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-xs text-green-400 mt-0.5">
                     Drag the pin or tap the map, then confirm.
                   </p>
                 </div>

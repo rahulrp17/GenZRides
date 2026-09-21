@@ -379,7 +379,7 @@ function RideMap({
                 selectingPin === "pickup" ? "bg-emerald-500" : "bg-red-500"
               }`}
             />
-            <p className="text-xs font-medium text-gray-300">
+            <p className="text-xs font-medium text-green-500">
               {draggablePin
                 ? "Drag pin or tap map to adjust"
                 : "Tap on the map to place pin"}

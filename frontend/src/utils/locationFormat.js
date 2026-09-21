@@ -5,6 +5,12 @@
 
 const COORD_PAIR_RE = /^-?\d{1,3}(?:\.\d+)?\s*,\s*-?\d{1,3}(?:\.\d+)?$/;
 
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// Google prefixes plus-codes (e.g. "RP5J+X95, ...") onto formatted_address
+// for POIs that don't have a street address — cryptic for a cab pickup.
+const PLUS_CODE_PREFIX_RE = /^\s*[0-9A-Z]{4,6}\+[0-9A-Z]{2,4},\s*/;
+
 export const isCoordinateLike = (value) =>
   typeof value === "string" && COORD_PAIR_RE.test(value.trim());
 
@@ -51,3 +57,25 @@ export const buildLocationPayload = (address, coords, fallback = "") => ({
   latitude: Number(coords?.lat),
   longitude: Number(coords?.lng),
 });
+
+// Best human label for a picked suggestion. Google's formatted_address for
+// many places — especially small-town stores/shops — drops the establishment
+// name (or is just the locality / a plus-code), so the input can look like it
+// "only kept the main place" (e.g. "Trichy" or "Thuraiyur"). Keep the place
+// name in front when it isn't already part of the address, and strip a
+// leading plus-code token so the exact spot stays readable and pinned.
+export const buildPlaceDisplayName = ({
+  name = "",
+  formattedAddress = "",
+  fallback = "",
+} = {}) => {
+  const nameT = String(name ?? "").trim();
+  let addrT = String(formattedAddress ?? "").trim().replace(PLUS_CODE_PREFIX_RE, "");
+  if (!addrT) {
+    return nameT || String(fallback ?? "").trim();
+  }
+  if (nameT && !new RegExp(escapeRegExp(nameT), "i").test(addrT)) {
+    return `${nameT}, ${addrT}`;
+  }
+  return addrT;
+};
