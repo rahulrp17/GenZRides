@@ -223,17 +223,19 @@ const CurrentRide = () => {
   }, []);
 
   const startGpsSharing = useCallback(() => {
+    if (gpsActiveRef.current) return; // already sharing
     if (!navigator.geolocation) {
       setGpsError('Geolocation is not supported by your browser');
       return;
     }
 
+    gpsActiveRef.current = true;
+    setGpsSharing(true);
+    requestWakeLock();
+
     navigator.geolocation.getCurrentPosition(
       () => {
         setGpsError(null);
-        gpsActiveRef.current = true;
-        setGpsSharing(true);
-        requestWakeLock();
 
         if (geoWatchRef.current !== null) {
           try { navigator.geolocation.clearWatch(geoWatchRef.current); } catch (err) { void err; }
@@ -289,13 +291,13 @@ const CurrentRide = () => {
   }, []);
 
   useEffect(() => {
-    if (isRideActive && socketConnected) {
+    if (isRideActive) {
       startGpsSharing();
     } else {
       stopGpsSharing();
     }
     return () => stopGpsSharing();
-  }, [isRideActive, socketConnected]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isRideActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep GPS alive when driver minimizes / switches apps — watches are throttled in background,
   // so re-acquire wake lock and restart watch on visibility change
@@ -303,7 +305,7 @@ const CurrentRide = () => {
     const onVis = () => {
       if (document.visibilityState === 'visible') {
         requestWakeLock();
-        if (isRideActive && gpsActiveRef.current && socketConnected) {
+        if (isRideActive && gpsActiveRef.current) {
           // Restart GPS sharing — watchPosition is throttled/ended in background
           stopGpsSharing();
           startGpsSharing();

@@ -10,7 +10,6 @@ import { getETA } from "../services/googleMaps.service.js";
 
 let io;
 
-const SOCKET_TIMEOUT = 30000;
 const driverLocationLast = new Map(); // driverUserId -> timestamp ms
 
 export const initializeSocket = (server) => {
@@ -159,17 +158,10 @@ export const initializeSocket = (server) => {
       }
     }
 
-    // Set socket timeout
-    const timeout = setTimeout(() => {
-      socket.disconnect(true);
-    }, SOCKET_TIMEOUT);
-
-    socket.on("pong", () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        socket.disconnect(true);
-      }, SOCKET_TIMEOUT);
-    });
+    // Socket liveness is handled by Socket.IO's native ping (pingInterval/
+    // pingTimeout). A custom kill-timer that required a "pong" event the
+    // client never sends used to force-disconnect every socket after 30 s,
+    // which broke live driver-location sharing.
 
     // Driver online (explicit emit from frontend) - verbose, trip-aware
     socket.on("driver-online", async () => {
@@ -366,8 +358,6 @@ export const initializeSocket = (server) => {
     // and dispatch (isOnline+isAvailable check) to keep matching until trip starts.
     socket.on("disconnect", async () => {
       try {
-        clearTimeout(timeout);
-
         if (socket.user?.role === "driver") {
           console.log(`[driver-disconnect] user=${socket.user._id} kept online (not forced offline)`);
           // Intentionally NOT setting isOnline/isAvailable false here.

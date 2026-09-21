@@ -13,11 +13,24 @@ import {
   Mountain,
   KeyRound,
   Route as RouteIcon,
+  Eye,
+  Wallet,
 } from "lucide-react";
-import { ChennaiBangalore,TrichyChennai, CoimbatoreOoty, ChennaiMadurai, ChennaiRameshwaram, ChennaiCoimbatore } from "../../assets/images";
+import {
+  ChennaiBangalore,
+  TrichyChennai,
+  CoimbatoreOoty,
+  ChennaiMadurai,
+  ChennaiRameshwaram,
+  ChennaiCoimbatore,
+  MaduraiRameshwaram,
+  CoimbatoreSalem,
+} from "../../assets/images";
 import { Reveal, SectionHeading, GlowBlobs } from "./Reveal";
 import { cardHover } from "./motion";
 import FareNotes from "../../components/shared/FareNotes";
+
+const slugOf = (from, to) => `${from.toLowerCase()}-to-${to.toLowerCase()}`;
 
 const ROUTES = [
   {
@@ -26,6 +39,8 @@ const ROUTES = [
     tag: "Most Booked",
     img: ChennaiBangalore,
     note: "One-way & round-trip cabs on NH-48",
+    distance: "≈ 350 km",
+    fare: "≈ ₹4,550",
   },
   {
     from: "Chennai",
@@ -33,6 +48,8 @@ const ROUTES = [
     tag: "Temple Trail",
     img: ChennaiMadurai,
     note: "Comfortable long-distance cruising",
+    distance: "≈ 460 km",
+    fare: "≈ ₹5,980",
   },
   {
     from: "Coimbatore",
@@ -40,6 +57,8 @@ const ROUTES = [
     tag: "Hill Escape",
     img: CoimbatoreOoty,
     note: "Ghat-ready cars with expert drivers",
+    distance: "≈ 90 km",
+    fare: "≈ ₹1,170",
   },
   {
     from: "Trichy",
@@ -47,22 +66,45 @@ const ROUTES = [
     tag: "Business Run",
     img: TrichyChennai,
     note: "On-time airport & city transfers",
+    distance: "≈ 330 km",
+    fare: "≈ ₹4,290",
   },
   {
-    from:"Chennai",
-    to:"Rameshwaram",
-    tag:"Temple Trail",
+    from: "Chennai",
+    to: "Rameshwaram",
+    tag: "Pilgrim Special",
     img: ChennaiRameshwaram,
-    note: "Comfortable long-distance cruising",
+    note: "Temple-run comfort all the way",
+    distance: "≈ 570 km",
+    fare: "≈ ₹7,410",
   },
   {
-    from:"Chennai",
-    to:"Coimbatore",
-    tag:"Hill Escape",
+    from: "Chennai",
+    to: "Coimbatore",
+    tag: "Cross-State",
     img: ChennaiCoimbatore,
-    note: "Ghat-ready cars with expert drivers",  
-  }
-  
+    note: "Ghat-aware drivers with refreshment stops",
+    distance: "≈ 500 km",
+    fare: "≈ ₹6,500",
+  },
+  {
+    from: "Madurai",
+    to: "Rameshwaram",
+    tag: "Coastal Run",
+    img: MaduraiRameshwaram,
+    note: "Temple trail through the Pamban bridge",
+    distance: "≈ 170 km",
+    fare: "≈ ₹2,210",
+  },
+  {
+    from: "Coimbatore",
+    to: "Salem",
+    tag: "Quick Hop",
+    img: CoimbatoreSalem,
+    note: "Brisk highway sprints, day and night",
+    distance: "≈ 180 km",
+    fare: "≈ ₹2,340",
+  },
 ];
 
 export const PopularRoutes = () => (
@@ -76,62 +118,87 @@ export const PopularRoutes = () => (
         sub="Handpicked corridors served daily by verified GenZRides chauffeurs."
       />
 
-      {/* Premium Swiper carousel: exactly 1 card on mobile, up to 4 on xl */}
+      {/* Premium auto-slide Swiper carousel: compact cards, 1 on mobile up to 4 on xl */}
       <Reveal>
         <Swiper
           modules={[Autoplay, Pagination]}
-          autoplay={{ delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true }}
+          autoplay={{
+            delay: 3200,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+          }}
           pagination={{ clickable: true }}
           loop
-          spaceBetween={20}
+          spaceBetween={16}
           slidesPerView={1}
           breakpoints={{
             640: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 },
             1280: { slidesPerView: 4 },
           }}
-          className="routes-swiper !pb-10 !pt-10  " 
+          className="routes-swiper !pb-10 !pt-6"
         >
           {ROUTES.map((r) => (
             <SwiperSlide key={`${r.from}-${r.to}`} className="h-auto">
               <Motion.div
                 {...cardHover}
-                className="group relative flex flex-col h-full rounded-[30px] overflow-hidden bg-white/[0.04] backdrop-blur-xl border border-white/10 hover:border-emerald-400/40 hover:shadow-[0_8px_50px_-12px_rgba(16,185,129,0.35)] transition-all duration-300"
+                className="group relative flex flex-col h-full rounded-[22px] overflow-hidden bg-white/[0.04] backdrop-blur-xl border border-white/10 hover:border-emerald-400/40 hover:shadow-[0_10px_40px_-12px_rgba(16,185,129,0.4)] transition-all duration-300"
               >
-              <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent" />
-              <div className="relative h-44 sm:h-48 overflow-hidden">
-                <img
-                  src={r.img}
-                  alt={`${r.from} to ${r.to}`}
-                  loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0d] via-transparent to-transparent" />
-                
-                <span className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/15 flex items-center justify-center">
-                  <RouteIcon size={14} className="text-emerald-300" />
-                </span>
-              </div>
-              <div className="relative flex flex-1 flex-col p-5">
-                <p className="flex items-center gap-1.5 text-emerald-400 text-[11px] font-semibold uppercase tracking-[0.18em]">
-                  <MapPin size={13} />
-                  {r.from}
-                  <ArrowRight size={13} className="text-gray-500" />
-                </p>
-                <h3 className="font-display text-[26px] font-bold text-white leading-tight mt-1">
-                  {r.to}
-                </h3>
-                <span className="absolute top-3.5 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold uppercase tracking-widest">
-                  {r.tag}
-                </span>
-                <p className="text-gray-400 text-[13px] leading-relaxed mt-1.5 flex-1">{r.note}</p>
-                <Link
-                  to="/booking"
-                  className="inline-flex items-center justify-center gap-1.5 mt-4 w-full py-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-sm font-semibold text-emerald-300 hover:bg-emerald-500/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] active:scale-[0.98] transition-all"
-                >
-                  Book this route
-                  <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
-                </Link>
-              </div>
+                <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent" />
+                <div className="relative h-33 sm:h-33 overflow-hidden">
+                  <img
+                    src={r.img}
+                    alt={`${r.from} to ${r.to}`}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0d] via-transparent to-transparent" />
+                  <span className="absolute top-2.5 left-2.5 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md border border-white/15 flex items-center justify-center">
+                    <RouteIcon size={12} className="text-emerald-300" />
+                  </span>
+                  <span className="absolute top-2.5 right-2.5 px-2 py-[3px] rounded-full bg-black/60 backdrop-blur-md border border-emerald-500/40 text-emerald-300 text-[9.5px] font-semibold uppercase tracking-wider">
+                    {r.tag}
+                  </span>
+                </div>
+                <div className="relative flex flex-1 flex-col p-4 pt-3">
+                  <p className="flex items-center gap-1 text-emerald-400 text-[10px] font-semibold uppercase tracking-[0.16em]">
+                    <MapPin size={11} />
+                    {r.from}
+                    <ArrowRight size={11} className="text-gray-500" />
+                    <MapPin size={11} />
+                    {r.to}
+                  </p>
+                  <h3 className="font-display text-[19px] font-bold text-white leading-tight mt-0.5">
+                    {r.from} → {r.to}
+                  </h3>
+                  <p className="text-gray-400 text-[12px] leading-snug mt-1 line-clamp-2 flex-1">
+                    {r.note}
+                  </p>
+                  <div className="flex items-center gap-2 mt-2.5">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 rounded-full px-2.5 py-1">
+                      <Wallet size={11} /> {r.fare}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-300 bg-white/[0.06] border border-white/10 rounded-full px-2.5 py-1">
+                      <RouteIcon size={11} className="text-gray-400" />{" "}
+                      {r.distance}
+                    </span>
+                  </div>
+                  <div className="flex gap-2 mt-3 pt-3 border-t border-white/10">
+                    <Link
+                      to={`/routes/${slugOf(r.from, r.to)}`}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-white/[0.07] border border-white/15 text-[12px] font-semibold text-white hover:border-emerald-400/50 hover:text-emerald-300 hover:shadow-[0_0_16px_rgba(16,185,129,0.25)] active:scale-[0.98] transition-all"
+                    >
+                      <Eye size={12} /> Details
+                    </Link>
+                    <Link
+                      to="/booking"
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white text-[12px] font-semibold hover:shadow-[0_0_20px_rgba(16,185,129,0.45)] active:scale-[0.98] transition-all"
+                    >
+                      Book
+                      <ArrowRight size={12} />
+                    </Link>
+                  </div>
+                </div>
               </Motion.div>
             </SwiperSlide>
           ))}

@@ -27,6 +27,15 @@ import {
   ChennaiMadurai,
   TrichyChennai,
   CoimbatoreSalem,
+  CoimbatoreOoty,
+  CoimbatoreTrichy,
+  ChennaiRameshwaram,
+  ChennaiCoimbatore,
+  CoimbatoreDindigul,
+  MaduraiChennai,
+  MaduraiCoimbatore,
+  TrichyRameshwaram,
+  TrichyCoimbatore,
 } from "../../assets/images";
 const ROUTES = {
   "trichy-to-chennai": {
@@ -43,6 +52,102 @@ const ROUTES = {
       "24×7 availability",
       "Airport pickup available",
       "One-way & round-trip",
+    ],
+  },
+  "trichy-to-rameshwaram": {
+    from: "Trichy",
+    to: "Rameshwaram",
+    img: TrichyRameshwaram,
+    tag: "Pilgrim Special",
+    distance: "≈ 380 km",
+    duration: "≈ 7 hrs",
+    startFare: "≈ ₹4,940",
+    desc: "Rameshwaram from Trichy direct — Pamban Bridge sunrise, halt-friendly drivers and group cabs ready.",
+    highlights: [
+      "Halt-friendly trips",
+      "Pamban Bridge drive",
+      "Family & group cabs",
+      "Upfront fares",
+    ],
+  },
+  "trichy-to-coimbatore": {
+    from: "Trichy",
+    to: "Coimbatore",
+    img: TrichyCoimbatore,
+    tag: "Industrial Run",
+    distance: "≈ 290 km",
+    duration: "≈ 6 hrs",
+    startFare: "≈ ₹3,770",
+    desc: "Straight shot to the textile city — crisp departures and quiet, laptop-ready cabins.",
+    highlights: [
+      "Corporate billing",
+      "Early-morning slots",
+      "Quiet work cabins",
+      "On-time promise",
+    ],
+  },
+  "trichy-to-madurai": {
+    from: "Trichy",
+    to: "Madurai",
+    img: MaduraiTrichy,
+    tag: "Temple Run",
+    distance: "≈ 130 km",
+    duration: "≈ 2.5 hrs",
+    startFare: "≈ ₹1,690",
+    desc: "Meenakshi shrine from Trichy in under three hours — same-day return friendly.",
+    highlights: [
+      "Same-day return friendly",
+      "Temple-halt timings",
+      "Upfront fares",
+      "Doorstep pickup",
+    ],
+  },
+  "chennai-to-rameshwaram": {
+    from: "Chennai",
+    to: "Rameshwaram",
+    img: ChennaiRameshwaram,
+    tag: "Pilgrim Special",
+    distance: "≈ 570 km",
+    duration: "≈ 10 hrs",
+    startFare: "≈ ₹7,410",
+    desc: "Chennai to Rameshwaram overnight run — coastal NH-49 with experienced long-haul chauffeurs.",
+    highlights: [
+      "Night departures",
+      "Pamban Bridge drive",
+      "Halt-friendly trips",
+      "Spacious SUVs",
+    ],
+  },
+  "chennai-to-coimbatore": {
+    from: "Chennai",
+    to: "Coimbatore",
+    img: ChennaiCoimbatore,
+    tag: "Cross-State",
+    distance: "≈ 500 km",
+    duration: "≈ 9 hrs",
+    startFare: "≈ ₹6,500",
+    desc: "Chennai to Coimbatore through the ghats — buffer-planned routing with refreshment stops.",
+    highlights: [
+      "Refreshment stops",
+      "Ghat-experienced drivers",
+      "Corporate billing",
+      "Fixed drop fares",
+    ],
+  },
+  "coimbatore-to-ooty": {
+    from: "Coimbatore",
+    to: "Ooty",
+    img: CoimbatoreOoty,
+    tag: "Hill Escape",
+    distance: "≈ 90 km",
+    duration: "≈ 3 hrs",
+    startFare: "≈ ₹1,170",
+    desc: "The classic hill run — toothed ghats handled by drivers who know every hairpin.",
+    highlights: [
+      "Ghat-ready cars",
+      "Scenic stopovers",
+      "Family & group cabs",
+      "On-time promise",
     ],
   },
   "madurai-to-trichy": {
@@ -125,6 +230,86 @@ const ROUTES = {
       "On-time promise",
     ],
   },
+  "coimbatore-to-dindigul": {
+    from: "Coimbatore",
+    to: "Dindigul",
+    img: CoimbatoreDindigul,
+    tag: "Business Run",
+    desc: "Sharp on-time transfers for the textile-city corridor — laptop-friendly, quiet cabins.",
+    distance: "≈ 180 km",
+    duration: "≈ 3.5 hrs",
+    startFare: "≈ ₹2,340",
+    highlights: [
+      "Corporate billing",
+      "Early-morning slots",
+      "Quiet work cabins",
+      "On-time promise",
+    ],
+  },
+  "madurai-to-chennai": {
+    from: "Madurai",
+    to: "Chennai",
+    img: MaduraiChennai,
+    tag: "Business Run",
+    desc: "Sharp on-time transfers for the textile-city corridor — laptop-friendly, quiet cabins.",
+    distance: "≈ 180 km",
+    duration: "≈ 3.5 hrs",
+    startFare: "≈ ₹2,340",
+    highlights: [
+      "Corporate billing",
+      "Early-morning slots",
+      "Quiet work cabins",
+      "On-time promise",
+    ],
+  },
+  "Madurai-to-coimbatore": {
+    from: "Madurai",
+    to: "Coimbatore",
+    img: MaduraiCoimbatore,
+    tag: "Business Run",
+    desc: "Sharp on-time transfers for the textile-city corridor — laptop-friendly, quiet cabins.",
+    distance: "≈ 180 km",
+    duration: "≈ 3.5 hrs",
+    startFare: "≈ ₹2,340",
+    highlights: [
+      "Corporate billing",
+      "Early-morning slots",
+      "Quiet work cabins",
+      "On-time promise",
+    ],
+  },
+  "Trichy-to-coimbatore": {
+    from: "Trichy",
+    to: "Coimbatore",
+    img: TrichyCoimbatore,
+    tag: "Business Run",
+    desc: "Sharp on-time transfers for the textile-city corridor — laptop-friendly, quiet cabins.",
+    distance: "≈ 180 km",
+    duration: "≈ 3.5 hrs",
+    startFare: "≈ ₹2,340",
+    highlights: [
+      "Corporate billing",
+      "Early-morning slots",
+      "Quiet work cabins",
+      "On-time promise",
+    ],
+  },
+  "Coimbatore-to-trichy": {
+    from: "Coimbatore",
+    to: "Trichy",
+    img: CoimbatoreTrichy,
+    tag: "Business Run",
+    desc: "Sharp on-time transfers for the textile-city corridor — laptop-friendly, quiet cabins.",
+    distance: "≈ 180 km",
+    duration: "≈ 3.5 hrs",
+    startFare: "≈ ₹2,340",
+    highlights: [
+      "Corporate billing",
+      "Early-morning slots",
+      "Quiet work cabins",
+      "On-time promise",
+    ],
+  },
 };
 
 const RouteDetail = () => {
@@ -147,6 +332,17 @@ const RouteDetail = () => {
         </div>
       </>
     );
+
+  // "Keep Exploring" — only routes that share a hub with the one being viewed
+  // (same origin city first, then same destination), so suggestions stay relevant.
+  const related = Object.entries(ROUTES)
+    .filter(([key]) => key !== slug)
+    .filter(([, r]) => r.from === route.from || r.to === route.to)
+    .sort((a, b) => Number(b[1].from === route.from) - Number(a[1].from === route.from))
+    .slice(0, 3);
+  const exploreRoutes = related.length
+    ? related
+    : Object.entries(ROUTES).filter(([key]) => key !== slug).slice(0, 3);
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -316,42 +512,39 @@ const RouteDetail = () => {
             </Reveal>
           </div>
 
-          {/* Other routes */}
+          {/* Related routes — same hub as the one being viewed */}
           <SectionHeading
             eyebrow="Keep Exploring"
-            title="More popular routes"
+            title={related.length ? `More ${route.from} ↔ routes` : "More popular routes"}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 -mt-4">
-            {Object.entries(ROUTES)
-              .filter(([key]) => key !== slug)
-              .slice(0, 3)
-              .map(([key, r], i) => (
-                <Reveal key={key} delay={i * 0.08}>
-                  <Link to={`/routes/${key}`}>
-                    <Motion.div
-                      {...cardHover}
-                      className="group relative h-52 sm:h-60 rounded-[24px] overflow-hidden border border-white/10"
-                    >
-                      <img
-                        src={r.img}
-                        alt={`${r.from} to ${r.to}`}
-                        loading="lazy"
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            {exploreRoutes.map(([key, r], i) => (
+              <Reveal key={key} delay={i * 0.08}>
+                <Link to={`/routes/${key}`}>
+                  <Motion.div
+                    {...cardHover}
+                    className="group relative h-52 sm:h-60 rounded-[24px] overflow-hidden border border-white/10 hover:border-emerald-500/40 transition-colors"
+                  >
+                    <img
+                      src={r.img}
+                      alt={`${r.from} to ${r.to}`}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-5 flex items-center justify-between gap-2">
+                      <p className="font-display text-lg sm:text-xl font-bold text-white">
+                        {r.from} → {r.to}
+                      </p>
+                      <ArrowRight
+                        size={18}
+                        className="text-green-400 shrink-0 transition-transform group-hover:translate-x-1"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-5 flex items-center justify-between gap-2">
-                        <p className="font-display text-lg sm:text-xl font-bold text-white">
-                          {r.from} → {r.to}
-                        </p>
-                        <ArrowRight
-                          size={18}
-                          className="text-green-400 shrink-0 transition-transform group-hover:translate-x-1"
-                        />
-                      </div>
-                    </Motion.div>
-                  </Link>
-                </Reveal>
-              ))}
+                    </div>
+                  </Motion.div>
+                </Link>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>

@@ -4,6 +4,7 @@ import Hero from '../../Component/Hero/Hero'
 import FloatingIcons from './FloatingIcons'
 import AIAssistant from '../../components/ai/AIAssistant'
 import { PopularRoutes, Services } from '../../Component/Landing/RouteServices'
+import AirportTransfers from '../../Component/Landing/AirportTransfers'
 import VehicleShowcase from '../../Component/Landing/VehicleShowcase'
 import { WhyChooseUs, AboutSection, HowItWorks } from '../../Component/Landing/StorySections'
 import { Testimonials, DriverCTA, FinalCTA } from '../../Component/Landing/SocialProof'
@@ -44,6 +45,7 @@ const Home = () => {
       <AIAssistant />
       <Hero />
       <PopularRoutes />
+      <AirportTransfers />
       <Services />
       <VehicleShowcase />
       <WhyChooseUs />

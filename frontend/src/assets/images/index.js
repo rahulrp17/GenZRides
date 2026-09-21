@@ -30,7 +30,14 @@ import CoimbatoreAirport from "./CoimbatoreAirport.webp";
 import ChennaiAirport from "./ChennaiAirport.webp";
 import BangaloreAirport from "./BangaloreAirport.webp";
 import about2 from "./about2.webp";
-
+import MaduraiChennai from "./MaduraiChennai.webp";
+import CoimbatoreChennai from "./CoimbatoreChennai.webp";
+import MaduraiCoimbatore from "./MaduraiCoimbatore.webp";
+import TrichyMadurai from "./TrichyMadurai.webp";
+import CoimbatoreDindigul from "./CoimbatoreDindigul.webp";
+import TrichyRameshwaram from "./TrichyRameshwaram.webp"
+import TrichyCoimbatore from "./TrichyCoimbatore.webp"
+import CoimbatoreTrichy from "./CoimbatoreTrichy.webp"
 export {
   hero2,
   hero4,
@@ -46,6 +53,7 @@ export {
   ChennaiBangalore,
   ChennaiMadurai,
   CoimbatoreOoty,
+  CoimbatoreTrichy,
   TrichyChennai,
   AirportPickup,
   AirportDrop,
@@ -61,5 +69,12 @@ export {
   MaduraiAirport,
   ChennaiAirport,
   BangaloreAirport,
-  CoimbatoreAirport
+  CoimbatoreAirport,
+  MaduraiChennai,
+  CoimbatoreChennai,
+  MaduraiCoimbatore,
+  TrichyMadurai,
+  CoimbatoreDindigul,
+  TrichyRameshwaram,
+  TrichyCoimbatore,
 };
