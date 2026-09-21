@@ -39,8 +39,8 @@ const ROUTES = [
     tag: "Most Booked",
     img: ChennaiBangalore,
     note: "One-way & round-trip cabs on NH-48",
-    distance: "≈ 350 km",
-    fare: "≈ ₹4,550",
+    distance: "≈ 354 km",
+    fare: "≈ ₹5,719",
   },
   {
     from: "Chennai",
@@ -48,8 +48,8 @@ const ROUTES = [
     tag: "Temple Trail",
     img: ChennaiMadurai,
     note: "Comfortable long-distance cruising",
-    distance: "≈ 460 km",
-    fare: "≈ ₹5,980",
+    distance: "≈ 451 km",
+    fare: "≈ ₹7,361",
   },
   {
     from: "Coimbatore",
@@ -58,7 +58,7 @@ const ROUTES = [
     img: CoimbatoreOoty,
     note: "Ghat-ready cars with expert drivers",
     distance: "≈ 90 km",
-    fare: "≈ ₹1,170",
+    fare: "≈ ₹2,350",
   },
   {
     from: "Trichy",
@@ -66,8 +66,8 @@ const ROUTES = [
     tag: "Business Run",
     img: TrichyChennai,
     note: "On-time airport & city transfers",
-    distance: "≈ 330 km",
-    fare: "≈ ₹4,290",
+    distance: "≈ 326 km",
+    fare: "≈ ₹5,289",
   },
   {
     from: "Chennai",
@@ -75,8 +75,8 @@ const ROUTES = [
     tag: "Pilgrim Special",
     img: ChennaiRameshwaram,
     note: "Temple-run comfort all the way",
-    distance: "≈ 570 km",
-    fare: "≈ ₹7,410",
+    distance: "≈ 554 km",
+    fare: "≈ ₹8,908",
   },
   {
     from: "Chennai",
@@ -84,8 +84,8 @@ const ROUTES = [
     tag: "Cross-State",
     img: ChennaiCoimbatore,
     note: "Ghat-aware drivers with refreshment stops",
-    distance: "≈ 500 km",
-    fare: "≈ ₹6,500",
+    distance: "≈ 503 km",
+    fare: "≈ ₹8,149",
   },
   {
     from: "Madurai",
@@ -93,8 +93,8 @@ const ROUTES = [
     tag: "Coastal Run",
     img: MaduraiRameshwaram,
     note: "Temple trail through the Pamban bridge",
-    distance: "≈ 170 km",
-    fare: "≈ ₹2,210",
+    distance: "≈ 173 km",
+    fare: "≈ ₹2,989",
   },
   {
     from: "Coimbatore",
@@ -102,8 +102,8 @@ const ROUTES = [
     tag: "Quick Hop",
     img: CoimbatoreSalem,
     note: "Brisk highway sprints, day and night",
-    distance: "≈ 180 km",
-    fare: "≈ ₹2,340",
+    distance: "≈ 166 km",
+    fare: "≈ ₹2,896",
   },
 ];
 
@@ -145,7 +145,7 @@ export const PopularRoutes = () => (
                 className="group relative flex flex-col h-full rounded-[22px] overflow-hidden bg-white/[0.04] backdrop-blur-xl border border-white/10 hover:border-emerald-400/40 hover:shadow-[0_10px_40px_-12px_rgba(16,185,129,0.4)] transition-all duration-300"
               >
                 <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent" />
-                <div className="relative h-33 sm:h-33 overflow-hidden">
+                <div className="relative h-39 sm:h-33 overflow-hidden">
                   <img
                     src={r.img}
                     alt={`${r.from} to ${r.to}`}
