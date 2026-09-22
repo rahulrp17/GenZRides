@@ -36,7 +36,7 @@ const Home = () => {
       <SEO
         title="Book Cabs Online in Tamil Nadu"
         description="Book airport taxis, city rides and outstation cabs across Tamil Nadu, Puducherry & Bangalore with verified drivers, transparent fares and 24/7 support."
-        keywords="cab booking Tamil Nadu, airport taxi Chennai, outstation cabs, online taxi booking, Trichy cab service, Bangalore airport taxi, local taxi Madurai, Coimbatore cab"
+        keywords="cab booking Tamil Nadu, one way drop cab, one way cab booking, round trip cab, one way taxi drop, airport taxi Chennai, outstation cabs, online taxi booking, Trichy cab service, Bangalore airport taxi, local taxi Madurai, Coimbatore cab"
         path="/"
         jsonLd={makeHomeJsonLd()}
         breadcrumbs={breadcrumbs}

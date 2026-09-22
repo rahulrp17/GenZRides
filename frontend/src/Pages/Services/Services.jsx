@@ -126,7 +126,7 @@ const Services = () => (
     <SEO
       title="Our Cab Services — City, Airport, Outstation & Rentals"
       description="City rides, airport transfers, outstation trips and hourly rentals with verified drivers and upfront fares across Tamil Nadu."
-      keywords="cab services, airport transfer taxi, outstation cab booking, hourly car rental with driver"
+      keywords="cab services, one way cab service, round trip taxi, one way drop outstation cab, airport transfer taxi, outstation cab booking, hourly car rental with driver"
       path="/services"
         jsonLd={localBusinessJsonLd}
         breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Services",path:"/services"}])}

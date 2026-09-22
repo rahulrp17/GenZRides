@@ -59,7 +59,7 @@ const AirportTransfers = () => (
     <SEO
       title="Airport Taxi Transfers — Chennai, Bangalore, Coimbatore & More"
       description="Flight-tracked airport pickups and drops at MAA, BLR, CJB, TRZ and IXM. Meet-and-greet, 45 min free waiting, 24/7 service."
-      keywords="Chennai airport taxi, Bangalore airport cab, airport pickup drop taxi, flight tracking cab"
+      keywords="Chennai airport taxi, one way airport drop, airport round trip taxi, airport pickup drop one way, Bangalore airport cab, airport transfer taxi, flight tracking cab"
       path="/airport-transfers"
         jsonLd={localBusinessJsonLd}
         breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Airport Transfers",path:"/airport-transfers"}])}

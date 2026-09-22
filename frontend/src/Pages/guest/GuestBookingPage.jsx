@@ -19,7 +19,7 @@ const GuestBookingPage = () => (
     <SEO
       title="Book a Cab Online — No Login Needed"
       description="Book your cab in 3 quick steps without signing up: enter trip, choose Sedan/SUV with live fares, confirm. Tamil Nadu-wide service."
-      keywords="book cab without login, guest cab booking, online taxi booking Tamil Nadu"
+      keywords="book cab without login, guest cab booking, one way drop booking, round trip cab booking, one way cab Tamil Nadu, online taxi booking Tamil Nadu"
       path="/booking"
       jsonLd={serviceJsonLd("Guest Cab Booking", "Book your cab in 3 quick steps without signing up: enter trip, choose Sedan/SUV with live fares, confirm.", "TaxiService", "Tamil Nadu", "booking")}
       breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Book a Cab",path:"/booking"}])}

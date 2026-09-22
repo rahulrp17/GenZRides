@@ -179,7 +179,7 @@ const PopularRoutes = () => (
     <SEO
       title="Popular Cab Routes — Chennai, Madurai, Bangalore & More"
       description="Top intercity cab routes: Chennai to Bangalore, Madurai, Trichy to Chennai and more. Fixed transparent fares with verified drivers."
-      keywords="Chennai to Bangalore cab, Chennai to Madurai taxi, intercity cab Tamil Nadu, popular cab routes"
+      keywords="Chennai to Bangalore cab, one way drop intercity cab, round trip taxi Tamil Nadu, one way cab route, Chennai to Madurai taxi, intercity cab Tamil Nadu, popular cab routes"
       path="/popular-routes"
       jsonLd={localBusinessJsonLd}
       breadcrumbs={breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Popular Routes", path: "/popular-routes" }])}

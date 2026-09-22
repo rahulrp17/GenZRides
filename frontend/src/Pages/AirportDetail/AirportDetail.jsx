@@ -82,7 +82,7 @@ const AirportDetail = () => {
       <SEO
         title={`${airport.city} Airport Taxi (${airport.code}) — Pickup & Drop`}
         description={`Flight-tracked ${airport.city} airport (${airport.code}) taxi pickups and drops with meet-and-greet, 45 min free waiting and 24/7 service.`}
-        keywords={`${airport.city.toLowerCase()} airport taxi, ${airport.code} airport cab pickup, airport transfer Tamil Nadu`}
+        keywords={`${airport.city.toLowerCase()} airport taxi, ${airport.code} airport cab pickup, one way airport drop, round trip airport taxi, airport transfer Tamil Nadu`}
         path={`/airport/${airport.city.toLowerCase()}`}
         jsonLd={localBusinessJsonLd}
         breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Airport Transfers",path:"/airport-transfers"},{name:airport.city,path:`/airport/${airport.city.toLowerCase()}`}])}

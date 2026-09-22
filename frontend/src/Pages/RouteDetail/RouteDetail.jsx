@@ -388,7 +388,7 @@ const RouteDetail = () => {
       <SEO
         title={`${route.from} to ${route.to} Cab — Fixed-Fare Taxi`}
         description={`Book a ${route.from.toLowerCase()} to ${route.to.toLowerCase()} cab with verified drivers, transparent fixed fares and 24/7 support. One-way and round-trip available.`}
-        keywords={`${route.from.toLowerCase()} to ${route.to.toLowerCase()} cab, ${route.from.toLowerCase()} to ${route.to.toLowerCase()} taxi fare, intercity cab Tamil Nadu`}
+        keywords={`${route.from.toLowerCase()} to ${route.to.toLowerCase()} cab, ${route.from.toLowerCase()} to ${route.to.toLowerCase()} taxi fare, one way drop ${route.from.toLowerCase()} to ${route.to.toLowerCase()}, round trip ${route.from.toLowerCase()} to ${route.to.toLowerCase()}, intercity cab Tamil Nadu`}
         path={`/routes/${slug}`}
         jsonLd={routeServiceJsonLd}
         breadcrumbs={breadcrumbJsonLd}

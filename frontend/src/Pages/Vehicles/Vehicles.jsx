@@ -231,7 +231,7 @@ const AttachVehicle = () => {
       <SEO
         title="Our Fleet — Sedan, SUV & Premium Cabs"
         description="Choose your perfect ride: AC sedans, spacious SUVs and premium cars with professional drivers. Upfront fares, Tamil Nadu-wide service."
-        keywords="sedan taxi, SUV cab booking, premium cars hire, Innova taxi Tamil Nadu"
+        keywords="sedan taxi, SUV cab booking, one way drop cab, round trip sedan SUV taxi, premium cars hire, Innova taxi Tamil Nadu"
         path="/vehicles"
         jsonLd={localBusinessJsonLd}
         breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Our Fleet",path:"/vehicles"}])}

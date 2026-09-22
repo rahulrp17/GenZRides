@@ -137,7 +137,7 @@ const TariffChart = () => {
       <SEO
         title="Cab Tariff Chart — Sedan, SUV & Premium Per-Km Fares"
         description="Transparent cab tariff: Sedan from ₹15/km, SUV ₹20/km, Innova ₹21/km. No hidden charges. City, airport, outstation and rental fares."
-        keywords="cab tariff, taxi fare per km Tamil Nadu, sedan SUV fare rates, outstation taxi price"
+        keywords="cab tariff, one way taxi fare, round trip cab fare, one way drop price, taxi fare per km Tamil Nadu, sedan SUV fare rates, outstation taxi price"
         path="/tariff"
         jsonLd={localBusinessJsonLd}
         breadcrumbs={breadcrumbJsonLd([{name:"Home",path:"/"},{name:"Tariff",path:"/tariff"}])}
