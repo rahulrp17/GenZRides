@@ -200,6 +200,21 @@ const bookingSchema = new mongoose.Schema(
       index: true,
     },
 
+    /* ==========================
+       ADMIN APPROVAL GATE
+       Instant (guest) bookings are created "Pending Approval" and stay
+       hidden from drivers until an admin verifies them. Registered
+       customer bookings default to "Approved" and flow straight to
+       dispatch. Legacy documents predate this field (null = Approved).
+    ========================== */
+
+    approvalStatus: {
+      type: String,
+      enum: ["Pending Approval", "Approved", "Rejected"],
+      default: "Approved",
+      index: true,
+    },
+
     cancelReason: {
       type: String,
       default: null,
@@ -317,6 +332,8 @@ bookingSchema.index({ customer: 1, createdAt: -1 });
 bookingSchema.index({ driver: 1, bookingStatus: 1 });
 // Perf: getAvailableBookings filter + sort
 bookingSchema.index({ bookingStatus: 1, vehicleType: 1, driver: 1, createdAt: -1 });
+// Perf: approval-gated driver feeds + admin instant queues
+bookingSchema.index({ approvalStatus: 1, bookingStatus: 1, driver: 1, createdAt: -1 });
 // Perf: daily driver cancel count
 bookingSchema.index({ driver: 1, cancelledBy: 1, cancelledAt: 1 });
 // Perf: admin history regex fallback + pickup/drop text search

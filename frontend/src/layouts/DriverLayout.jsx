@@ -3,7 +3,7 @@ import { NavLink, Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import {
   Home, Car, Clock, Wallet, Star, Bell, User,
-  FileText, LogOut, Menu, ChevronDown, IndianRupee, LayoutPanelLeft, Calendar, PanelLeftClose, PanelLeftOpen
+  FileText, LogOut, Menu, ChevronDown, IndianRupee, LayoutPanelLeft, Calendar, PanelLeftClose, PanelLeftOpen, Zap, ClipboardList
 } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 import { useSocket } from '../Context/SocketContext';
@@ -17,7 +17,9 @@ import { motion as Motion } from 'framer-motion';
 const navItems = [
   { path: '/', label: 'Home', icon: Home, end: true },
   { path: '/driver', label: 'Dashboard', icon: LayoutPanelLeft, end: true },
-  { path: '/driver/bookings', label: 'Bookings', icon: Calendar },
+  { path: '/driver/instant-bookings', label: 'Instant Bookings', icon: Zap },
+  { path: '/driver/customer-requests', label: 'Customer Requests', icon: Calendar },
+  { path: '/driver/my-bookings', label: 'My Bookings', icon: ClipboardList },
   { path: '/driver/ride', label: 'Current Ride', icon: Car },
   { path: '/driver/history', label: 'Ride History', icon: Clock },
   { path: '/driver/earnings', label: 'Earnings', icon: IndianRupee },

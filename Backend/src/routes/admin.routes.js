@@ -30,6 +30,13 @@ import {
   deleteVehicle,
   getBookings,
   getBookingById,
+  getInstantBookings,
+  getInstantBookingRequests,
+  verifyInstantBooking,
+  rejectInstantBooking,
+  approveBooking,
+  getVisitors,
+  getAdminCounts,
   assignDriver,
   cancelBooking,
   completeBooking,
@@ -93,9 +100,22 @@ router.patch("/vehicles/:id/enable", validateParams(idParamSchema), enableVehicl
 router.patch("/vehicles/:id/disable", validateParams(idParamSchema), disableVehicle);
 router.delete("/vehicles/:id", validateParams(idParamSchema), deleteVehicle);
 
+// Instant bookings (guest) — full feed + pending-verification queue
+router.get("/instant-bookings", validateQuery(paginationQuerySchema), getInstantBookings);
+router.get("/instant-bookings/requests", validateQuery(paginationQuerySchema), getInstantBookingRequests);
+router.patch("/instant-bookings/:id/verify", validateParams(idParamSchema), verifyInstantBooking);
+router.patch("/instant-bookings/:id/reject", validateParams(idParamSchema), validate(rejectBookingSchema), rejectInstantBooking);
+
+// Visitors (temporary guest holds)
+router.get("/visitors", validateQuery(paginationQuerySchema), getVisitors);
+
+// Live sidebar counts (pending queues for badges)
+router.get("/counts", getAdminCounts);
+
 // Bookings
 router.get("/bookings", validateQuery(paginationQuerySchema), getBookings);
 router.get("/bookings/:id", validateParams(idParamSchema), getBookingById);
+router.patch("/bookings/:id/approve", validateParams(idParamSchema), approveBooking);
 router.patch("/bookings/:id/assign-driver", validateParams(idParamSchema), validate(assignDriverSchema), assignDriver);
 router.patch("/bookings/:id/cancel", validateParams(idParamSchema), validate(cancelBookingSchema), cancelBooking);
 router.patch("/bookings/:id/complete", validateParams(idParamSchema), completeBooking);

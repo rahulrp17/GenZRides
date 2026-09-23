@@ -1,5 +1,6 @@
 import * as adminService from "../services/admin.service.js";
 import { getIO } from "../socket/index.js";
+import { emitToAdmins } from "../services/notification.service.js";
 import { uploadImage } from "../services/upload.service.js";
 
 /* ===========================================================
@@ -701,6 +702,7 @@ export const getBookings = async (req, res) => {
       status = "",
       vehicleType = "",
       search = "",
+      scope = "",
     } = req.query;
 
     const bookings = await adminService.getBookings(
@@ -708,7 +710,8 @@ export const getBookings = async (req, res) => {
       Number(limit),
       status,
       vehicleType,
-      search
+      search,
+      scope
     );
 
     res.status(200).json({
@@ -743,6 +746,214 @@ export const getBookingById = async (req, res) => {
 };
 
 /**
+ * INSTANT BOOKINGS (guest) — full feed + pending queue
+ */
+export const getInstantBookings = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      status = "",
+      vehicleType = "",
+      approval = "",
+    } = req.query;
+
+    const bookings = await adminService.getInstantBookings(
+      Number(page),
+      Number(limit),
+      search,
+      status,
+      vehicleType,
+      approval
+    );
+
+    res.status(200).json({
+      success: true,
+      ...bookings,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * GET INSTANT BOOKING REQUESTS (pending verification queue)
+ */
+export const getInstantBookingRequests = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      vehicleType = "",
+    } = req.query;
+
+    const bookings = await adminService.getInstantBookingRequests(
+      Number(page),
+      Number(limit),
+      search,
+      vehicleType
+    );
+
+    res.status(200).json({
+      success: true,
+      ...bookings,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * VERIFY INSTANT BOOKING (Pending Approval → Approved + dispatch)
+ */
+export const verifyInstantBooking = async (req, res) => {
+  try {
+    const result = await adminService.verifyInstantBooking(req.params.id);
+
+    try {
+      const io = getIO();
+      io.to(req.params.id).emit("booking-updated", result.booking);
+      io.to("admins").emit("booking-updated", result.booking);
+    } catch (_) {}
+    emitToAdmins("admin-counts-updated", null);
+
+    res.status(200).json({
+      success: true,
+      message: result.already
+        ? "Booking already verified."
+        : result.dispatched
+          ? "Booking verified and sent to drivers."
+          : "Booking verified. No online drivers right now — assign manually.",
+      ...result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * REJECT INSTANT BOOKING (Pending Approval → Rejected)
+ */
+export const rejectInstantBooking = async (req, res) => {
+  try {
+    const result = await adminService.rejectInstantBooking(
+      req.params.id,
+      req.body.reason
+    );
+
+    try {
+      const io = getIO();
+      io.to(req.params.id).emit("booking-updated", result.booking);
+      io.to("admins").emit("booking-updated", result.booking);
+    } catch (_) {}
+    emitToAdmins("admin-counts-updated", null);
+
+    res.status(200).json({
+      success: true,
+      message: result.already
+        ? "Booking already rejected."
+        : "Booking rejected.",
+      ...result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * APPROVE BOOKING (registered re-dispatch path: approve + dispatch)
+ */
+export const approveBooking = async (req, res) => {
+  try {
+    const result = await adminService.approveBooking(req.params.id);
+
+    try {
+      const io = getIO();
+      io.to(req.params.id).emit("booking-updated", result.booking);
+      io.to("admins").emit("booking-updated", result.booking);
+    } catch (_) {}
+    emitToAdmins("admin-counts-updated", null);
+
+    res.status(200).json({
+      success: true,
+      message: result.dispatched
+        ? "Booking approved and sent to drivers."
+        : "Booking approved. No online drivers right now — assign manually.",
+      ...result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * GET VISITORS (temporary guest holds, incl. expired/confirmed)
+ */
+export const getVisitors = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      status = "",
+    } = req.query;
+
+    const visitors = await adminService.getVisitors(
+      Number(page),
+      Number(limit),
+      search,
+      status
+    );
+
+    res.status(200).json({
+      success: true,
+      ...visitors,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * GET LIVE SIDEBAR COUNTS (pending queues for badges)
+ */
+export const getAdminCounts = async (req, res) => {
+  try {
+    const counts = await adminService.getAdminCounts();
+
+    res.status(200).json({
+      success: true,
+      counts,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
  * ASSIGN DRIVER
  */
 export const assignDriver = async (req, res) => {
@@ -757,6 +968,7 @@ export const assignDriver = async (req, res) => {
       io.to(req.params.id).emit("booking-updated", booking);
       io.to("admins").emit("booking-updated", booking);
     } catch (_) {}
+    emitToAdmins("admin-counts-updated", null);
 
     res.status(200).json({
       success: true,
@@ -786,6 +998,7 @@ export const cancelBooking = async (req, res) => {
       io.to(req.params.id).emit("ride-status-updated", booking);
       io.to("admins").emit("ride-status-updated", booking);
     } catch (_) {}
+    emitToAdmins("admin-counts-updated", null);
 
     res.status(200).json({
       success: true,
@@ -812,6 +1025,7 @@ export const completeBooking = async (req, res) => {
       io.to(req.params.id).emit("ride-status-updated", booking);
       io.to("admins").emit("ride-status-updated", booking);
     } catch (_) {}
+    emitToAdmins("admin-counts-updated", null);
 
     res.status(200).json({
       success: true,

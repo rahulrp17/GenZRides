@@ -3,6 +3,8 @@ import User from "../models/User.js";
 import DriverProfile from "../models/DriverProfile.js";
 import Vehicle from "../models/Vehicle.js";
 import Booking from "../models/Booking.js";
+import Visitor from "../models/Visitor.js";
+import { sweepExpiredVisitors } from "./booking.service.js";
 import DriverWallet from "../models/DriverWallet.js";
 import WithdrawalRequest from "../models/WithdrawalRequest.js";
 import Review from "../models/Review.js";
@@ -726,7 +728,7 @@ export const deleteVehicle = async (vehicleId) => {
    BOOKING MANAGEMENT
 =========================================================== */
 
-export const getBookings = async (page = 1, limit = 10, status = "", vehicleType = "", search = "") => {
+export const getBookings = async (page = 1, limit = 10, status = "", vehicleType = "", search = "", scope = "") => {
   const skip = (page - 1) * limit;
 
   const query = {};
@@ -737,6 +739,14 @@ export const getBookings = async (page = 1, limit = 10, status = "", vehicleType
 
   if (vehicleType) {
     query.vehicleType = vehicleType;
+  }
+
+  // Feed scoping: "guest" = instant (guest) bookings, "registered" =
+  // logged-in customer bookings. Empty = everything (legacy behavior).
+  if (scope === "guest") {
+    query.guestName = { $ne: null };
+  } else if (scope === "registered") {
+    query.guestName = null;
   }
 
   // Case-insensitive partial search across customer identity, booking ID
@@ -869,6 +879,16 @@ export const assignDriver = async (bookingId, driverId) => {
 
   if (!targetBooking) {
     throw new Error("Booking not found.");
+  }
+
+  // Approval gate: an unverified instant booking must be verified first
+  // (verify dispatches automatically); a rejected one can never be assigned.
+  const targetApproval = targetBooking.approvalStatus || "Approved";
+  if (targetApproval === "Pending Approval") {
+    throw new Error("Verify this booking before assigning a driver.");
+  }
+  if (targetApproval === "Rejected") {
+    throw new Error("This booking was rejected and cannot be assigned.");
   }
 
   // Vehicle-type guard: a booking must only go to a driver whose registered
@@ -1077,6 +1097,330 @@ export const completeBooking = async (bookingId) => {
 /* ===========================================================
    WITHDRAWAL REQUEST MANAGEMENT
 =========================================================== */
+const populateAdminBooking = (query) =>
+  query
+    .populate("customer", "name phone email")
+    .populate("vehicleType")
+    .populate({
+      path: "driver",
+      populate: [
+        {
+          path: "user",
+          select: "name phone",
+        },
+        {
+          path: "vehicleType",
+        },
+      ],
+    });
+
+export const getInstantBookings = async (
+  page = 1,
+  limit = 10,
+  search = "",
+  status = "",
+  vehicleType = "",
+  approval = ""
+) => {
+  const skip = (page - 1) * limit;
+
+  // `guestName` is only set for guest bookings, so it cleanly separates the
+  // instant feed from registered-customer reservations.
+  const query = { guestName: { $ne: null } };
+
+  if (status) {
+    query.bookingStatus = status;
+  }
+
+  if (approval) {
+    query.approvalStatus = approval;
+  }
+
+  if (vehicleType) {
+    query.vehicleType = vehicleType;
+  }
+
+  const q = String(search || "").trim().replace(/^#+/, "");
+  if (q) {
+    const safe = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const rx = { $regex: safe, $options: "i" };
+    const or = [
+      { guestName: rx },
+      { guestEmail: rx },
+      { guestPhone: rx },
+      { "pickup.address": rx },
+      { "drop.address": rx },
+    ];
+    const nq = q.toLowerCase().replace(/[\s_-]+/g, "");
+    if (nq.length >= 2) {
+      const matched = ["One Way", "Round Trip", "Airport Pickup", "Airport Drop"].filter((t) =>
+        t.toLowerCase().replace(/[\s_-]+/g, "").includes(nq)
+      );
+      if (matched.length) or.push({ tripType: { $in: matched } });
+    }
+    if (/^[0-9a-fA-F]{4,}$/.test(q)) {
+      or.push({
+        $expr: {
+          $regexMatch: {
+            input: { $toString: "$_id" },
+            regex: `${safe}$`,
+            options: "i",
+          },
+        },
+      });
+    }
+    query.$or = or;
+  }
+
+  const [bookings, total] = await Promise.all([
+    populateAdminBooking(
+      Booking.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit))
+    ).lean(),
+    Booking.countDocuments(query),
+  ]);
+
+  return {
+    bookings,
+    total,
+    page: Number(page),
+    totalPages: Math.ceil(total / limit),
+  };
+};
+
+// Pending-verification queue: guest bookings awaiting admin approval.
+export const getInstantBookingRequests = async (
+  page = 1,
+  limit = 10,
+  search = "",
+  vehicleType = ""
+) =>
+  getInstantBookings(page, limit, search, "Pending", vehicleType, "Pending Approval");
+
+export const verifyInstantBooking = async (bookingId) => {
+  const updated = await Booking.findOneAndUpdate(
+    {
+      _id: bookingId,
+      approvalStatus: "Pending Approval",
+      bookingStatus: "Pending",
+    },
+    { $set: { approvalStatus: "Approved" } },
+    { new: true }
+  );
+
+  if (!updated) {
+    const current = await Booking.findById(bookingId)
+      .select("approvalStatus bookingStatus")
+      .lean();
+    if (current && (current.approvalStatus || "Approved") === "Approved") {
+      const booking = await populateAdminBooking(
+        Booking.findById(bookingId)
+      ).lean();
+      return { booking, already: true, dispatched: false };
+    }
+    throw new Error("Booking not found or cannot be verified.");
+  }
+
+  // Best-effort dispatch now that the booking is approved. Never breaks
+  // verification (e.g. no online drivers yet — admin can assign manually).
+  let dispatched = false;
+  try {
+    const { dispatchBooking } = await import("./dispatch.service.js");
+    const res = await dispatchBooking(
+      updated._id,
+      updated.pickup.latitude,
+      updated.pickup.longitude
+    );
+    dispatched = !!res?.success;
+  } catch {
+    dispatched = false;
+  }
+
+  await notifyUser({
+    user: updated.customer,
+    title: "Booking Approved",
+    message:
+      "Your booking request was approved. We are finding your driver now.",
+    type: "Booking",
+    booking: updated._id,
+  });
+
+  try {
+    await invalidateCache("dashboard:stats");
+  } catch {
+    // cache layer is best-effort
+  }
+
+  const booking = await populateAdminBooking(
+    Booking.findById(updated._id)
+  ).lean();
+
+  return { booking, already: false, dispatched };
+};
+
+export const rejectInstantBooking = async (
+  bookingId,
+  reason = "Rejected by admin"
+) => {
+  const updated = await Booking.findOneAndUpdate(
+    { _id: bookingId, approvalStatus: "Pending Approval" },
+    { $set: { approvalStatus: "Rejected" } },
+    { new: true }
+  );
+
+  if (!updated) {
+    const current = await Booking.findById(bookingId)
+      .select("approvalStatus")
+      .lean();
+    if (current?.approvalStatus === "Rejected") {
+      const booking = await populateAdminBooking(
+        Booking.findById(bookingId)
+      ).lean();
+      return { booking, already: true };
+    }
+    throw new Error("Booking not found or cannot be rejected.");
+  }
+
+  await notifyUser({
+    user: updated.customer,
+    title: "Booking Not Approved",
+    message: `Sorry, your booking request was not approved. Reason: ${reason}`,
+    type: "Booking",
+    booking: updated._id,
+  });
+
+  try {
+    await invalidateCache("dashboard:stats");
+  } catch {
+    // cache layer is best-effort
+  }
+
+  const booking = await populateAdminBooking(
+    Booking.findById(updated._id)
+  ).lean();
+
+  return { booking, already: false };
+};
+
+// Approve any booking (registered re-dispatch path) + best-effort dispatch.
+export const approveBooking = async (bookingId) => {
+  const booking = await Booking.findById(bookingId);
+
+  if (!booking) {
+    throw new Error("Booking not found.");
+  }
+
+  if (["Completed", "Cancelled"].includes(booking.bookingStatus)) {
+    throw new Error("Booking cannot be approved.");
+  }
+
+  booking.approvalStatus = "Approved";
+  await booking.save();
+
+  let dispatched = false;
+  try {
+    const { dispatchBooking } = await import("./dispatch.service.js");
+    const res = await dispatchBooking(
+      booking._id,
+      booking.pickup.latitude,
+      booking.pickup.longitude
+    );
+    dispatched = !!res?.success;
+  } catch {
+    dispatched = false;
+  }
+
+  await notifyUser({
+    user: booking.customer,
+    title: "Booking Approved",
+    message: "Your booking request was approved. We are finding your driver now.",
+    type: "Booking",
+    booking: booking._id,
+  });
+
+  try {
+    await invalidateCache("dashboard:stats");
+  } catch {
+    // cache layer is best-effort
+  }
+
+  const populated = await populateAdminBooking(
+    Booking.findById(booking._id)
+  ).lean();
+
+  return { booking: populated, dispatched };
+};
+
+export const getVisitors = async (
+  page = 1,
+  limit = 10,
+  search = "",
+  status = ""
+) => {
+  await sweepExpiredVisitors();
+
+  const skip = (page - 1) * limit;
+  const query = {};
+
+  if (status) {
+    query.status = status;
+  }
+
+  const q = String(search || "").trim();
+  if (q) {
+    const rx = {
+      $regex: q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      $options: "i",
+    };
+    query.$or = [
+      { guestName: rx },
+      { guestEmail: rx },
+      { guestPhone: rx },
+      { reference: rx },
+      { "pickup.address": rx },
+      { "drop.address": rx },
+    ];
+  }
+
+  const [visitors, total] = await Promise.all([
+    Visitor.find(query)
+      .populate("vehicleType", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit))
+      .lean(),
+    Visitor.countDocuments(query),
+  ]);
+
+  return {
+    visitors,
+    total,
+    page: Number(page),
+    totalPages: Math.ceil(total / limit),
+  };
+};
+
+export const getAdminCounts = async () => {
+  const [pendingCustomerRequests, pendingInstantRequests] =
+    await Promise.all([
+      Booking.countDocuments({
+        guestName: null,
+        bookingStatus: "Pending",
+        driver: null,
+        approvalStatus: { $in: [null, "Approved"] },
+      }),
+      Booking.countDocuments({
+        guestName: { $ne: null },
+        bookingStatus: "Pending",
+        approvalStatus: "Pending Approval",
+      }),
+    ]);
+
+  return { pendingCustomerRequests, pendingInstantRequests };
+};
+
 export const getWithdrawalRequests = async () => {
   return await WithdrawalRequest.find()
     .populate({

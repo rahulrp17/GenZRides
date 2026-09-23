@@ -53,6 +53,9 @@ const DriverBookingDetail = () => {
     onSuccess: () => {
       toast.success('Booking accepted successfully!');
       queryClient.invalidateQueries({ queryKey: ['driverAvailableBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['driverInstantBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['driverCustomerRequests'] });
+      queryClient.invalidateQueries({ queryKey: ['driverMyBookings'] });
       queryClient.invalidateQueries({ queryKey: ['driverBookingDetail', id] });
       queryClient.invalidateQueries({ queryKey: ['driverCurrentBooking'] });
       navigate('/driver/ride');

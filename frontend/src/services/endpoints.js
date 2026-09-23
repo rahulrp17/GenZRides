@@ -28,6 +28,10 @@ export const guestAPI = {
   reverseGeocode: (data) => api.post('/maps/guest/reverse-geocode', data),
   estimateFare: (data) => api.post('/fares/guest/estimate', data),
   create: (data) => api.post('/bookings/guest', data),
+  // "Book Now" holds the trip as a temporary visitor (no booking yet);
+  // "Confirm Booking" converts the hold into a real instant booking.
+  visit: (data) => api.post('/bookings/guest/visit', data),
+  confirm: (data) => api.post('/bookings/guest/confirm', data),
   lookup: (data) => api.post('/bookings/guest/lookup', data),
   cancel: (id, data) => api.patch(`/bookings/guest/${id}/cancel`, data),
 };
@@ -37,6 +41,7 @@ export const bookingAPI = {
   create: (data) => api.post('/bookings', data),
   getMyBookings: (params) => api.get('/bookings/my-bookings', { params }),
   getAvailable: (params) => api.get('/bookings/available', { params }),
+  getMyDriverBookings: (params) => api.get('/bookings/my-driver-bookings', { params }),
   getById: (id) => api.get(`/bookings/${id}`),
   cancel: (id, data) => api.patch(`/bookings/${id}/cancel`, data),
   driverCancel: (id, data) => api.patch(`/bookings/${id}/driver-cancel`, data),
@@ -140,9 +145,18 @@ export const adminAPI = {
   deleteVehicle: (id) => api.delete(`/admin/vehicles/${id}`),
   getBookings: (params) => api.get('/admin/bookings', { params }),
   getBooking: (id) => api.get(`/admin/bookings/${id}`),
+  approveBooking: (id) => api.patch(`/admin/bookings/${id}/approve`),
   assignDriver: (id, data) => api.patch(`/admin/bookings/${id}/assign-driver`, data),
   cancelBooking: (id, data) => api.patch(`/admin/bookings/${id}/cancel`, data),
   completeBooking: (id) => api.patch(`/admin/bookings/${id}/complete`),
+  // Instant (guest) bookings + verification gate
+  getInstantBookings: (params) => api.get('/admin/instant-bookings', { params }),
+  getInstantBookingRequests: (params) => api.get('/admin/instant-bookings/requests', { params }),
+  verifyInstantBooking: (id) => api.patch(`/admin/instant-bookings/${id}/verify`),
+  rejectInstantBooking: (id, data) => api.patch(`/admin/instant-bookings/${id}/reject`, data),
+  // Visitor holds + live sidebar counts
+  getVisitors: (params) => api.get('/admin/visitors', { params }),
+  getCounts: () => api.get('/admin/counts'),
   getWithdrawals: () => api.get('/admin/withdrawals'),
   approveWithdrawal: (id) => api.patch(`/admin/withdrawals/${id}/approve`),
   rejectWithdrawal: (id, data) => api.patch(`/admin/withdrawals/${id}/reject`, data),

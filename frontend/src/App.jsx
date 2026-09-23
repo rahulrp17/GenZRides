@@ -36,12 +36,14 @@ const BookingDetailsPage = lazy(() => import("./Pages/booking/BookingDetailsPage
 
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const AdminDashboard = lazy(() => import("./Pages/admin/AdminDashboard"));
-const InstantCustomers = lazy(() => import("./Pages/admin/InstantCustomers"));
+const AdminCustomerBookings = lazy(() => import("./Pages/admin/AdminCustomerBookings"));
+const AdminCustomerBookingRequests = lazy(() => import("./Pages/admin/AdminCustomerBookingRequests"));
+const AdminInstantBookings = lazy(() => import("./Pages/admin/AdminInstantBookings"));
+const AdminInstantBookingRequests = lazy(() => import("./Pages/admin/AdminInstantBookingRequests"));
+const AdminVisitors = lazy(() => import("./Pages/admin/AdminVisitors"));
 const ManageCustomers = lazy(() => import("./Pages/admin/ManageCustomers"));
 const ManageDrivers = lazy(() => import("./Pages/admin/ManageDrivers"));
 const ManageVehicles = lazy(() => import("./Pages/admin/ManageVehicles"));
-const ManageBookings = lazy(() => import("./Pages/admin/ManageBookings"));
-const AdminBookingRequests = lazy(() => import("./Pages/admin/AdminBookingRequests"));
 const ManageWithdrawals = lazy(() => import("./Pages/admin/ManageWithdrawals"));
 const ManageReviews = lazy(() => import("./Pages/admin/ManageReviews"));
 const AdminNotifications = lazy(() => import("./Pages/admin/AdminNotifications"));
@@ -63,7 +65,9 @@ const Profile = lazy(() => import("./Pages/customer/Profile"));
 
 const DriverLayout = lazy(() => import("./layouts/DriverLayout"));
 const DriverDashboard = lazy(() => import("./Pages/driver/DriverDashboard"));
-const DriverBookings = lazy(() => import("./Pages/driver/DriverBookings"));
+const DriverInstantBookings = lazy(() => import("./Pages/driver/DriverInstantBookings"));
+const DriverCustomerRequests = lazy(() => import("./Pages/driver/DriverCustomerRequests"));
+const DriverMyBookings = lazy(() => import("./Pages/driver/DriverMyBookings"));
 const DriverBookingDetail = lazy(() => import("./Pages/driver/DriverBookingDetail"));
 const CurrentRide = lazy(() => import("./Pages/driver/CurrentRide"));
 const DriverHistory = lazy(() => import("./Pages/driver/DriverHistory"));
@@ -175,13 +179,15 @@ function App() {
         {/* Admin dashboard */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="instant-customers" element={<InstantCustomers />} />
           <Route path="customers" element={<ManageCustomers />} />
           <Route path="drivers" element={<ManageDrivers />} />
           <Route path="vehicles" element={<ManageVehicles />} />
-          <Route path="bookings" element={<ManageBookings />} />
+          <Route path="bookings" element={<AdminCustomerBookings />} />
           <Route path="bookings/:id" element={<BookingDetailsPage />} />
-          <Route path="booking-requests" element={<AdminBookingRequests />} />
+          <Route path="booking-requests" element={<AdminCustomerBookingRequests />} />
+          <Route path="instant-bookings" element={<AdminInstantBookings />} />
+          <Route path="instant-bookings/requests" element={<AdminInstantBookingRequests />} />
+          <Route path="visitors" element={<AdminVisitors />} />
           <Route path="withdrawals" element={<ManageWithdrawals />} />
           <Route path="reviews" element={<ManageReviews />} />
           <Route path="notifications" element={<AdminNotifications />} />
@@ -208,7 +214,11 @@ function App() {
         {/* Driver dashboard */}
         <Route path="/driver" element={<DriverLayout />}>
           <Route index element={<DriverDashboard />} />
-          <Route path="bookings" element={<DriverBookings />} />
+          <Route path="instant-bookings" element={<DriverInstantBookings />} />
+          <Route path="customer-requests" element={<DriverCustomerRequests />} />
+          <Route path="my-bookings" element={<DriverMyBookings />} />
+          {/* Legacy alias — old bookmarks land on the instant feed. */}
+          <Route path="bookings" element={<DriverInstantBookings />} />
           <Route path="bookings/:id" element={<DriverBookingDetail />} />
           <Route path="ride" element={<CurrentRide />} />
           <Route path="history" element={<DriverHistory />} />

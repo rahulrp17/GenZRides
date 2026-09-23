@@ -16,6 +16,7 @@ export const createBooking = async (req, res) => {
 
     // Live admin queue: a new request just entered.
     emitToAdmins("new-booking", result.booking);
+    emitToAdmins("admin-counts-updated", null);
 
     res.status(201).json(result);
   } catch (error) {
@@ -44,6 +45,59 @@ export const createGuestBooking = async (req, res) => {
     console.error(error);
 
     res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/* ===========================================================
+   GUEST VISIT (no JWT) — "Book Now" stores a temporary hold only
+========================================================== */
+
+export const createVisit = async (req, res) => {
+  try {
+    const result = await bookingService.createVisit(req.body);
+
+    // Live admin queue: a new visitor hold just entered.
+    emitToAdmins("visitor-created", result.visitor);
+
+    res.status(201).json(result);
+  } catch (error) {
+    console.error(error);
+
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/* ===========================================================
+   GUEST CONFIRM (no JWT) — visit converts to an instant booking
+========================================================== */
+
+export const confirmVisit = async (req, res) => {
+  try {
+    const result = await bookingService.confirmVisit(req.body.visitorId);
+
+    // The visit converted — admins see the hold update plus the new
+    // pending-verification instant booking in their live queues.
+    emitToAdmins("visitor-updated", {
+      visitorId: result.visitorId,
+      bookingId: result.booking?._id,
+    });
+    emitToAdmins("new-booking", result.booking);
+    emitToAdmins("instant-booking-pending", result.booking);
+    emitToAdmins("admin-counts-updated", null);
+
+    res.status(201).json(result);
+  } catch (error) {
+    console.error(error);
+
+    const status =
+      error.code === 404 ? 404 : error.code === 410 ? 410 : 400;
+    res.status(status).json({
       success: false,
       message: error.message,
     });
@@ -150,18 +204,19 @@ export const cancelBooking = async (
   res
 ) => {
   try {
-    const result =
-      await bookingService.cancelBooking(
-        req.params.id,
-        req.user,
-        req.body.cancelReason
-      );
+      const result =
+        await bookingService.cancelBooking(
+          req.params.id,
+          req.user,
+          req.body.cancelReason
+        );
 
-    try {
-      const io = getIO();
-      io.to(req.params.id).emit("ride-status-updated", result.booking);
-      emitToAdmins("ride-status-updated", result.booking);
-    } catch (_) {}
+      try {
+        const io = getIO();
+        io.to(req.params.id).emit("ride-status-updated", result.booking);
+        emitToAdmins("ride-status-updated", result.booking);
+        emitToAdmins("admin-counts-updated", null);
+      } catch (_) {}
 
     res.status(200).json(result);
   } catch (error) {
@@ -181,18 +236,19 @@ export const driverCancelBooking = async (
   res
 ) => {
   try {
-    const result =
-      await bookingService.driverCancelBooking(
-        req.params.id,
-        req.user._id,
-        req.body.cancelReason
-      );
+      const result =
+        await bookingService.driverCancelBooking(
+          req.params.id,
+          req.user._id,
+          req.body.cancelReason
+        );
 
-    try {
-      const io = getIO();
-      io.to(req.params.id).emit("ride-status-updated", result.booking);
-      emitToAdmins("ride-status-updated", result.booking);
-    } catch (_) {}
+      try {
+        const io = getIO();
+        io.to(req.params.id).emit("ride-status-updated", result.booking);
+        emitToAdmins("ride-status-updated", result.booking);
+        emitToAdmins("admin-counts-updated", null);
+      } catch (_) {}
 
     res.status(200).json(result);
   } catch (error) {
@@ -446,13 +502,36 @@ export const completeRide = async (
    AVAILABLE BOOKINGS
 =========================================================== */
 
+export const getMyDriverBookings = async (req, res) => {
+  try {
+    const result = await bookingService.getMyDriverBookings(
+      req.user._id,
+      {
+        page: Number(req.query.page) || 1,
+        limit: Math.min(Number(req.query.limit) || 12, 100),
+      }
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const getAvailableBookings =
   async (req, res) => {
     try {
       // Filtered by the calling driver's cab type inside the service.
+      // `scope=instant|customer` splits the feed; unverified instant
+      // bookings are always excluded by the approval gate.
       const result =
         await bookingService.getAvailableBookings({
           driverUserId: req.user?._id,
+          scope: req.query.scope || null,
+          limit: Math.min(Number(req.query.limit) || 50, 100),
         });
 
       res.status(200).json(result);

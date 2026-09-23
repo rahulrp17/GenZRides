@@ -44,6 +44,11 @@ const ConfirmPage = () => {
   const [note, setNote] = useState(draft?.guest?.note || "");
   const [booking, setBooking] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  // Temporary visitor hold created by "Book Now" (guests only). "Confirm
+  // Booking" converts this hold into the real instant booking.
+  const [visitor, setVisitor] = useState(null);
+  const [reserving, setReserving] = useState(false);
+  const [nowTs, setNowTs] = useState(0);
 
   useEffect(() => {
     if (!draft?.pickup?.lat || !draft?.drop?.lat || !draft?.vehicleType || !draft?.fareEstimate) {
@@ -76,6 +81,15 @@ const ConfirmPage = () => {
       },
     });
   }, [draft, name, email, phone, note, pickupAddress]);
+
+  // Ticking clock for the 10-minute trip hold shown in the modal.
+  // (Above the early return — hooks must run on every render.)
+  useEffect(() => {
+    if (!confirmOpen || !visitor?.expiresAt) return;
+    setNowTs(Date.now());
+    const t = setInterval(() => setNowTs(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [confirmOpen, visitor?.expiresAt]);
 
   if (!draft?.fareEstimate) return null;
 
@@ -114,10 +128,72 @@ const ConfirmPage = () => {
     return { cleanName, cleanEmail, cleanPhone };
   };
 
-  const openConfirm = (e) => {
+  const holdLeftMs = visitor?.expiresAt
+    ? new Date(visitor.expiresAt).getTime() - nowTs
+    : null;
+  const holdCountdown =
+    holdLeftMs == null || nowTs === 0
+      ? ""
+      : holdLeftMs <= 0
+        ? "expired"
+        : `${Math.floor(holdLeftMs / 60000)}:${String(
+            Math.floor((holdLeftMs % 60000) / 1000),
+          ).padStart(2, "0")}`;
+
+  const buildVisitPayload = (validated) => ({
+    pickup: {
+      address: pickupAddress.trim(),
+      latitude: draft.pickup.lat,
+      longitude: draft.pickup.lng,
+    },
+    drop: {
+      address: draft.drop.address,
+      latitude: draft.drop.lat,
+      longitude: draft.drop.lng,
+    },
+    pickupDateTime: new Date(draft.pickupDateTime).toISOString(),
+    tripType: draft.tripType,
+    days,
+    vehicleType: draft.vehicleType,
+    customerNotes: note.trim(),
+    guestName: validated.cleanName,
+    guestEmail: validated.cleanEmail,
+    guestPhone: validated.cleanPhone,
+  });
+
+  // Did the guest edit anything after the hold was created?
+  const holdIsStale = (validated) =>
+    !visitor ||
+    visitor.guestName !== validated.cleanName ||
+    visitor.guestEmail !== validated.cleanEmail ||
+    visitor.guestPhone !== validated.cleanPhone ||
+    visitor.pickup?.address !== pickupAddress.trim() ||
+    (visitor.customerNotes || "") !== note.trim();
+
+  const openConfirm = async (e) => {
     e.preventDefault();
-    if (booking) return;
-    if (validateDetails()) setConfirmOpen(true);
+    if (booking || reserving) return;
+    const validated = validateDetails();
+    if (!validated) return;
+    // Logged-in users book directly on their account (unchanged flow).
+    if (localStorage.getItem("accessToken")) {
+      setConfirmOpen(true);
+      return;
+    }
+    // Guests: "Book Now" only reserves a temporary 10-minute hold.
+    setReserving(true);
+    try {
+      const { data } = await guestAPI.visit(buildVisitPayload(validated));
+      if (!data.success) throw new Error(data.message || "Could not hold your trip.");
+      setVisitor(data.visitor);
+      setConfirmOpen(true);
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || err.message || "Could not hold your trip. Please try again.",
+      );
+    } finally {
+      setReserving(false);
+    }
   };
 
   const handleBook = async () => {
@@ -152,12 +228,20 @@ const ConfirmPage = () => {
         bookingRef = data.booking?._id || data.data?._id;
         createdResponse = data;
       } else {
-        const { data } = await guestAPI.create({
-          ...payload,
-          guestName: cleanName,
-          guestEmail: cleanEmail,
-          guestPhone: cleanPhone,
-        });
+        // Guests: "Confirm Booking" converts the temporary hold into the
+        // real instant booking (Pending Approval until admin verifies).
+        // Details edited after the hold refresh it first so the booking
+        // carries exactly what the guest confirmed.
+        let visitorId = visitor?._id;
+        if (holdIsStale(validated)) {
+          const { data: hold } = await guestAPI.visit(
+            buildVisitPayload(validated),
+          );
+          if (!hold.success) throw new Error(hold.message || "Booking failed.");
+          visitorId = hold.visitor._id;
+          setVisitor(hold.visitor);
+        }
+        const { data } = await guestAPI.confirm({ visitorId });
         if (!data.success) throw new Error(data.message || "Booking failed.");
         bookingRef = data.booking?._id;
         duplicate = !!data.duplicate;
@@ -211,6 +295,11 @@ const ConfirmPage = () => {
       navigate("/booking/waiting", { state: { ref: bookingRef, name: cleanName, note: note.trim(), booking: summary } });
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || "Booking failed. Please try again.");
+      // Expired hold — drop it so "Book Now" reserves a fresh one.
+      if (err.response?.status === 410) {
+        setConfirmOpen(false);
+        setVisitor(null);
+      }
     } finally {
       setBooking(false);
     }
@@ -388,10 +477,16 @@ const ConfirmPage = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   type="submit"
-                  disabled={booking}
+                  disabled={booking || reserving}
                   className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-4 rounded-2xl hover:shadow-[0_0_30px_rgba(34,197,94,0.55)] transition-all disabled:opacity-50"
                 >
-                  Book Now
+                  {reserving ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> Holding your trip…
+                    </>
+                  ) : (
+                    "Book Now"
+                  )}
                 </Motion.button>
               </form>
             </Reveal>
@@ -420,11 +515,32 @@ const ConfirmPage = () => {
         </div>
       </section>
 
-      {/* Premium glass confirm popup — Confirm uses the existing booking
-          API; Cancel just closes. Submit is disabled while booking so no
-          duplicate booking can be created. */}
+      {/* Premium glass confirm popup — Confirm converts the temporary
+          visitor hold into the real instant booking (guests) or books
+          directly (logged-in); Cancel just closes. Submit is disabled
+          while booking so no duplicate booking can be created. */}
       <Modal isOpen={confirmOpen} onClose={() => !booking && setConfirmOpen(false)} title="Confirm your booking" maxWidth="max-w-md">
         <div className="space-y-3">
+          {/* Trip hold — guests only: reference + live 10-minute countdown */}
+          {visitor && !localStorage.getItem("accessToken") && (
+            <div className="flex items-center justify-between gap-3 bg-emerald-500/10 border border-emerald-500/25 rounded-xl px-3.5 py-2.5 text-[13px]">
+              <span className="text-gray-400 min-w-0">
+                Trip hold{" "}
+                <span className="font-mono font-semibold text-emerald-300">
+                  {visitor.reference}
+                </span>
+              </span>
+              {holdCountdown && (
+                <span
+                  className={`font-semibold tabular-nums shrink-0 ${
+                    holdCountdown === "expired" ? "text-red-300" : "text-emerald-300"
+                  }`}
+                >
+                  {holdCountdown === "expired" ? "expired" : `reserved ${holdCountdown}`}
+                </span>
+              )}
+            </div>
+          )}
           {/* Guest details — compact contact strip */}
           <div className="bg-white/5 border border-white/10 rounded-xl divide-y divide-white/10">
             {[

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
 import {
@@ -25,6 +25,23 @@ import PageHero from "../../Component/Landing/PageHero";
 import { hero2 } from "../../assets/images";
 import { Reveal } from "../../Component/Landing/Reveal";
 import { formatTripDuration } from "../../utils/formatDuration";
+import { guestAPI } from "../../services/endpoints";
+
+const LIVE_POLL_MS = 10_000;
+
+const BANNER_TONES = {
+  amber: "border-amber-500/25 shadow-[0_0_50px_rgba(245,158,11,0.12)]",
+  red: "border-rose-500/30 shadow-[0_0_50px_rgba(244,63,94,0.12)]",
+  green: "border-emerald-500/25 shadow-[0_0_50px_rgba(16,185,129,0.12)]",
+  blue: "border-sky-500/30 shadow-[0_0_50px_rgba(56,189,248,0.12)]",
+};
+
+const BANNER_DOT = {
+  amber: "bg-amber-500/15 border-amber-500/40 text-amber-400",
+  red: "bg-rose-500/15 border-rose-500/40 text-rose-400",
+  green: "bg-emerald-500/15 border-emerald-500/40 text-emerald-400",
+  blue: "bg-sky-500/15 border-sky-500/40 text-sky-400",
+};
 
 const readJSON = (raw) => {
   try {
@@ -64,6 +81,95 @@ const WaitingPage = () => {
   const name = location.state?.name || storedName;
   const note = (location.state?.note || location.state?.booking?.note || storedBooking?.note || "").trim();
   const booking = location.state?.booking || storedBooking || null;
+
+  // Live status: guests have no socket session, so the approval/driver
+  // state is polled from the backend lookup (ref + phone prove ownership).
+  let storedPhone = "";
+  try {
+    storedPhone = localStorage.getItem("guestBookingPhone") || "";
+  } catch {
+    // ignore — page stays static
+  }
+  const lookupRef = ref ? String(ref).slice(-8).toUpperCase() : null;
+  const [live, setLive] = useState(null);
+  const terminal = ["Completed", "Cancelled"].includes(live?.bookingStatus);
+
+  useEffect(() => {
+    if (!lookupRef || !storedPhone || terminal) return;
+    let stop = false;
+    const fetchStatus = async () => {
+      try {
+        const { data } = await guestAPI.lookup({
+          ref: lookupRef,
+          phone: storedPhone,
+        });
+        if (!stop && data.success) setLive(data.booking);
+      } catch {
+        // keep the last known state
+      }
+    };
+    fetchStatus();
+    const t = setInterval(fetchStatus, LIVE_POLL_MS);
+    return () => {
+      stop = true;
+      clearInterval(t);
+    };
+  }, [lookupRef, storedPhone, terminal]);
+
+  const statusBanner = (() => {
+    if (!live) return null;
+    const approval = live.approvalStatus || "Approved";
+    const st = live.bookingStatus;
+    if (st === "Cancelled")
+      return {
+        tone: "red",
+        title: "Booking cancelled",
+        sub: live.cancelReason
+          ? `Reason: ${live.cancelReason}`
+          : "This booking was cancelled.",
+      };
+    if (approval === "Rejected")
+      return {
+        tone: "red",
+        title: "Booking not approved",
+        sub: "Sorry, this request was not approved. Call us and we'll arrange your ride right away.",
+      };
+    if (st === "Completed")
+      return {
+        tone: "green",
+        title: "Trip completed",
+        sub: "Thanks for riding with GenZRides!",
+      };
+    if (["Started", "Reached"].includes(st))
+      return {
+        tone: "green",
+        title: "Trip in progress",
+        sub: "Have a safe journey!",
+      };
+    if (live.driver && ["Accepted", "On The Way", "Arrived"].includes(st)) {
+      const bits = [
+        live.driver.vehicleBrand,
+        live.driver.vehicleModel,
+        live.driver.vehicleNumber,
+      ].filter(Boolean);
+      return {
+        tone: "green",
+        title: `Driver assigned — ${live.driver.name || "your driver"}`,
+        sub: `${live.driver.phone || ""}${bits.length ? ` · ${bits.join(" ")}` : ""}`.trim(),
+      };
+    }
+    if (approval === "Pending Approval")
+      return {
+        tone: "amber",
+        title: "Waiting for approval",
+        sub: "Our team is reviewing your request — this usually takes a few minutes.",
+      };
+    return {
+      tone: "blue",
+      title: "Approved — finding your driver",
+      sub: "Your request is approved. A driver will accept it shortly.",
+    };
+  })();
 
   try {
     if (location.state?.ref) {
@@ -143,7 +249,34 @@ const WaitingPage = () => {
           </Reveal>
 
           {/* Booking details — premium trip card */}
-          {booking && (
+           {statusBanner && (
+            <Reveal
+              delay={0.04}
+              className={`mt-5 md:mt-6 bg-white/5 backdrop-blur-lg rounded-[30px] border p-5 sm:p-6 text-left ${BANNER_TONES[statusBanner.tone]}`}
+            >
+              <div className="flex items-start gap-3">
+                <span
+                  className={`w-10 h-10 rounded-2xl border flex items-center justify-center shrink-0 ${BANNER_DOT[statusBanner.tone]}`}
+                >
+                  {statusBanner.tone === "green" ? (
+                    <CheckCircle2 size={18} />
+                  ) : (
+                    <Clock3 size={18} />
+                  )}
+                </span>
+                <div className="min-w-0">
+                  <p className="font-display text-base sm:text-lg font-bold text-white">
+                    {statusBanner.title}
+                  </p>
+                  <p className="text-sm text-gray-400 mt-0.5 break-words">
+                    {statusBanner.sub}
+                  </p>
+                </div>
+              </div>
+            </Reveal>
+          )}
+
+           {booking && (
             <Reveal delay={0.08} className="mt-5 md:mt-6 bg-gradient-to-br from-emerald-500/10 via-white/5 to-transparent backdrop-blur-lg rounded-[30px] border border-emerald-500/20 p-6 sm:p-8 overflow-hidden">
               <div className="flex items-end justify-between gap-3 flex-wrap">
                 <div>

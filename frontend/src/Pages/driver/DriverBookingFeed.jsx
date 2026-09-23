@@ -28,20 +28,48 @@ const SORTS = [
   { id: 'distance', label: 'Shortest trip' },
 ];
 
-const DriverBookings = () => {
+const STATUS_STYLES = {
+  Pending: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+  Accepted: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+  'On The Way': 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+  Arrived: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
+  Started: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
+  Reached: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+  Completed: 'bg-green-500/15 text-green-300 border-green-400/30',
+  Cancelled: 'bg-rose-500/15 text-rose-300 border-rose-400/30',
+};
+
+// Parameterized opportunity feed. `mode` picks the source:
+// - "instant": verified guest bookings (scope=instant)
+// - "customer": registered-customer bookings (scope=customer)
+// - "mine": rides assigned to the logged-in driver
+const DriverBookingFeed = ({
+  mode,
+  queryKey,
+  storageKey,
+  eyebrow,
+  title,
+  subtitle,
+  liveSubtitle,
+  actionLabel,
+  emptyTitle,
+  emptyDescription,
+  showStatus = false,
+  gateOnActiveRide = true,
+}) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { socket } = useSocket();
   const [payTab, setPayTab] = useState('all');
   const [sort, setSort] = useState('newest');
   const [search, setSearch] = useState('');
-  // Debounced client-side filter over the fetched queue (bounded ≤50 rows
-  // by the API, so no backend round-trip is needed per keystroke).
+  // Debounced client-side filter over the fetched queue (bounded rows by
+  // the API, so no backend round-trip is needed per keystroke).
   const debouncedSearch = useDebounce(search, 300);
   const [view, setView] = useState(
     () => {
       try {
-        return localStorage.getItem('driverBookingsView') || 'cards';
+        return localStorage.getItem(storageKey) || 'cards';
       } catch {
         return 'cards';
       }
@@ -50,16 +78,20 @@ const DriverBookings = () => {
   const changeView = (v) => {
     setView(v);
     try {
-      localStorage.setItem('driverBookingsView', v);
+      localStorage.setItem(storageKey, v);
     } catch {
       // private mode — preference simply won't persist
     }
   };
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ['driverAvailableBookings'],
+    queryKey: [queryKey],
     queryFn: async () => {
-      const { data } = await bookingAPI.getAvailable();
+      if (mode === 'mine') {
+        const { data } = await bookingAPI.getMyDriverBookings({ page: 1, limit: 50 });
+        return data;
+      }
+      const { data } = await bookingAPI.getAvailable({ scope: mode });
       return data;
     },
     refetchInterval: 10000,
@@ -67,7 +99,8 @@ const DriverBookings = () => {
     staleTime: 5_000,
   });
 
-  // Active ride gates the available list — one ride at a time
+  // Active ride gates the available lists — one ride at a time.
+  // "My bookings" are the driver's own rides, so they never gate.
   const { data: currentRideData } = useQuery({
     queryKey: ['currentRide'],
     queryFn: async () => {
@@ -80,13 +113,13 @@ const DriverBookings = () => {
   });
 
   const activeRide = currentRideData?.data;
-  const hasActiveRide = !!activeRide && !['Completed', 'Cancelled'].includes(activeRide.bookingStatus);
+  const hasActiveRide = gateOnActiveRide && !!activeRide && !['Completed', 'Cancelled'].includes(activeRide.bookingStatus);
 
-  // Return the available list in real time when rides complete/cancel
+  // Return the list in real time when rides complete/cancel
   useEffect(() => {
     if (!socket) return;
     const handleRideUpdate = () => {
-      queryClient.invalidateQueries({ queryKey: ['driverAvailableBookings'] });
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
       queryClient.invalidateQueries({ queryKey: ['currentRide'] });
     };
     socket.on('ride-status-updated', handleRideUpdate);
@@ -95,7 +128,7 @@ const DriverBookings = () => {
       socket.off('ride-status-updated', handleRideUpdate);
       socket.off('booking-updated', handleRideUpdate);
     };
-  }, [socket, queryClient]);
+  }, [socket, queryClient, queryKey]);
 
   const bookingsSource = data?.bookings;
   const allBookings = useMemo(
@@ -188,6 +221,16 @@ const DriverBookings = () => {
     );
   };
 
+  const StatusBadge = ({ status }) => (
+    <span
+      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border backdrop-blur whitespace-nowrap ${
+        STATUS_STYLES[status] || STATUS_STYLES.Pending
+      }`}
+    >
+      {status || 'Pending'}
+    </span>
+  );
+
   // Table view columns — same data and actions as the cards.
   const bookingColumns = [
     {
@@ -216,8 +259,8 @@ const DriverBookings = () => {
       header: 'Customer',
       cell: (b) => (
         <div className="min-w-[120px] max-w-[180px]">
-          <p className="text-sm font-semibold text-white truncate">{b.customer?.name || 'Guest'}</p>
-          <p className="text-[11px] text-gray-500 truncate">{b.customer?.phone || ''}</p>
+          <p className="text-sm font-semibold text-white truncate">{b.customer?.name || b.guestName || 'Guest'}</p>
+          <p className="text-[11px] text-gray-500 truncate">{b.customer?.phone || b.guestPhone || ''}</p>
         </div>
       ),
     },
@@ -225,6 +268,14 @@ const DriverBookings = () => {
       header: 'Type',
       cell: (b) => <TripTypeBadge type={b.tripType} />,
     },
+    ...(showStatus
+      ? [
+          {
+            header: 'Status',
+            cell: (b) => <StatusBadge status={b.bookingStatus} />,
+          },
+        ]
+      : []),
     {
       header: 'Fare',
       tdClassName: 'text-right',
@@ -241,10 +292,10 @@ const DriverBookings = () => {
       cell: (b) => (
         <button
           onClick={() => openBooking(b._id)}
-          aria-label={`View booking ${b._id?.slice(-6)}`}
+          aria-label={`${actionLabel} ${b._id?.slice(-6)}`}
           className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[40px] bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-xs font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] active:scale-[0.98] transition-all whitespace-nowrap"
         >
-          View & Accept
+          {actionLabel}
         </button>
       ),
     },
@@ -259,17 +310,17 @@ const DriverBookings = () => {
         <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between min-w-0">
           <div className="min-w-0">
             <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
-              <Sparkles size={12} /> Opportunity feed
+              <Sparkles size={12} /> {eyebrow}
               <span className="relative flex w-1.5 h-1.5 ml-1">
                 <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
                 <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-emerald-400" />
               </span>
             </p>
             <h1 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight mt-1">
-              Available Bookings
+              {title}
             </h1>
             <p className="text-xs text-gray-400 mt-1">
-              {isLoading ? 'Finding rides near you…' : 'Fresh requests auto-refresh every 10 seconds.'}
+              {isLoading ? 'Finding rides near you…' : subtitle}
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:min-w-[380px]">
@@ -296,7 +347,7 @@ const DriverBookings = () => {
             <RefreshCw size={15} className={isFetching ? 'animate-spin' : ''} />
             {isFetching ? 'Refreshing…' : 'Refresh now'}
           </button>
-          <p className="text-[11px] text-gray-500 self-center hidden md:block">Socket live · polling every 10s as backup</p>
+          <p className="text-[11px] text-gray-500 self-center hidden md:block">{liveSubtitle}</p>
         </div>
       </div>
 
@@ -386,8 +437,8 @@ const DriverBookings = () => {
       ) : bookings.length === 0 ? (
         <EmptyState
           icon={Calendar}
-          title={hasActiveRide ? 'Paused while you ride' : debouncedSearch ? 'No matching rides' : payTab === 'all' ? 'No available bookings' : `No ${payTab} rides right now`}
-          description={hasActiveRide ? 'Finish your current ride to see new requests.' : debouncedSearch ? `Nothing matches “${debouncedSearch}”. Try a place, ID, name, or trip type (one way, round trip).` : payTab === 'all' ? 'There are no pending bookings at the moment. Check back later.' : 'Try another payment filter or refresh the feed.'}
+          title={hasActiveRide ? 'Paused while you ride' : debouncedSearch ? 'No matching rides' : payTab === 'all' ? emptyTitle : `No ${payTab} rides right now`}
+          description={hasActiveRide ? 'Finish your current ride to see new requests.' : debouncedSearch ? `Nothing matches “${debouncedSearch}”. Try a place, ID, name, or trip type (one way, round trip).` : payTab === 'all' ? emptyDescription : 'Try another payment filter or refresh the feed.'}
           action={
             debouncedSearch && !hasActiveRide ? (
               <button
@@ -419,14 +470,17 @@ const DriverBookings = () => {
                 {/* ── Route side ── */}
                 <div className="p-4 sm:p-5 min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5 mb-3 min-w-0">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/15 text-emerald-300 border border-emerald-500/25 rounded-full text-[11px] font-semibold">
-                      <span className="relative flex w-1.5 h-1.5">
-                        <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
-                        <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    {mode !== 'mine' && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/15 text-emerald-300 border border-emerald-500/25 rounded-full text-[11px] font-semibold">
+                        <span className="relative flex w-1.5 h-1.5">
+                          <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
+                          <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        </span>
+                        New request
                       </span>
-                      New request
-                    </span>
+                    )}
                     <TripTypeBadge type={b.tripType} />
+                    {showStatus && <StatusBadge status={b.bookingStatus} />}
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] text-gray-500">
                       <Clock size={11} /> {formatDateTime(b.pickupDateTime)}
                     </span>
@@ -478,11 +532,11 @@ const DriverBookings = () => {
                   </div>
                   <button
                     onClick={() => openBooking(b._id)}
-                    aria-label={`View booking ${b._id?.slice(-6)}`}
+                    aria-label={`${actionLabel} ${b._id?.slice(-6)}`}
                     className="shrink-0 inline-flex items-center justify-center gap-1.5 px-5 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-sm font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all"
                   >
-                    <span className="sm:hidden">View</span>
-                    <span className="hidden sm:inline">View & Accept</span>
+                    <span className="sm:hidden">{actionLabel === 'View & Accept' ? 'View' : actionLabel}</span>
+                    <span className="hidden sm:inline">{actionLabel}</span>
                     <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
                   </button>
                 </div>
@@ -497,4 +551,4 @@ const DriverBookings = () => {
   );
 };
 
-export default DriverBookings;
+export default DriverBookingFeed;

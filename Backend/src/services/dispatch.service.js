@@ -93,6 +93,16 @@ export const dispatchBooking = async (
     };
   }
 
+  // Approval gate: bookings awaiting admin verification are never
+  // dispatched to drivers — the verify endpoint dispatches after
+  // approving. Legacy documents predate approvalStatus (null = Approved).
+  if ((booking.approvalStatus || "Approved") !== "Approved") {
+    return {
+      success: false,
+      message: "Booking is pending admin approval.",
+    };
+  }
+
   // Only drivers whose registered cab type matches the booking's
   // vehicleType are eligible — never send an SUV booking to a Sedan
   // driver (or any other cross-type assignment). No distance filter:
@@ -499,6 +509,13 @@ export const acceptBooking = async (
         `This booking requires a ${booking.vehicleType.name || "matching"} vehicle.`
       );
     }
+  }
+
+  // Approval gate: an unverified instant booking can never be accepted,
+  // even by guessing its id — the driver feed hides it and this guard
+  // blocks the direct accept path too.
+  if ((booking.approvalStatus || "Approved") !== "Approved") {
+    throw new Error("Booking is pending admin approval.");
   }
 
   // Only the current driver in the queue may accept — unless the booking was

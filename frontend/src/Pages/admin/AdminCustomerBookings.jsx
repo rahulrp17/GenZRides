@@ -50,7 +50,7 @@ const STATUSES = [
   "Cancelled",
 ];
 
-const ManageBookings = () => {
+const AdminCustomerBookings = () => {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState("");
@@ -60,12 +60,12 @@ const ManageBookings = () => {
   // Table/cards preference persists; switching never refetches or resets
   // search, filters or page — all live outside the view branch.
   const [view, setView] = useState(
-    () => localStorage.getItem("adminBookingsView") || "cards"
+    () => localStorage.getItem("adminCustomerBookingsView") || "cards"
   );
   const changeView = (v) => {
     setView(v);
     try {
-      localStorage.setItem("adminBookingsView", v);
+      localStorage.setItem("adminCustomerBookingsView", v);
     } catch {
       // private mode — preference simply won't persist
     }
@@ -93,7 +93,8 @@ const ManageBookings = () => {
   useEffect(() => {
     if (!socket) return;
     const handleRideUpdate = (data) => {
-      queryClient.invalidateQueries({ queryKey: ["adminBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCustomerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCounts"] });
       if (data?._id) {
         setSelectedBooking((prev) =>
           prev && prev._id === data._id ? { ...prev, ...data } : prev,
@@ -105,9 +106,11 @@ const ManageBookings = () => {
     };
     socket.on("ride-status-updated", handleRideUpdate);
     socket.on("booking-updated", handleRideUpdate);
+    socket.on("admin-counts-updated", handleRideUpdate);
     return () => {
       socket.off("ride-status-updated", handleRideUpdate);
       socket.off("booking-updated", handleRideUpdate);
+      socket.off("admin-counts-updated", handleRideUpdate);
     };
   }, [socket, queryClient]);
 
@@ -122,9 +125,10 @@ const ManageBookings = () => {
   const vehicleTypes = vehicleData?.vehicles || [];
 
   const { data, isLoading, isFetching, isError, error } = useQuery({
-    queryKey: ["adminBookings", page, statusFilter, vehicleTypeFilter, debouncedSearch],
+    queryKey: ["adminCustomerBookings", page, statusFilter, vehicleTypeFilter, debouncedSearch],
     queryFn: async () => {
-      const params = { page, limit: 10 };
+      // Registered customers only — guest bookings live in Instant Bookings.
+      const params = { page, limit: 10, scope: "registered" };
       if (statusFilter) params.status = statusFilter;
       if (vehicleTypeFilter) params.vehicleType = vehicleTypeFilter;
       if (debouncedSearch) params.search = debouncedSearch;
@@ -160,8 +164,9 @@ const ManageBookings = () => {
     mutationFn: (id) => adminAPI.completeBooking(id),
     onSuccess: () => {
       toast.success("Booking completed");
-      queryClient.invalidateQueries({ queryKey: ["adminBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCustomerBookings"] });
       queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCounts"] });
     },
     onError: (err) =>
       toast.error(err?.response?.data?.message || "Failed to complete booking"),
@@ -171,8 +176,9 @@ const ManageBookings = () => {
     mutationFn: ({ id, reason }) => adminAPI.cancelBooking(id, { reason }),
     onSuccess: () => {
       toast.success("Booking cancelled");
-      queryClient.invalidateQueries({ queryKey: ["adminBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCustomerBookings"] });
       queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCounts"] });
       setActionDialog({ open: false, action: null, id: null });
     },
     onError: (err) =>
@@ -184,13 +190,28 @@ const ManageBookings = () => {
       adminAPI.assignDriver(bookingId, { driverId }),
     onSuccess: () => {
       toast.success("Driver assigned successfully!");
-      queryClient.invalidateQueries({ queryKey: ["adminBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCustomerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCustomerRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCounts"] });
       setAssignDialog({ open: false, bookingId: null });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Failed to assign driver");
     },
     onSettled: () => setAssigningDriverId(null),
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: (id) => adminAPI.approveBooking(id),
+    onSuccess: (res) => {
+      toast.success(res?.data?.message || "Booking approved!");
+      queryClient.invalidateQueries({ queryKey: ["adminCustomerBookings"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCustomerRequests"] });
+      queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCounts"] });
+    },
+    onError: (err) =>
+      toast.error(err?.response?.data?.message || "Failed to approve booking"),
   });
 
   const handleSelectDriver = (driverId) => {
@@ -207,7 +228,7 @@ const ManageBookings = () => {
       <ErrorState
         message={error?.message || "Failed to load bookings"}
         onRetry={() =>
-          queryClient.invalidateQueries({ queryKey: ["adminBookings"] })
+          queryClient.invalidateQueries({ queryKey: ["adminCustomerBookings"] })
         }
       />
     );
@@ -323,9 +344,14 @@ const ManageBookings = () => {
             <MapPin size={14} />
           </button>
           {!b.driver && b.bookingStatus === "Pending" && (
-            <button onClick={() => setAssignDialog({ open: true, bookingId: b._id })} title="Assign driver" aria-label="Assign driver" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-xs hover:shadow-[0_0_18px_rgba(34,197,94,0.5)] transition">
-              <User size={14} />
-            </button>
+            <>
+              <button onClick={() => approveMutation.mutate(b._id)} disabled={approveMutation.isPending} title="Approve & dispatch to drivers" aria-label="Approve and dispatch" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-xs hover:shadow-[0_0_18px_rgba(34,197,94,0.5)] transition disabled:opacity-50">
+                <CheckCircle size={14} />
+              </button>
+              <button onClick={() => setAssignDialog({ open: true, bookingId: b._id })} title="Assign driver" aria-label="Assign driver" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs hover:bg-white/10 transition">
+                <User size={14} />
+              </button>
+            </>
           )}
           {canAct(b) && (
             <>
@@ -357,10 +383,10 @@ const ManageBookings = () => {
             <CalendarCheck size={12} /> Operations
           </p>
           <h1 className="font-display text-lg sm:text-xl font-bold text-white tracking-tight">
-            Manage Bookings
+            Customer Bookings
           </h1>
           <p className="text-[11px] sm:text-xs text-gray-400 w-full">
-            Track every ride, assign drivers, complete or cancel — updates live.
+            Every registered-customer ride — track, approve, assign drivers, complete or cancel. Updates live.
           </p>
         </div>
         <div className="relative mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -641,6 +667,15 @@ const ManageBookings = () => {
                           >
                             Track ride
                           </button>
+                      {!b.driver && b.bookingStatus === "Pending" && (
+                        <button
+                          onClick={() => approveMutation.mutate(b._id)}
+                          disabled={approveMutation.isPending}
+                          className="inline-flex items-center justify-center gap-1 px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-xs font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                        >
+                          Approve
+                        </button>
+                      )}
                       {!b.driver && b.bookingStatus === "Pending" && (
                         <button
                           onClick={() =>
@@ -932,19 +967,32 @@ const ManageBookings = () => {
             </div>
             {!selectedBooking.driver &&
               selectedBooking.bookingStatus === "Pending" && (
-                <button
-                  onClick={() => {
-                    setSelectedBooking(null);
-                    setAssignDialog({
-                      open: true,
-                      bookingId: selectedBooking._id,
-                    });
-                  }}
-                  className="w-full py-2.5 min-h-[44px] bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-semibold rounded-2xl hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all flex items-center justify-center gap-2"
-                >
-                  <CheckCircle size={16} />
-                  Assign Driver
-                </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      approveMutation.mutate(selectedBooking._id);
+                      setSelectedBooking(null);
+                    }}
+                    disabled={approveMutation.isPending}
+                    className="w-full py-2.5 min-h-[44px] bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-semibold rounded-2xl hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle size={16} />
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedBooking(null);
+                      setAssignDialog({
+                        open: true,
+                        bookingId: selectedBooking._id,
+                      });
+                    }}
+                    className="w-full py-2.5 min-h-[44px] bg-white/5 border border-white/10 text-white text-sm font-semibold rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle size={16} />
+                    Assign Driver
+                  </button>
+                </div>
               )}
             {selectedBooking.bookingStatus !== "Completed" &&
               selectedBooking.bookingStatus !== "Cancelled" && (
@@ -1001,4 +1049,4 @@ const ManageBookings = () => {
   );
 };
 
-export default ManageBookings;
+export default AdminCustomerBookings;

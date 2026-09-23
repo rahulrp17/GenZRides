@@ -3,6 +3,8 @@ import crypto from "crypto";
 import Booking from "../models/Booking.js";
 import DriverProfile from "../models/DriverProfile.js";
 import User from "../models/User.js";
+import Vehicle from "../models/Vehicle.js";
+import Visitor from "../models/Visitor.js";
 import { notifyAdminOfBooking } from "./whatsapp.service.js";
 import { notifyAdminOfBookingEmail } from "./email.service.js";
 
@@ -53,6 +55,10 @@ export const createBooking = async (
     guestName = null,
     guestEmail = null,
     guestPhone = null,
+    // Admin approval gate. Instant (guest) bookings are created
+    // "Pending Approval" and stay hidden from drivers until verified.
+    // Registered customer bookings default to "Approved".
+    approvalStatus = "Approved",
   } = bookingData;
 
   /* ===========================
@@ -144,6 +150,8 @@ export const createBooking = async (
 
       bookingStatus: "Pending",
 
+      approvalStatus,
+
       paymentStatus:
         paymentMethod === "Cash"
           ? "Pending"
@@ -220,7 +228,11 @@ export const createBooking = async (
   // Sedan→Sedan, SUV→SUV, Innova→Innova (via dispatch.service findEligibleDrivers vehicleType filter)
   // Admin still gets all bookings via emitToAdmins in booking.controller; this dispatch is driver-only.
   // Best-effort: never breaks booking creation.
-  tryAutoDispatch(populatedBooking).catch(() => {});
+  // Approval gate: bookings awaiting admin verification are never
+  // dispatched — the verify endpoint dispatches after approving.
+  if (approvalStatus === "Approved") {
+    tryAutoDispatch(populatedBooking).catch(() => {});
+  }
 
   return {
     success: true,
@@ -234,8 +246,10 @@ export const createBooking = async (
 /* ===========================================================
    CREATE GUEST BOOKING (no JWT)
    Reuses the standard booking pipeline so guest bookings appear
-   in Admin/Driver dashboards with the identical status,
-   notification, dispatch and WhatsApp flow as logged-in bookings.
+   in Admin dashboards with the identical status, notification
+   and WhatsApp flow as logged-in bookings — except dispatch:
+   instant bookings are created "Pending Approval" and stay
+   hidden from drivers until an admin verifies them.
 =========================================================== */
 
 const DUPLICATE_WINDOW_MS = 10 * 60 * 1000;
@@ -385,12 +399,215 @@ export const createGuestBooking = async (guestData) => {
     guestName: guestName.trim(),
     guestEmail: cleanEmail,
     guestPhone,
+    // Instant bookings wait for admin verification before dispatch.
+    approvalStatus: "Pending Approval",
   });
 
 return {
     ...result,
     duplicate: false,
     isGuest: true,
+  };
+};
+
+/* ===========================================================
+   GUEST VISIT ("Book Now") — temporary intent, NOT a booking.
+   Stores the guest's trip + contact as a Visitor only: no
+   Booking document, no dispatch, no driver visibility. The
+   visit converts into a real instant booking on confirm, or
+   expires 10 minutes after creation.
+========================================================== */
+
+const VISIT_TTL_MS = 10 * 60 * 1000;
+
+const makeVisitorReference = () => {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let ref = "";
+  const bytes = crypto.randomBytes(6);
+  for (const b of bytes) ref += chars[b % chars.length];
+  return `VST-${ref}`;
+};
+
+export const sweepExpiredVisitors = async () => {
+  const res = await Visitor.updateMany(
+    { status: "Pending", expiresAt: { $lte: new Date() } },
+    { $set: { status: "Expired" } }
+  );
+  return res.modifiedCount ?? 0;
+};
+
+export const createVisit = async (visitData) => {
+  const {
+    pickup,
+    drop,
+    pickupDateTime,
+    tripType = "One Way",
+    days = 1,
+    returnDateTime = null,
+    vehicleType,
+    customerNotes = "",
+    guestName,
+    guestEmail,
+    guestPhone,
+  } = visitData;
+
+  await sweepExpiredVisitors();
+
+  const vehicle = await Vehicle.findById(vehicleType);
+  if (!vehicle || vehicle.isActive === false) {
+    throw new Error("Selected vehicle type is not available.");
+  }
+
+  let effectiveDays = days;
+  if (tripType === "Round Trip" && returnDateTime) {
+    const diffMs =
+      new Date(returnDateTime).getTime() -
+      new Date(pickupDateTime).getTime();
+    if (diffMs <= 0) {
+      throw new Error("Return date must be after pickup date.");
+    }
+    effectiveDays = Math.max(
+      1,
+      Math.ceil(diffMs / (24 * 60 * 60 * 1000))
+    );
+  }
+
+  let reference = makeVisitorReference();
+  for (let i = 0; i < 3; i++) {
+    const clash = await Visitor.findOne({ reference })
+      .select("_id")
+      .lean();
+    if (!clash) break;
+    reference = makeVisitorReference();
+  }
+
+  const visitor = await Visitor.create({
+    guestName: guestName.trim(),
+    guestEmail: guestEmail.trim().toLowerCase(),
+    guestPhone: guestPhone.trim(),
+    pickup,
+    drop,
+    pickupDateTime,
+    tripType,
+    days: effectiveDays,
+    returnDateTime: returnDateTime || null,
+    vehicleType: vehicle._id,
+    customerNotes: (customerNotes || "").trim(),
+    status: "Pending",
+    reference,
+    expiresAt: new Date(Date.now() + VISIT_TTL_MS),
+  });
+
+  const populated = await Visitor.findById(visitor._id)
+    .populate("vehicleType", "name image seats")
+    .lean();
+
+  return {
+    success: true,
+    message: "Trip reserved for 10 minutes. Confirm to book your cab.",
+    visitor: populated,
+  };
+};
+
+/* ===========================================================
+   GUEST CONFIRM — converts a pending visit into a real instant
+   booking ("Pending Approval", hidden from drivers until an
+   admin verifies it). Idempotent: confirming twice returns the
+   same booking instead of creating a second one.
+========================================================== */
+
+export const confirmVisit = async (visitorId) => {
+  await sweepExpiredVisitors();
+
+  const visitor = await Visitor.findById(visitorId);
+
+  if (!visitor) {
+    throw Object.assign(new Error("Visit not found or expired."), {
+      code: 404,
+    });
+  }
+
+  if (visitor.status === "Confirmed" && visitor.bookingId) {
+    const existing = await Booking.findById(visitor.bookingId)
+      .populate("customer", "name phone profileImage")
+      .populate("vehicleType");
+    if (existing) {
+      return {
+        success: true,
+        message: "Booking already confirmed.",
+        booking: existing,
+        duplicate: true,
+        isGuest: true,
+        visitorId: visitor._id,
+      };
+    }
+  }
+
+  if (visitor.status !== "Pending") {
+    throw Object.assign(
+      new Error(
+        visitor.status === "Expired"
+          ? "This trip hold expired. Please start a new booking."
+          : "This visit can no longer be confirmed."
+      ),
+      { code: 410 }
+    );
+  }
+
+  if (visitor.expiresAt <= new Date()) {
+    visitor.status = "Expired";
+    await visitor.save();
+    throw Object.assign(
+      new Error("This trip hold expired. Please start a new booking."),
+      { code: 410 }
+    );
+  }
+
+  // Atomic claim: exactly one confirm wins a visit, even under retry.
+  const claimed = await Visitor.findOneAndUpdate(
+    {
+      _id: visitor._id,
+      status: "Pending",
+      expiresAt: { $gt: new Date() },
+    },
+    { $set: { status: "Confirmed" } },
+    { new: true }
+  );
+
+  if (!claimed) {
+    throw Object.assign(
+      new Error("This trip hold expired. Please start a new booking."),
+      { code: 410 }
+    );
+  }
+
+  const result = await createGuestBooking({
+    pickup: {
+      address: visitor.pickup.address,
+      latitude: visitor.pickup.latitude,
+      longitude: visitor.pickup.longitude,
+    },
+    drop: {
+      address: visitor.drop.address,
+      latitude: visitor.drop.latitude,
+      longitude: visitor.drop.longitude,
+    },
+    pickupDateTime: new Date(visitor.pickupDateTime).toISOString(),
+    tripType: visitor.tripType,
+    days: visitor.days,
+    vehicleType: visitor.vehicleType.toString(),
+    customerNotes: visitor.customerNotes || "",
+    guestName: visitor.guestName,
+    guestEmail: visitor.guestEmail,
+    guestPhone: visitor.guestPhone,
+  });
+
+  claimed.bookingId = result.booking._id;
+  await claimed.save();
+
+  return {
+    ...result,
+    visitorId: claimed._id,
   };
 };
 
@@ -451,6 +668,7 @@ export const lookupGuestBooking = async (ref, phone) => {
     guestName: booking.guestName,
     guestPhone: booking.guestPhone,
     bookingStatus: booking.bookingStatus,
+    approvalStatus: booking.approvalStatus || "Approved",
     pickup: booking.pickup,
     drop: booking.drop,
     pickupDateTime: booking.pickupDateTime,
@@ -1544,14 +1762,25 @@ export const completeRide = async (
 =========================================================== */
 
 export const getAvailableBookings = async (
-  { limit = 50, driverUserId = null } = {}
+  { limit = 50, driverUserId = null, scope = null } = {}
 ) => {
   // A driver only sees bookings for their own cab type
   // (SUV drivers → SUV bookings, Sedan → Sedan, etc.).
   const query = {
     bookingStatus: "Pending",
     driver: null,
+    // Approval gate: instant bookings stay hidden from every driver
+    // until an admin verifies them. Legacy documents predate
+    // approvalStatus (null = Approved).
+    approvalStatus: { $in: [null, "Approved"] },
   };
+
+  // Feed scoping: "instant" = guest bookings, "customer" = registered.
+  if (scope === "instant") {
+    query.guestName = { $ne: null };
+  } else if (scope === "customer") {
+    query.guestName = null;
+  }
 
   if (driverUserId) {
     const driverProfile = await DriverProfile.findOne({
@@ -1594,6 +1823,42 @@ export const getAvailableBookings = async (
 /* ===========================================================
    TIP DRIVER
 =========================================================== */
+
+export const getMyDriverBookings = async (
+  driverUserId,
+  { page = 1, limit = 12 } = {}
+) => {
+  const driver = await DriverProfile.findOne({
+    user: driverUserId,
+  }).select("_id");
+
+  if (!driver) {
+    throw new Error("Driver not found.");
+  }
+
+  const skip = (page - 1) * limit;
+  const query = { driver: driver._id };
+
+  const [bookings, total] = await Promise.all([
+    Booking.find(query)
+      .populate("customer", "name phone profileImage")
+      .populate("vehicleType")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Booking.countDocuments(query),
+  ]);
+
+  return {
+    success: true,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+    bookings,
+  };
+};
 
 export const addDriverTip = async (
   bookingId,

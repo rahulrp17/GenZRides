@@ -6,22 +6,46 @@ import useAuth from "../hooks/useAuth";
 import SEO from "../components/SEO";
 import PushListener from "../components/PushListener";
 import AutoPushSync from "../components/AutoPushSync";
+import { useAdminCounts } from "../Pages/admin/bookingUtils";
 import { motion as Motion } from "framer-motion";
 
 const navItems = [
   { path: "/", label: "Home", icon: Home, end: true },
   { path: "/admin", label: "Dashboard", icon: LayoutPanelLeft, end: true },
-  { path: "/admin/instant-customers", label: "Instant Customers", icon: Zap },
+  { path: "/admin/bookings", label: "Customer Bookings", icon: Calendar },
+  { path: "/admin/booking-requests", label: "Customer Requests", icon: Bell, countKey: "pendingCustomerRequests" },
+  { path: "/admin/instant-bookings", label: "Instant Bookings", icon: Zap },
+  { path: "/admin/instant-bookings/requests", label: "Instant Requests", icon: Bell, countKey: "pendingInstantRequests" },
+  { path: "/admin/visitors", label: "Visitors", icon: Users },
   { path: "/admin/customers", label: "Customers", icon: Users },
   { path: "/admin/drivers", label: "Drivers", icon: Car },
   { path: "/admin/vehicles", label: "Vehicles", icon: Settings },
-  { path: "/admin/bookings", label: "Bookings", icon: Calendar },
-  { path: "/admin/booking-requests", label: "Booking Requests", icon: Bell },
   { path: "/admin/withdrawals", label: "Withdrawals", icon: Wallet },
   { path: "/admin/reviews", label: "Reviews", icon: Star },
   { path: "/admin/notifications", label: "Notifications", icon: Bell },
   { path: "/admin/profile", label: "Profile", icon: User },
 ];
+
+// Live pending-queue badge for request nav items. Hidden when the count is
+// zero; collapses to a dot when the sidebar is collapsed.
+const NavBadge = ({ countKey, collapsed }) => {
+  const { data } = useAdminCounts();
+  const count = Number(data?.[countKey] || 0);
+  if (!count) return null;
+  if (collapsed) {
+    return (
+      <span
+        aria-label={`${count} pending`}
+        className="hidden lg:block absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.9)]"
+      />
+    );
+  }
+  return (
+    <span className="ml-auto min-w-[22px] h-[22px] px-1.5 inline-flex items-center justify-center rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-bold tabular-nums">
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+};
 
 const AdminLayout = () => {
   const { user, loading, logout } = useAuth();
@@ -109,7 +133,7 @@ const AdminLayout = () => {
                 onClick={() => setSidebarOpen(false)}
                 title={sidebarExpanded ? undefined : item.label}
                 className={({ isActive }) =>
-                  `group flex items-center rounded-xl text-sm font-medium transition-all duration-200 ${
+                  `group relative flex items-center rounded-xl text-sm font-medium transition-all duration-200 ${
                     sidebarExpanded
                       ? "gap-3 px-3.5 py-2.5"
                       : "gap-3 px-3.5 py-2.5 lg:mx-auto lg:h-11 lg:w-11 lg:justify-center lg:gap-0 lg:px-0 lg:py-0"
@@ -122,6 +146,9 @@ const AdminLayout = () => {
               >
                 <item.icon size={20} className="shrink-0 transition-transform duration-200 group-hover:scale-110" />
                 <span className={`truncate ${sidebarExpanded ? "" : "lg:hidden"}`}>{item.label}</span>
+                {item.countKey && (
+                  <NavBadge countKey={item.countKey} collapsed={!sidebarExpanded} />
+                )}
               </NavLink>
             ))}
           </nav>

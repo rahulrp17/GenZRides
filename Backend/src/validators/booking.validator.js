@@ -96,6 +96,44 @@ const guestCreateBookingSchema = z.object({
   { message: 'Return date must be after pickup date', path: ['returnDateTime'] }
 );
 
+// "Book Now" stores a temporary visitor only — same trip/contact shape as a
+// guest booking, but creates no Booking and dispatches to no driver.
+const guestVisitSchema = z.object({
+  pickup: locationSchema,
+  drop: locationSchema,
+  pickupDateTime: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), 'Invalid date format')
+    .refine((val) => new Date(val) > new Date(), 'Pickup date must be in the future'),
+  tripType: z.enum(['One Way', 'Round Trip', 'Airport Pickup', 'Airport Drop'], {
+    errorMap: () => ({ message: 'Trip type must be One Way, Round Trip, Airport Pickup, or Airport Drop' }),
+  }),
+  days: z.number().int().min(1, 'Days must be at least 1').optional().default(1),
+  returnDateTime: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), 'Invalid return date format')
+    .optional(),
+  vehicleType: z.string().length(24, 'Invalid vehicle type ID').regex(/^[0-9a-fA-F]{24}$/, 'Invalid ObjectId format'),
+  customerNotes: z.string().max(500, 'Customer notes must be at most 500 characters').optional(),
+  guestName: z.string().min(2, 'Name must be at least 2 characters').max(50, 'Name must be at most 50 characters'),
+  guestEmail: z.string().email('Enter a valid email address'),
+  guestPhone: z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit Indian mobile number'),
+}).refine(
+  (val) =>
+    val.tripType !== 'Round Trip' ||
+    !val.returnDateTime ||
+    new Date(val.returnDateTime) > new Date(val.pickupDateTime),
+  { message: 'Return date must be after pickup date', path: ['returnDateTime'] }
+);
+
+// "Confirm Booking" converts a pending visitor into a real instant booking.
+const guestConfirmSchema = z.object({
+  visitorId: z
+    .string()
+    .length(24, 'Visit ID must be 24 characters')
+    .regex(/^[0-9a-fA-F]{24}$/, 'Visit ID must be a valid hex string'),
+});
+
 // Guests prove ownership of a booking with reference (+ phone); no JWT involved.
 const guestLookupSchema = z.object({
   ref: z.string().min(6, 'Booking reference is too short').max(28, 'Booking reference is too long'),
@@ -110,6 +148,8 @@ const guestCancelSchema = z.object({
 export {
   createBookingSchema,
   guestCreateBookingSchema,
+  guestVisitSchema,
+  guestConfirmSchema,
   cancelBookingSchema,
   driverCancelBookingSchema,
   updatePaymentSchema,
