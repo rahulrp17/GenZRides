@@ -7,13 +7,8 @@ import { CardSkeleton } from '../../components/shared/Skeleton';
 import ErrorState from '../../components/shared/ErrorState';
 import StatsCard from '../../components/shared/StatsCard';
 import useAuth from '../../hooks/useAuth';
+import { BookingStatusBadge } from '../../utils/bookingStatus';
 import { motion as Motion } from 'framer-motion';
-
-const STATUS_BADGE = {
-  Completed: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
-  Cancelled: 'bg-red-500/20 text-red-400 border border-red-500/30',
-  Accepted: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
-};
 
 const CustomerDashboard = () => {
   const { user } = useAuth();
@@ -151,9 +146,7 @@ const CustomerDashboard = () => {
               <div key={booking._id} className="p-4 hover:bg-white/5 transition">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      STATUS_BADGE[booking.bookingStatus] || 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                    }`}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
                       <Car size={18} />
                     </div>
                     <div>
@@ -168,14 +161,10 @@ const CustomerDashboard = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      STATUS_BADGE[booking.bookingStatus] || 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                    }`}>
-                      {booking.bookingStatus}
-                    </span>
-                    {booking.finalFare > 0 && (
-                      <p className="text-sm font-semibold text-white mt-1">₹{booking.finalFare}</p>
-                    )}
+                    <BookingStatusBadge status={booking.bookingStatus} size="sm" />
+                      {booking.finalFare > 0 && (
+                        <p className="text-sm font-semibold text-white mt-1">₹{Number(booking.finalFare).toLocaleString('en-IN')}</p>
+                      )}
                   </div>
                 </div>
               </div>

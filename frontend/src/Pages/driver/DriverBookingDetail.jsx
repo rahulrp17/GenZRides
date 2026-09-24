@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { MapPin, Clock, Car, ArrowLeft, Loader2, CheckCircle, Navigation, User, Wifi, WifiOff, Copy, Check } from 'lucide-react';
+import { MapPin, Clock, Car, ArrowLeft, Loader2, CheckCircle, Navigation, User, Wifi, WifiOff, Copy, Check, Ban } from 'lucide-react';
 import { bookingAPI, driverAPI } from '../../services/endpoints';
+import { BookingStatusBadge } from '../../utils/bookingStatus';
 import { useCopyBooking } from '../../utils/bookingText';
 import { formatTripDuration } from '../../utils/formatDuration';
 import { CardSkeleton } from '../../components/shared/Skeleton';
@@ -66,6 +67,29 @@ const DriverBookingDetail = () => {
     },
   });
 
+  // Reject ≠ Cancel: the request stays open for other drivers (routed via
+  // the dispatch queue) but never shows again to this driver.
+  const rejectMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await bookingAPI.reject(id);
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Request rejected. It won't be shown again.");
+      queryClient.invalidateQueries({ queryKey: ['driverAvailableBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['driverInstantBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['driverCustomerRequests'] });
+      queryClient.invalidateQueries({ queryKey: ['driverMyBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['driverBookingDetail', id] });
+      queryClient.invalidateQueries({ queryKey: ['driverCurrentBooking'] });
+      navigate('/driver/instant-bookings');
+    },
+    onError: (err) => {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to reject request';
+      toast.error(msg, { duration: 4000 });
+    },
+  });
+
   const booking = data?.booking;
   const profile = profileData?.data;
   const { copied, copyBooking } = useCopyBooking();
@@ -73,18 +97,6 @@ const DriverBookingDetail = () => {
   // Location gate: accepting requires a live GPS fix (used for dispatch
   // accuracy and trip tracking). 'needed' shows the enable-location prompt.
   const [locCheck, setLocCheck] = useState('idle');
-   const statusColors = {
-    Pending: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
-    Accepted: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
-    "On The Way":
-      "bg-purple-500/20 text-purple-400 border border-purple-500/30",
-    Arrived: "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30",
-    Started: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30",
-    Reached: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
-    Completed:
-      "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
-    Cancelled: "bg-red-500/20 text-red-400 border border-red-500/30",
-  };
   const handleAccept = () => {
     if (acceptMutation.isPending || locCheck === 'checking') return;
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
@@ -168,9 +180,7 @@ const DriverBookingDetail = () => {
                 {copied ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
                 <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
               </button>
-              <span className={`px-3 py-1 rounded-full text-md font-medium ${statusColors[booking.bookingStatus]}`}>
-                {booking.bookingStatus}
-              </span>
+              <BookingStatusBadge status={booking.bookingStatus} />
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-1">#{booking._id?.slice(-8).toUpperCase()}</p>
@@ -224,7 +234,7 @@ const DriverBookingDetail = () => {
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <p className="text-xs text-gray-400">Fare</p>
-              <p className="text-sm font-bold text-emerald-400">₹{booking.estimatedFare}</p>
+              <p className="text-sm font-bold text-emerald-400">₹{Number(booking.estimatedFare ?? 0).toLocaleString("en-IN")}</p>
             </div>
           </div>
 
@@ -308,6 +318,19 @@ const DriverBookingDetail = () => {
                 <CheckCircle size={18} />
               )}
               {acceptMutation.isPending ? 'Accepting...' : locCheck === 'checking' ? 'Locating…' : 'Accept Booking Request'}
+            </button>
+            <button
+              onClick={() => rejectMutation.mutate()}
+              disabled={rejectMutation.isPending || acceptMutation.isPending}
+              title="Reject request — it stays open for other drivers"
+              className="w-full py-3 bg-red-500/15 border border-red-500/25 text-red-300 font-medium rounded-xl flex items-center justify-center gap-2 hover:bg-red-500/25 transition-colors disabled:opacity-50"
+            >
+              {rejectMutation.isPending ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <Ban size={18} />
+              )}
+              {rejectMutation.isPending ? 'Rejecting…' : 'Reject Request'}
             </button>
           </div>
         )}

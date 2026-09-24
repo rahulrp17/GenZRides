@@ -47,7 +47,7 @@ const DriverHome = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard icon={Car} label="Total Trips" value={stats.totalTrips || 0} color="emerald" />
-          <StatsCard icon={TrendingUp} label="Today Earnings" value={`₹${stats.todayEarnings || 0}`} color="indigo" />
+          <StatsCard icon={TrendingUp} label="Today Earnings" value={`₹${Number(stats.todayEarnings || 0).toLocaleString('en-IN')}`} color="indigo" />
           <StatsCard icon={Star} label="Rating" value={stats.rating?.toFixed(1) || '5.0'} color="amber" />
           <StatsCard icon={Clock} label="Completed" value={stats.completedTrips || 0} color="blue" />
         </div>

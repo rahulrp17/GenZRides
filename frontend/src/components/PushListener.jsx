@@ -107,7 +107,7 @@ const PushListener = () => {
         ? ` (${booking.vehicleType.name})`
         : "";
       const fare = booking.estimatedFare
-        ? ` · ₹${booking.estimatedFare}`
+        ? ` · ₹${Number(booking.estimatedFare ?? 0).toLocaleString('en-IN')}`
         : "";
       bookingAlert(
         "New ride request",

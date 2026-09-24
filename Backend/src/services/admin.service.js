@@ -157,6 +157,59 @@ export const getDashboardStats = async () => {
     Booking.countDocuments(guestMatch),
   ]);
 
+  /* ── Accepted revenue (assigned rides only) ─────────────────── */
+  // A booking counts as accepted/assigned only when a driver is attached
+  // and the ride is neither cancelled nor rejected. Pending (never
+  // assigned), Rejected and Cancelled bookings NEVER contribute revenue.
+  // Fare per ride: finalFare once known, otherwise the estimate.
+  const acceptedMatch = (guest) => ({
+    driver: { $ne: null },
+    bookingStatus: { $ne: "Cancelled" },
+    approvalStatus: { $ne: "Rejected" },
+    ...(guest ? { guestName: { $ne: null } } : { guestName: null }),
+  });
+
+  const [instantAccepted, customerAccepted, instantPending, customerPending, acceptedRevenue] =
+    await Promise.all([
+      Booking.countDocuments(acceptedMatch(true)),
+      Booking.countDocuments(acceptedMatch(false)),
+      Booking.countDocuments({ guestName: { $ne: null }, bookingStatus: "Pending" }),
+      Booking.countDocuments({ guestName: null, bookingStatus: "Pending" }),
+      Booking.aggregate([
+        {
+          $match: {
+            driver: { $ne: null },
+            bookingStatus: { $ne: "Cancelled" },
+            approvalStatus: { $ne: "Rejected" },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $cond: [
+                { $ne: ["$guestName", null] },
+                "instant",
+                "customer",
+              ],
+            },
+            revenue: {
+              $sum: {
+                $cond: [
+                  { $gt: ["$finalFare", 0] },
+                  "$finalFare",
+                  "$estimatedFare",
+                ],
+              },
+            },
+          },
+        },
+      ]),
+    ]);
+
+  const revenueBySegment = Object.fromEntries(
+    acceptedRevenue.map((r) => [r._id, r.revenue])
+  );
+
   return {
     totalCustomers,
     totalDrivers,
@@ -191,6 +244,13 @@ export const getDashboardStats = async () => {
 
     instantBookers,
     instantBookersCount,
+
+    instantAccepted,
+    instantAcceptedRevenue: revenueBySegment.instant || 0,
+    customerAccepted,
+    customerAcceptedRevenue: revenueBySegment.customer || 0,
+    instantPending,
+    customerPending,
   };
   });
 };

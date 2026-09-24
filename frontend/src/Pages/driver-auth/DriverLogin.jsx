@@ -131,6 +131,14 @@ const DriverLogin = () => {
               {errors.password && (
                 <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
               )}
+              <div className="text-right mt-1.5">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-green-400 hover:text-green-300 hover:underline font-medium"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
             </div>
 
             <button

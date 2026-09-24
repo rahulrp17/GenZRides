@@ -127,7 +127,7 @@ const DriverWallet = () => {
                       </div>
                       <div className="text-right shrink-0">
                         <p className={`text-sm font-semibold ${tx.amount > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {tx.amount > 0 ? '+' : ''}₹{Math.abs(tx.amount)}
+                          {tx.amount > 0 ? '+' : ''}₹{Number(Math.abs(tx.amount ?? 0)).toLocaleString('en-IN')}
                         </p>
                         <p className="text-xs text-gray-400">
                           {new Date(tx.createdAt).toLocaleDateString('en-IN')}

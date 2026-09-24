@@ -25,6 +25,7 @@ import PageHero from "../../Component/Landing/PageHero";
 import { hero2 } from "../../assets/images";
 import { Reveal } from "../../Component/Landing/Reveal";
 import { formatTripDuration } from "../../utils/formatDuration";
+import { BookingStatusBadge } from "../../utils/bookingStatus";
 import { guestAPI } from "../../services/endpoints";
 
 const LIVE_POLL_MS = 10_000;
@@ -265,9 +266,12 @@ const WaitingPage = () => {
                   )}
                 </span>
                 <div className="min-w-0">
-                  <p className="font-display text-base sm:text-lg font-bold text-white">
-                    {statusBanner.title}
-                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-display text-base sm:text-lg font-bold text-white">
+                      {statusBanner.title}
+                    </p>
+                    <BookingStatusBadge status={live.bookingStatus} size="sm" />
+                  </div>
                   <p className="text-sm text-gray-400 mt-0.5 break-words">
                     {statusBanner.sub}
                   </p>
@@ -362,7 +366,7 @@ const WaitingPage = () => {
                     <span className="hidden sm:inline text-gray-500"> — tolls &amp; permits at actuals</span>
                   </span>
                 </div>
-                <span className="font-display text-2xl sm:text-3xl font-bold text-emerald-300">₹{booking.estimatedFare ?? 0}</span>
+                <span className="font-display text-2xl sm:text-3xl font-bold text-emerald-300">₹{Number(booking.estimatedFare ?? 0).toLocaleString("en-IN")}</span>
               </div>
 
               {note && (

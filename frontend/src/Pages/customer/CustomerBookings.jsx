@@ -12,18 +12,8 @@ import Pagination from '../../components/shared/Pagination';
 import Modal from '../../components/shared/Modal';
 import { formatTripDuration } from '../../utils/formatDuration';
 import CancelReasonDialog from '../../components/shared/CancelReasonDialog';
+import { BookingStatusBadge } from '../../utils/bookingStatus';
 import { motion as Motion } from 'framer-motion';
-
-const STATUS_COLORS = {
-  Pending: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
-  Accepted: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
-  'On The Way': 'bg-purple-500/20 text-purple-400 border border-purple-500/30',
-  Arrived: 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30',
-  Started: 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30',
-  Reached: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
-  Completed: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
-  Cancelled: 'bg-red-500/20 text-red-400 border border-red-500/30',
-};
 
 const CustomerBookings = () => {
   const [page, setPage] = useState(1);
@@ -205,12 +195,10 @@ const CustomerBookings = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${STATUS_COLORS[b.bookingStatus] || 'bg-white/5 text-gray-400 border border-white/10'}`}>
-                        {b.bookingStatus}
-                      </span>
+                      <BookingStatusBadge status={b.bookingStatus} size="sm" />
                     </td>
                     <td className="px-4 py-3 text-sm font-semibold text-white">
-                      ₹{b.finalFare || b.estimatedFare}
+                      ₹{Number(b.finalFare || b.estimatedFare || 0).toLocaleString('en-IN')}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1.5">
@@ -253,13 +241,11 @@ const CustomerBookings = () => {
               <div key={b._id} className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${STATUS_COLORS[b.bookingStatus] || ''}`}>
-                      {b.bookingStatus}
-                    </span>
+                    <BookingStatusBadge status={b.bookingStatus} size="sm" />
                     <span className="text-xs text-gray-400">{formatDateTime(b.pickupDateTime).split(',')[0]}</span>
                   </div>
                   <span className="text-sm font-bold text-white">
-                    ₹{b.finalFare || b.estimatedFare}
+                    ₹{Number(b.finalFare || b.estimatedFare || 0).toLocaleString('en-IN')}
                   </span>
                 </div>
                 <div className="space-y-1.5">
@@ -308,9 +294,7 @@ const CustomerBookings = () => {
         {selectedBooking && (
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-2">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${STATUS_COLORS[selectedBooking.bookingStatus]}`}>
-                {selectedBooking.bookingStatus}
-              </span>
+              <BookingStatusBadge status={selectedBooking.bookingStatus} />
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => copyBooking(selectedBooking)}
@@ -321,7 +305,7 @@ const CustomerBookings = () => {
                   {copied ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
                 </button>
                 <span className="text-xl font-bold text-white">
-                  ₹{selectedBooking.finalFare || selectedBooking.estimatedFare}
+                  ₹{Number(selectedBooking.finalFare || selectedBooking.estimatedFare || 0).toLocaleString('en-IN')}
                 </span>
               </div>
             </div>

@@ -25,18 +25,22 @@ const readLs = (key) => {
  */
 const TrackRidePanel = () => {
   const navigate = useNavigate();
-  const [ref, setRef] = useState(readLs("guestBookingRef"));
+  // Never auto-fill the booking reference: the stored value may be the full
+  // booking ID, but this field accepts only its last 8 characters.
+  const [ref, setRef] = useState("");
   const [phone, setPhone] = useState(readLs("guestBookingPhone"));
 
   const handleTrack = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const cleanRef = ref.trim().replace(/^#/, "");
+    const cleanRef = ref.trim().replace(/^#/, "").toUpperCase();
     const cleanPhone = phone.trim();
 
-    if (cleanRef.length < 6) {
-      toast.error("Enter the booking reference from your confirmation.");
+    // Last-8-characters only — validated against the existing guest lookup
+    // API, which suffix-matches the booking reference server-side.
+    if (!/^[0-9A-F]{8}$/.test(cleanRef)) {
+      toast.error("Enter the last 8 characters of your booking reference.");
       return;
     }
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
@@ -78,11 +82,19 @@ const TrackRidePanel = () => {
             </label>
             <input
               value={ref}
-              onChange={(e) => setRef(e.target.value.slice(0, 24))}
+              onChange={(e) =>
+                setRef(
+                  e.target.value
+                    .toUpperCase()
+                    .replace(/[^0-9A-F]/g, "")
+                    .slice(0, 8)
+                )
+              }
               onKeyDown={(e) => e.key === "Enter" && handleTrack(e)}
-              placeholder="e.g. 0D81F495 (from #ref)"
+              placeholder="Enter last 8 characters"
               autoComplete="off"
-              className="w-full mt-1.5 bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 transition text-[15px] font-mono"
+              maxLength={8}
+              className="w-full mt-1.5 bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 transition text-[15px] font-mono uppercase"
             />
           </div>
           <div className="min-w-0">

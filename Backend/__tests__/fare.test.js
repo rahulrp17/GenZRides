@@ -104,11 +104,14 @@ describe("Fare policy (calculateFare)", () => {
       destinationCity: "Bengaluru, Karnataka",
     });
 
-    // max(200, 1*300) = 300, doubled legs = 600 totalRunningKm
-    // chargeableDistance = 600 - 0 = 600, distanceFare = 600 * 12 = 7200
-    expect(fare.fareBreakdown.distanceFare).toBe(600 * 12);
-    // 600 > 400 threshold but round trips always use the flat bata rate
+    // Round-trip total = max(200*1, 1*300) = 300 totalRunningKm
+    // chargeableDistance = 300 - 0 = 300, distanceFare = 300 * 12 = 3600
+    expect(fare.fareBreakdown.totalRunningKm).toBe(300);
+    expect(fare.fareBreakdown.distanceFare).toBe(300 * 12);
+    // Round trips always use the flat bata rate (no slabs, no threshold)
     expect(fare.fareBreakdown.driverAllowance).toBe(400);
+    // 100 base + 3600 distance + 400 bata
+    expect(fare.estimatedFare).toBe(4100);
   });
 
   it("round trip to Bengaluru also matches the Bangalore spelling and the flag", async () => {
@@ -124,7 +127,7 @@ describe("Fare policy (calculateFare)", () => {
         days: 1,
         ...extra,
       });
-      expect(fare.fareBreakdown.distanceFare).toBe(600 * 12);
+      expect(fare.fareBreakdown.distanceFare).toBe(300 * 12);
     }
   });
 
@@ -137,11 +140,48 @@ describe("Fare policy (calculateFare)", () => {
       days: 2,
     });
 
-    // max(100, 2*250) = 500 km, doubled legs = 1000 totalRunningKm
-    // chargeableDistance = 1000 - 0 = 1000, distanceFare = 1000 * 12 = 12000
-    expect(fare.fareBreakdown.distanceFare).toBe(1000 * 12);
-    // 1000 > 400 but round trips always use the flat bata rate, 2 days
+    // Round-trip total = max(100*2, 2*250) = 500 totalRunningKm
+    // chargeableDistance = 500 - 0 = 500, distanceFare = 500 * 12 = 6000
+    expect(fare.fareBreakdown.totalRunningKm).toBe(500);
+    expect(fare.fareBreakdown.distanceFare).toBe(500 * 12);
+    // Round trips always use the flat bata rate (400/day, no slabs), 2 days
     expect(fare.fareBreakdown.driverAllowance).toBe(400 * 2);
+    // 100 base + 6000 distance + 800 bata
+    expect(fare.estimatedFare).toBe(6900);
+  });
+
+  it("prices Chennai–Trichy 2-day round trip exactly per the tariff example", async () => {
+    const sedanLike = await Vehicle.create({
+      name: "Fare Sedan Tariff",
+      seats: 4,
+      oneWayBaseFare: 1300,
+      roundTripBaseFare: 2700,
+      oneWayBaseKm: 130,
+      roundTripBaseKm: 200,
+      oneWayPerKm: 14,
+      roundTripPerKm: 14,
+      minimumDistance: 1,
+      isActive: true,
+    });
+
+    const fare = await calculateFare({
+      vehicleId: sedanLike._id,
+      distance: 326,
+      pickupDateTime: noonISO(),
+      tripType: "Round Trip",
+      days: 2,
+    });
+
+    // 326 × 2 days = 652 total (above the 2×250 minimum, so no floor);
+    // 652 − 200 baseKm = 452 chargeable; 452 × 14 = 6328 distance fare;
+    // bata = 400 × 2 = 800; total = 2700 + 6328 + 800 = 9828.
+    // Displayed billed figure = 652 − 250 = 402 (money untouched).
+    expect(fare.fareBreakdown.totalRunningKm).toBe(652);
+    expect(fare.fareBreakdown.billedDistanceKm).toBe(402);
+    expect(fare.fareBreakdown.chargeableDistance).toBe(452);
+    expect(fare.fareBreakdown.distanceFare).toBe(6328);
+    expect(fare.fareBreakdown.driverAllowance).toBe(800);
+    expect(fare.estimatedFare).toBe(9828);
   });
 
   it("waiting under 30 min is free; 45 min bills 15 min", async () => {
@@ -233,7 +273,8 @@ describe("Fare policy (calculateFare)", () => {
       destinationCity: "Bengaluru",
     });
 
-    expect(fare.fareBreakdown.billedDistanceKm).toBe(600);
+    // Displayed billed figure = total − one minimum block: 600 − 300 = 300
+    expect(fare.fareBreakdown.billedDistanceKm).toBe(300);
     expect(fare.fareBreakdown.billableDays).toBe(2);
     // Round trips always use the flat bata rate (400), not high-distance
     expect(fare.fareBreakdown.bataPerDay).toBe(400);
@@ -362,7 +403,7 @@ describe("Package-inclusive base fare (baseKm)", () => {
     expect(fare.estimatedFare).toBe(5450);
   });
 
-  it("round trip 320km each way subtracts baseKm once from total 640km", async () => {
+  it("round trip bills one-way km × days minus baseKm once", async () => {
     const fare = await calculateFare({
       vehicleId: baseKmVehicle._id,
       distance: 350,
@@ -371,12 +412,14 @@ describe("Package-inclusive base fare (baseKm)", () => {
       days: 1,
     });
 
-    // 350 * 2 = 700 total running km (above 250km/day minimum for 1 day);
-    // baseKm 50 applied once → 650 chargeable
-    // distanceFare = 650 * 15 = 9750
-    expect(fare.fareBreakdown.totalRunningKm).toBe(700);
-    expect(fare.fareBreakdown.chargeableDistance).toBe(650);
-    expect(fare.fareBreakdown.distanceFare).toBe(650 * 15);
+    // max(350*1, 1*250) = 350 total running km;
+    // baseKm 50 applied once → 300 chargeable
+    // distanceFare = 300 * 15 = 4500
+    // displayed billed figure = 350 − 250 = 100 (chargeable untouched)
+    expect(fare.fareBreakdown.totalRunningKm).toBe(350);
+    expect(fare.fareBreakdown.billedDistanceKm).toBe(100);
+    expect(fare.fareBreakdown.chargeableDistance).toBe(300);
+    expect(fare.fareBreakdown.distanceFare).toBe(300 * 15);
   });
 
   it("trip below baseKm still applies the per-day minimum floor", async () => {

@@ -118,6 +118,22 @@ const AuthSplit = ({ children, eyebrow = "GenZRides" }) => (
         transition={{ duration: 0.6 }}
         className="relative w-full max-w-md"
       >
+        {/* Clickable brand logo — mobile only (desktop shows it on the hero panel) */}
+        <Link to="/" aria-label="GenZRides home" className="lg:hidden flex items-center justify-center gap-2.5 mb-6 w-fit mx-auto">
+          <img
+            src="/logo5.png"
+            alt="GenZRides logo"
+            className="w-11 h-11 rounded-2xl object-cover ring-1 ring-green-500/40 shadow-[0_0_24px_rgba(34,197,94,0.35)]"
+          />
+          <span className="text-left leading-tight">
+            <span className="block font-display text-lg font-bold text-white tracking-tight">
+              Gen<span className="text-green-400">Z</span>Rides
+            </span>
+            <span className="block text-[10px] uppercase tracking-[0.2em] text-green-400">
+              Premium Rides
+            </span>
+          </span>
+        </Link>
         <Link
           to="/"
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-green-400 mb-6 transition-colors"

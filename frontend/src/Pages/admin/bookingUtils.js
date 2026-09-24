@@ -56,6 +56,47 @@ export const useAdminCounts = () => {
   return query;
 };
 
+// Live count of incomplete visitor bookings (abandoned holds: the guest
+// took no further action inside the 10-minute window, so the sweep marked
+// them Expired). Uses the existing visitors list endpoint — page 1,
+// limit 1 — and reads only its `total`, so no new API is needed.
+export const useIncompleteVisitorCount = () => {
+  const queryClient = useQueryClient();
+  const { socket } = useSocket();
+
+  const query = useQuery({
+    queryKey: ["incompleteVisitorCount"],
+    queryFn: async () => {
+      const { data } = await adminAPI.getVisitors({
+        page: 1,
+        limit: 1,
+        status: "Expired",
+      });
+      return data.total || 0;
+    },
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (!socket) return;
+    const refresh = () => {
+      queryClient.invalidateQueries({ queryKey: ["incompleteVisitorCount"] });
+      queryClient.invalidateQueries({ queryKey: ["adminVisitors"] });
+    };
+    const events = [
+      "visitor-created",
+      "visitor-updated",
+      "instant-booking-pending",
+      "admin-counts-updated",
+    ];
+    events.forEach((e) => socket.on(e, refresh));
+    return () => events.forEach((e) => socket.off(e, refresh));
+  }, [socket, queryClient]);
+
+  return query;
+};
+
 export const useVehicles = () => {
   const { data } = useQuery({
     queryKey: ["vehicles"],

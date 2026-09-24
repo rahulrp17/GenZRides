@@ -11,6 +11,9 @@ import {
   XCircle,
   UserPlus,
   Zap,
+  CheckCircle,
+  Users,
+  IndianRupee,
 } from "lucide-react";
 import { motion as Motion } from "framer-motion";
 import { adminAPI } from "../../services/endpoints";
@@ -24,8 +27,9 @@ import Pagination from "../../components/shared/Pagination";
 import ConfirmDialog from "../../components/shared/ConfirmDialog";
 import CancelReasonDialog from "../../components/shared/CancelReasonDialog";
 import AssignDriverDialog from "../../components/shared/AssignDriverDialog";
+import { BookingStatusBadge } from "../../utils/bookingStatus";
+import { fareTotal } from "../../utils/bookingStatusMeta";
 import {
-  QueueHero,
   QueueToolbar,
   QueueCard,
   BookingRouteSide,
@@ -33,6 +37,7 @@ import {
   RailDetailsBtn,
   BookingDetailModal,
   ApprovalBadge,
+  DriverCell,
   TripTypeBadge,
 } from "./bookingShared";
 import {
@@ -57,17 +62,6 @@ const STATUSES = [
 ];
 
 const APPROVALS = ["Pending Approval", "Approved", "Rejected"];
-
-const STATUS_STYLES = {
-  Pending: "bg-amber-500/15 text-amber-300 border-amber-400/30",
-  Accepted: "bg-blue-500/15 text-blue-300 border-blue-400/30",
-  "On The Way": "bg-cyan-500/15 text-cyan-300 border-cyan-400/30",
-  Arrived: "bg-sky-500/15 text-sky-300 border-sky-400/30",
-  Started: "bg-violet-500/15 text-violet-300 border-violet-400/30",
-  Reached: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
-  Completed: "bg-green-500/15 text-green-300 border-green-400/30",
-  Cancelled: "bg-rose-500/15 text-rose-300 border-rose-400/30",
-};
 
 const REJECT_REASONS = [
   "Duplicate request",
@@ -115,6 +109,19 @@ const AdminInstantBookings = () => {
   const vehicleTypes = useVehicles();
   const drivers = useApprovedDrivers();
 
+  // Accepted-revenue hero numbers reuse the shared dashboard cache —
+  // no extra endpoint, same socket-invalidated data as /admin.
+  const { data: dashData } = useQuery({
+    queryKey: ["adminDashboard"],
+    queryFn: async () => {
+      const { data } = await adminAPI.getDashboard();
+      return data;
+    },
+    staleTime: 30_000,
+  });
+  const dash = dashData?.stats || {};
+  const inr = (n) => `₹${Number(n || 0).toLocaleString("en-IN")}`;
+
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: [
       "adminInstantBookings",
@@ -144,6 +151,7 @@ const AdminInstantBookings = () => {
       queryClient.invalidateQueries({ queryKey: ["adminInstantBookings"] });
       queryClient.invalidateQueries({ queryKey: ["adminInstantRequests"] });
       queryClient.invalidateQueries({ queryKey: ["adminCounts"] });
+      queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
       if (update?._id) {
         setSelectedBooking((prev) =>
           prev && prev._id === update._id ? { ...prev, ...update } : prev,
@@ -357,6 +365,7 @@ const AdminInstantBookings = () => {
         </div>
       ),
     },
+    { header: "Driver", cell: (b) => <DriverCell b={b} /> },
     {
       header: "Route",
       cell: (b) => (
@@ -380,17 +389,18 @@ const AdminInstantBookings = () => {
     },
     {
       header: "Status",
-      cell: (b) => (
-        <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap border ${STATUS_STYLES[b.bookingStatus] || STATUS_STYLES.Pending}`}>
-          {b.bookingStatus}
-        </span>
-      ),
+      cell: (b) => <BookingStatusBadge status={b.bookingStatus} size="sm" />,
     },
     {
       header: "Fare",
       tdClassName: "text-right",
       thClassName: "text-right",
-      cell: (b) => <span className="font-bold text-white tabular-nums whitespace-nowrap">₹{(b.estimatedFare ?? 0).toLocaleString("en-IN")}</span>,
+      cell: (b) => (
+        <span className="block tabular-nums whitespace-nowrap">
+          <span className="block text-[11px] text-gray-500">Approx ₹{(b.estimatedFare ?? 0).toLocaleString("en-IN")}</span>
+          <span className="block font-bold text-white">₹{fareTotal(b).toLocaleString("en-IN")}</span>
+        </span>
+      ),
     },
     {
       header: "Actions",
@@ -410,20 +420,63 @@ const AdminInstantBookings = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-4 sm:space-y-6 min-w-0"
     >
-      <QueueHero
-        icon={Zap}
-        eyebrow="Live ledger · all guest bookings"
-        title="Instant Customer Bookings"
-        subtitle="Verify pending holds, assign approved rides, complete or cancel — updates live."
-        stats={[
-          { label: "Total instant", value: data?.total ?? 0 },
-          { label: "Page", value: `${data?.page ?? 1}/${data?.totalPages ?? 1}` },
-          { label: "Drivers online", value: drivers.filter((d) => d.isOnline).length, accent: "text-emerald-300" },
-        ]}
-        loading={isLoading}
-        refreshing={isFetching}
-        onRefresh={() => refetch()}
-      />
+      {/* ── Hero panel (compact) — same style as Customer Bookings ── */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-emerald-500/15 via-white/5 to-transparent p-4 sm:p-5">
+        <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/20 blur-[100px]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent" />
+        <div className="relative min-w-0 flex flex-wrap items-center gap-x-4 gap-y-1">
+          <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
+            <Zap size={12} /> Instant Ops
+          </p>
+          <h1 className="font-display text-lg sm:text-xl font-bold text-white tracking-tight">
+            Instant Customer Bookings
+          </h1>
+          <p className="text-[11px] sm:text-xs text-gray-400 w-full">
+            Verify pending holds, assign approved rides, complete or cancel — updates live. Accepted revenue counts assigned rides only.
+          </p>
+        </div>
+        <div className="relative mt-3 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          {[
+            {
+              label: "Total instant",
+              value: dash.instantBookersCount ?? data?.total ?? "–",
+              icon: Zap,
+              tint: "text-emerald-300",
+            },
+            {
+              label: "Accepted",
+              value: dash.instantAccepted ?? "–",
+              icon: CheckCircle,
+              tint: "text-emerald-300",
+            },
+            {
+              label: "Accepted Revenue",
+              value: inr(dash.instantAcceptedRevenue),
+              icon: IndianRupee,
+              tint: "text-green-300",
+            },
+            {
+              label: "Drivers online",
+              value: drivers.filter((d) => d.isOnline).length,
+              icon: Users,
+              tint: "text-sky-300",
+            },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className="bg-black/30 border border-white/10 rounded-2xl px-3 py-2 min-w-0"
+            >
+              <p className="flex items-center gap-1.5 text-[10px] text-gray-400 truncate">
+                <s.icon size={12} className={s.tint} />
+                {s.label}
+              </p>
+              <p className="text-base sm:text-lg font-bold text-white leading-tight mt-0.5 truncate">
+                {s.value}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <QueueToolbar
         search={search}
@@ -531,7 +584,7 @@ const AdminInstantBookings = () => {
               ))}
             </div>
           ) : (
-            <GlassTable columns={bookingColumns} rows={bookings} rowKey={(b) => b._id} />
+            <GlassTable columns={bookingColumns} rows={bookings} rowKey={(b) => b._id} density="compact" />
           )}
           <Pagination
             page={data?.page || 1}

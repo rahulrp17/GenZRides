@@ -30,6 +30,7 @@ import {
   RailDetailsBtn,
   BookingDetailModal,
   ApprovalBadge,
+  DriverCell,
   TripTypeBadge,
 } from "./bookingShared";
 import {
@@ -238,6 +239,7 @@ const AdminInstantBookingRequests = () => {
         </div>
       ),
     },
+    { header: "Driver", cell: (b) => <DriverCell b={b} /> },
     {
       header: "Route",
       cell: (b) => (
@@ -349,7 +351,7 @@ const AdminInstantBookingRequests = () => {
           ))}
         </div>
       ) : (
-        <GlassTable columns={requestColumns} rows={bookings} rowKey={(b) => b._id} />
+        <GlassTable columns={requestColumns} rows={bookings} rowKey={(b) => b._id} density="compact" />
       )}
 
       <BookingDetailModal

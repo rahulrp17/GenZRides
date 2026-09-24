@@ -32,10 +32,13 @@ const driverCancelBookingSchema = z.object({
   cancelReason: z.string().min(1, 'Cancel reason is required').max(500, 'Cancel reason must be at most 500 characters'),
 });
 
+// Driver records the cash the customer handed over (no more
+// Paid/Unpaid toggle — the entered amount IS the payment).
 const updatePaymentSchema = z.object({
-  paymentStatus: z.enum(['Paid', 'Unpaid'], {
-    errorMap: () => ({ message: 'Payment status must be Paid or Unpaid' }),
-  }),
+  amount: z
+    .number({ errorMap: () => ({ message: 'Amount must be a number' }) })
+    .min(1, 'Collected amount must be at least ₹1')
+    .max(100000, 'Collected amount looks too high'),
 });
 
 const addTipSchema = z.object({

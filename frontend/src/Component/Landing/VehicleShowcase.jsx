@@ -115,7 +115,7 @@ const VehicleShowcase = () => {
                       <div>
                         <p className="text-[11px] uppercase tracking-widest text-gray-500">Starting from</p>
                         <p className="font-display text-2xl font-bold text-white">
-                          ₹{v.oneWayBaseFare}
+                          ₹{Number(v.oneWayBaseFare ?? 0).toLocaleString("en-IN")}
                           <span className="text-xs font-medium text-gray-400 ml-1.5">
                             + ₹{v.oneWayPerKm}/km
                           </span>

@@ -16,8 +16,13 @@ import {
   Eye,
   Copy,
   Check,
+  Mail,
+  Phone,
+  Navigation,
 } from "lucide-react";
 import { motion as Motion } from "framer-motion";
+import { BookingStatusBadge } from "../../utils/bookingStatus";
+import { fareTotal } from "../../utils/bookingStatusMeta";
 import { useCopyBooking } from "../../utils/bookingText";
 import { formatTripDuration } from "../../utils/formatDuration";
 import Modal from "../../components/shared/Modal";
@@ -192,10 +197,25 @@ export const QueueToolbar = ({
   </div>
 );
 
+// Shared driver cell: assigned name or the "Driver Not Assigned" fallback.
+// Pages spread it as `{ header: "Driver", cell: (b) => <DriverCell b={b} /> }`.
+export const DriverCell = ({ b }) => (
+  <div className="min-w-[130px] max-w-[190px]">
+    {b.driver?.user?.name ? (
+      <>
+        <p className="text-[13px] font-semibold text-white truncate">{b.driver.user.name}</p>
+        <p className="text-[11px] text-gray-500 truncate">{b.driver.user.phone || ""}</p>
+      </>
+    ) : (
+      <p className="text-[13px] text-gray-500 italic whitespace-nowrap">Driver Not Assigned</p>
+    )}
+  </div>
+);
+
 // Left (route) side of a queue card: badges, timeline, chips.
 export const BookingRouteSide = ({ b, showApproval }) => (
-  <div className="p-4 sm:p-5 min-w-0">
-    <div className="flex flex-wrap items-center gap-1.5 mb-3 min-w-0">
+  <div className="p-3.5 sm:p-4 min-w-0">
+    <div className="flex flex-wrap items-center gap-1.5 mb-2.5 min-w-0">
       <TripTypeBadge type={b.tripType} />
       {showApproval && <ApprovalBadge value={b.approvalStatus} />}
       <span className="font-mono text-[14px] bg-green-400/15 border border-green-400/25 rounded-full px-2 py-0.5 text-green-500">
@@ -212,7 +232,7 @@ export const BookingRouteSide = ({ b, showApproval }) => (
       </span>
     </div>
 
-    <div className="relative pl-5 space-y-3 min-w-0">
+    <div className="relative pl-5 space-y-2.5 min-w-0">
       <span
         aria-hidden
         className="absolute left-[5px] top-2 bottom-2 w-px bg-gradient-to-b from-green-400/70 via-white/15 to-red-400/70"
@@ -243,16 +263,16 @@ export const BookingRouteSide = ({ b, showApproval }) => (
       </div>
     </div>
 
-    <div className="flex flex-wrap gap-1.5 mt-3">
+    <div className="flex flex-wrap gap-1.5 mt-2.5">
       {(b.vehicleType?.name || b.driver?.vehicleType?.name) && (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300 max-w-full">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300 max-w-full">
           <Car size={12} className="text-violet-400 shrink-0" />
           <span className="truncate">
             {b.vehicleType?.name || b.driver?.vehicleType?.name}
           </span>
         </span>
       )}
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300 max-w-full">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300 max-w-full">
         <User size={12} className="text-emerald-400 shrink-0" />
         <span className="truncate">
           {customerName(b)}
@@ -260,13 +280,13 @@ export const BookingRouteSide = ({ b, showApproval }) => (
         </span>
       </span>
       {b.distance != null && (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
           <MapPin size={12} className="text-sky-400 shrink-0" />
           {Number(b.distance).toFixed(1)} km
         </span>
       )}
       {b.paymentMethod && (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
           <Wallet size={12} className="text-amber-400 shrink-0" />
           {b.paymentMethod}
         </span>
@@ -277,13 +297,13 @@ export const BookingRouteSide = ({ b, showApproval }) => (
 
 // Right (fare) rail of a queue card; action buttons go in as children.
 export const BookingFareRail = ({ b, children }) => (
-  <div className="relative flex sm:flex-col items-center sm:items-stretch justify-between gap-3 px-4 py-3.5 sm:p-5 bg-gradient-to-br from-green-500/15 via-green-500/5 to-transparent border-t sm:border-t-0 sm:border-l border-white/10 min-w-0">
+  <div className="relative flex sm:flex-col items-center sm:items-stretch justify-between gap-2.5 px-4 py-3 sm:p-4 bg-gradient-to-br from-green-500/15 via-green-500/5 to-transparent border-t sm:border-t-0 sm:border-l border-white/10 min-w-0">
     {b?.estimatedFare != null && (
       <div className="min-w-0 sm:text-right">
         <p className="text-[10px] uppercase tracking-[0.12em] text-gray-400 font-semibold">
           Est. fare
         </p>
-        <p className="text-2xl sm:text-[26px] font-bold bg-gradient-to-r from-green-300 via-green-200 to-green-400 bg-clip-text text-transparent leading-tight">
+        <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-300 via-green-200 to-green-400 bg-clip-text text-transparent leading-tight">
           ₹{(b.estimatedFare ?? 0).toLocaleString("en-IN")}
         </p>
       </div>
@@ -311,6 +331,7 @@ export const RailDetailsBtn = ({ onClick }) => (
 // Detail modal shared by all booking queues; footer actions via prop.
 export const BookingDetailModal = ({ booking: b, onClose, footer }) => {
   const { copied, copyBooking } = useCopyBooking();
+  const contactEmail = b?.customer?.email || b?.guestEmail || "";
   return (
     <Modal
       isOpen={!!b}
@@ -319,12 +340,13 @@ export const BookingDetailModal = ({ booking: b, onClose, footer }) => {
       maxWidth="max-w-xl"
     >
       {b && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <p className="text-sm font-semibold text-white">
               #{b._id?.slice(-8).toUpperCase()}
             </p>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <BookingStatusBadge status={b.bookingStatus} size="sm" />
               <ApprovalBadge value={b.approvalStatus} />
               <button
                 onClick={() => copyBooking(b)}
@@ -341,49 +363,88 @@ export const BookingDetailModal = ({ booking: b, onClose, footer }) => {
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2.5">
-            {[
-              ["Status", b.bookingStatus],
-              [
-                "Cab Type",
-                b.vehicleType?.name || b.driver?.vehicleType?.name || "—",
-              ],
-              ["Payment", `${b.paymentMethod || "—"} · ${b.paymentStatus || "—"}`],
-              [
-                "Distance",
-                b.distance != null ? `${Number(b.distance).toFixed(1)} km` : "—",
-              ],
-              ["Duration", formatTripDuration(b.duration)],
-              ["Fare", `₹${b.estimatedFare ?? 0}`],
-              ["Trip Type", b.tripType || "One Way"],
-              ["Booked On", formatDateTime(b.createdAt)],
-            ].map(([label, value]) => (
-              <div key={label} className="bg-white/5 rounded-2xl p-3">
-                <p className="text-[11px] text-gray-500">{label}</p>
-                <p className="font-medium text-white text-sm">{value}</p>
+
+          {/* Customer */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+            <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold flex items-center gap-1.5 mb-2">
+              <User size={12} className="text-emerald-400" /> Customer
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              <span className="inline-flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-full px-3 py-1.5 text-[13px] text-gray-200 min-w-0 max-w-full">
+                <User size={12} className="text-emerald-400 shrink-0" />
+                <span className="truncate">{customerName(b)}</span>
+              </span>
+              {customerPhone(b) && (
+                <a href={`tel:${customerPhone(b)}`} className="inline-flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-full px-3 py-1.5 text-[13px] text-gray-200 hover:border-green-500/50 hover:text-green-300 transition">
+                  <Phone size={12} className="text-green-400 shrink-0" /> {customerPhone(b)}
+                </a>
+              )}
+              {contactEmail && (
+                <span className="inline-flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-full px-3 py-1.5 text-[13px] text-gray-200 min-w-0 max-w-full">
+                  <Mail size={12} className="text-blue-400 shrink-0" />
+                  <span className="truncate">{contactEmail}</span>
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Trip */}
+          <div className="bg-gradient-to-br from-emerald-500/10 via-white/5 to-transparent border border-emerald-500/20 rounded-2xl p-3.5">
+            <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold mb-2">Trip</p>
+            <div className="relative pl-4 space-y-2 text-[13px]">
+              <span aria-hidden className="absolute left-[4px] top-1 bottom-1 w-px bg-gradient-to-b from-green-400/70 via-white/15 to-red-400/70" />
+              <div className="relative min-w-0">
+                <span aria-hidden className="absolute left-[-15px] top-1 w-[9px] h-[9px] rounded-full bg-green-400 ring-4 ring-green-400/20" />
+                <p className="text-white font-medium break-words">{b.pickup?.address}</p>
               </div>
-            ))}
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-start gap-2">
-              <MapPin size={14} className="text-green-400 mt-0.5 shrink-0" />
-              <p className="text-sm text-gray-300 break-words">{b.pickup?.address}</p>
+              <div className="relative min-w-0">
+                <span aria-hidden className="absolute left-[-15px] top-1 w-[9px] h-[9px] rounded-full bg-red-400 ring-4 ring-red-400/20" />
+                <p className="text-white font-medium break-words">{b.drop?.address}</p>
+              </div>
             </div>
-            <div className="flex items-start gap-2">
-              <MapPin size={14} className="text-red-400 mt-0.5 shrink-0" />
-              <p className="text-sm text-gray-300 break-words">{b.drop?.address}</p>
+            <div className="mt-2.5 flex flex-wrap gap-1.5 text-[12px]">
+              <span className="inline-flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300">
+                <Clock size={12} className="text-blue-400 shrink-0" />
+                {formatDateTime(b.pickupDateTime)}
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300">
+                <Car size={12} className="text-violet-400 shrink-0" />
+                {b.vehicleType?.name || b.driver?.vehicleType?.name || "—"}
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300">
+                <Navigation size={12} className="text-sky-400 shrink-0" />
+                {b.tripType || "One Way"}
+                {b.distance != null ? ` · ${Number(b.distance).toFixed(1)} km` : ""}
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-300 min-w-0">
-            <User size={14} className="shrink-0" />
-            <span className="truncate">
-              Customer: {customerName(b)}
-              {customerPhone(b) ? ` · ${customerPhone(b)}` : ""}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-300">
-            <Clock size={14} className="shrink-0" />
-            <span>Scheduled: {formatDateTime(b.pickupDateTime)}</span>
+
+          {/* Fare & driver */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white/5 rounded-2xl p-3">
+              <p className="text-[11px] text-gray-500">Total Fare</p>
+              <p className="font-bold text-white text-sm">₹{fareTotal(b).toLocaleString("en-IN")}</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">Approx ₹{(b.estimatedFare ?? 0).toLocaleString("en-IN")} · {b.paymentMethod || "Cash"} · {b.paymentStatus || "Pending"}</p>
+            </div>
+            <div className="bg-white/5 rounded-2xl p-3 min-w-0">
+              <p className="text-[11px] text-gray-500">Driver</p>
+              {b.driver?.user?.name ? (
+                <>
+                  <p className="font-bold text-white text-sm truncate">{b.driver.user.name}</p>
+                  <p className="text-[11px] text-gray-500 mt-0.5 truncate">{b.driver.user.phone || ""}</p>
+                </>
+              ) : (
+                <p className="font-medium text-gray-500 text-sm italic">Driver Not Assigned</p>
+              )}
+            </div>
+            <div className="bg-white/5 rounded-2xl p-3">
+              <p className="text-[11px] text-gray-500">Duration</p>
+              <p className="font-medium text-white text-sm">{formatTripDuration(b.duration)}</p>
+            </div>
+            <div className="bg-white/5 rounded-2xl p-3">
+              <p className="text-[11px] text-gray-500">Booked On</p>
+              <p className="font-medium text-white text-sm">{formatDateTime(b.createdAt)}</p>
+            </div>
           </div>
           {b.customerNotes && (
             <p className="text-xs text-gray-400 bg-white/5 border border-white/10 rounded-2xl p-3">

@@ -76,7 +76,7 @@ const WalletPage = () => {
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-semibold text-red-400">-₹{b.finalFare}</p>
+                  <p className="text-sm font-semibold text-red-400">-₹{Number(b.finalFare ?? 0).toLocaleString('en-IN')}</p>
                   <p className="text-xs text-gray-400">
                     {new Date(b.completedAt || b.updatedAt).toLocaleDateString('en-IN')}
                   </p>

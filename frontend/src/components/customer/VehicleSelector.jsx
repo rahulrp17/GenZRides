@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion as Motion } from "framer-motion";
-import { Car, Users, Luggage, Snowflake, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { Car, Users, Luggage, Snowflake, ChevronDown, ChevronUp, Loader2, Receipt } from "lucide-react";
 import { sedan, innova } from "../../assets/images";
 import { formatTripDuration } from "../../utils/formatDuration";
 
@@ -41,20 +41,8 @@ const SkeletonCard = () => (
   </div>
 );
 
-const FareBreakdownRow = ({ label, value, bold = false, large = false }) => (
-  <div className={`flex justify-between items-center ${large ? "pt-2 border-t border-white/10" : ""}`}>
-    <span className={`${bold ? "font-semibold text-white" : "text-gray-400"} ${large ? "text-base" : "text-sm"}`}>
-      {label}
-    </span>
-    <span
-      className={`${bold ? "font-bold text-green-400" : "font-medium text-gray-300"} ${large ? "text-lg" : "text-sm"}`}
-    >
-      {value}
-    </span>
-  </div>
-);
-
-const formatCurrency = (n) => `₹${Number(n ?? 0).toFixed(2)}`;
+const formatCurrency = (n) =>
+  `₹${Number(n ?? 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const perKmLabel = (n) =>
   n == null
@@ -101,13 +89,29 @@ const VehicleSelector = ({
 
   const fareBreakdown = fareEstimate?.fareBreakdown;
 
+  // Billed figure comes straight from the backend (billedDistanceKm
+  // already nets the daily-minimum block on round trips). totalRunningKm
+  // is only used for the minimum-floor check.
+  const vsLegs = tripType === "Round Trip" ? 2 : 1;
+  const vsBilledTotal =
+    fareBreakdown?.billedDistanceKm ??
+    fareBreakdown?.totalRunningKm ??
+    fareEstimate?.distance;
+  const vsRunningTotal =
+    fareBreakdown?.totalRunningKm ??
+    fareBreakdown?.billedDistanceKm ??
+    fareEstimate?.distance;
+  const vsMinimumApplied =
+    (fareEstimate?.distance ?? 0) > 0 &&
+    (vsRunningTotal ?? 0) > vsLegs * fareEstimate.distance;
+
   return (
     <div>
       <Motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible"
+        className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-2 md:overflow-x-visible"
       >
         {vehicles.map((vehicle) => {
           const isSelected = selectedVehicle === vehicle._id;
@@ -128,7 +132,7 @@ const VehicleSelector = ({
               whileTap={{ scale: 0.98 }}
               onClick={() => onSelect(vehicle._id)}
               className={`
-                relative flex-shrink-0 w-[200px] md:w-auto bg-white/5 backdrop-blur-lg rounded-xl border-2 p-4 cursor-pointer
+                relative flex-shrink-0 w-[200px] md:w-[230px] bg-white/5 backdrop-blur-lg rounded-xl border-2 p-4 cursor-pointer
                 transition-colors duration-200 select-none
                 ${isSelected ? "border-green-500 bg-green-500/10 shadow-md" : "border-white/10 hover:border-white/20 hover:shadow"}
               `}
@@ -186,10 +190,10 @@ const VehicleSelector = ({
 
               <div className="border-t border-white/10 pt-2">
                 {cardTotal != null ? (
-                  <p className={`text-lg font-bold ${isSelected ? "text-green-400" : "text-white"}`}>₹{cardTotal}</p>
+                  <p className={`text-lg font-bold ${isSelected ? "text-green-400" : "text-white"}`}>₹{Number(cardTotal ?? 0).toLocaleString("en-IN")}</p>
                 ) : (
                   <p className="text-sm font-semibold text-gray-300">
-                    ₹{vehicle.oneWayBaseFare} <span className="text-xs font-normal text-gray-500">base</span>
+                    ₹{Number(vehicle.oneWayBaseFare ?? 0).toLocaleString("en-IN")} <span className="text-xs font-normal text-gray-500">base</span>
                   </p>
                 )}
               </div>
@@ -221,7 +225,7 @@ const VehicleSelector = ({
           >
             <span className="text-sm font-semibold text-gray-300">Fare Breakdown</span>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-green-400">₹{fareBreakdown.total}</span>
+              <span className="text-sm font-bold text-green-400">₹{Number(fareBreakdown.total ?? 0).toLocaleString("en-IN")}</span>
               {breakdownOpen ? (
                 <ChevronUp size={16} className="text-gray-500" />
               ) : (
@@ -236,64 +240,116 @@ const VehicleSelector = ({
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="px-4 pb-4 space-y-2"
+              className="px-4 pb-4 text-sm"
             >
-              <FareBreakdownRow label="Base fare" value={formatCurrency(fareBreakdown.baseFare)} />
-              {fareEstimate.perKm != null && (
-                <FareBreakdownRow
-                  label={
-                    tripType === "Round Trip"
-                      ? "Round trip base fare per km"
-                      : "One way base fare per km"
-                  }
-                  value={perKmLabel(fareEstimate.perKm)}
-                />
-              )}
-              <FareBreakdownRow
-                label={fareBreakdown.baseKm > 0 && fareBreakdown.chargeableDistance < fareBreakdown.billedDistanceKm
-                  ? `Distance fare (${fareBreakdown.chargeableDistance} km billed · ${fareBreakdown.baseKm} km included in base fare)`
-                  : "Distance fare"}
-                value={formatCurrency(fareBreakdown.distanceFare)}
-              />
-              {fareBreakdown.billedDistanceKm != null &&
-                fareEstimate.distance != null &&
-                Number(fareBreakdown.billedDistanceKm) >
-                  Number(fareEstimate.distance) && (
-                  <FareBreakdownRow
-                    label="Billed distance"
-                    value={`${Number(fareBreakdown.billedDistanceKm).toFixed(1)} km (minimum applied)`}
-                  />
-                )}
-              {fareBreakdown.driverAllowance > 0 && (
-                <FareBreakdownRow
-                  label={`Driver bata${fareBreakdown.bataPerDay ? ` (₹${fareBreakdown.bataPerDay}/day${fareBreakdown.billableDays > 1 ? ` × ${fareBreakdown.billableDays} days` : ""})` : ""}`}
-                  value={formatCurrency(fareBreakdown.driverAllowance)}
-                />
-              )}
-              {fareBreakdown.waitingCharge > 0 && (
-                <FareBreakdownRow label="Waiting charge (first 30 min free)" value={formatCurrency(fareBreakdown.waitingCharge)} />
-              )}
-              {fareBreakdown.nightCharge > 0 && (
-                <FareBreakdownRow label="Night charge" value={formatCurrency(fareBreakdown.nightCharge)} />
-              )}
-              {fareBreakdown.airportCharge > 0 && (
-                <FareBreakdownRow label="Airport charge" value={formatCurrency(fareBreakdown.airportCharge)} />
-              )}
-              {fareBreakdown.tollCharges > 0 && (
-                <FareBreakdownRow label="Toll charges" value={formatCurrency(fareBreakdown.tollCharges)} />
-              )}
-              {fareBreakdown.permitCharges > 0 && (
-                <FareBreakdownRow label="Permit charges" value={formatCurrency(fareBreakdown.permitCharges)} />
-              )}
-              <FareBreakdownRow label="Distance" value={`${fareEstimate.distance?.toFixed(1)} km`} />
+              
+              <div className="flex items-center justify-between gap-3 pb-2 pt-3 border-b border-dashed border-white/15">
+                <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-gray-400 font-semibold">
+                  <Receipt size={13} className="text-emerald-400" /> Trip invoice
+                </span>
+                <span className="text-[11px] text-gray-500 tabular-nums">
+                  {fareEstimate.distance?.toFixed(1)} km · {formatTripDuration(fareEstimate.duration)}
+                </span>
+              </div>
               {tripType === "Round Trip" && days > 1 && (
-                <FareBreakdownRow
-                  label={`Total distance (${days} days)`}
-                  value={`${(fareEstimate.distance * days).toFixed(1)} km`}
-                />
-              )}
-              <FareBreakdownRow label="Duration" value={formatTripDuration(fareEstimate.duration)} />
-              <FareBreakdownRow label="Total" value={formatCurrency(fareBreakdown.total)} bold large />
+                  <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                    <span className="text-gray-300">Total distance ({days} days){vsMinimumApplied ? " (minimum applied)" : ""}
+                      <span className="block text-[11px] text-gray-500 font-normal">{fareEstimate.distance?.toFixed(1)} km * {days} days</span>
+                    </span>
+                    <span className="text-gray-200 font-medium tabular-nums shrink-0">{(vsRunningTotal ?? 0).toFixed(1)} km</span>
+                  </div>
+                )}
+               {(tripType === "Round Trip" || vsMinimumApplied) && vsBilledTotal != null && (
+                  <div className="flex justify-between gap-3 py-1.5 border-b-2  border-white/30">
+                    <span className="text-gray-300">
+                      Billed distance
+                      
+                        <span className="block text-[11px] text-gray-500 font-normal">{vsRunningTotal?.toFixed(1)} km - {fareBreakdown.baseKm} Km</span>
+                      
+                    </span>
+                    <span className="text-gray-200 font-medium tabular-nums shrink-0">{Number(vsBilledTotal).toFixed(1)} km</span>
+                  </div>
+                )}
+              <div className="py-1">
+                <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                  <span className="text-gray-300">
+                    Base fare
+                    {fareBreakdown.baseKm > 0 && (
+                      <span className="block text-[11px] text-gray-500 font-normal">first {fareBreakdown.baseKm} km included</span>
+                    )}
+                  </span>
+                  <span className="text-gray-200 font-medium tabular-nums shrink-0">{formatCurrency(fareBreakdown.baseFare)}</span>
+                </div>
+                <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                  <span className="text-gray-300">
+                    Distance fare
+                    {fareBreakdown.chargeableDistance > 0 && fareEstimate.perKm != null && (
+                      <span className="block text-[11px] text-gray-500 font-normal">{fareBreakdown.chargeableDistance} km × {perKmLabel(fareEstimate.perKm)}</span>
+                    )}
+                  </span>
+                  <span className="text-gray-200 font-medium tabular-nums shrink-0">{formatCurrency(fareBreakdown.distanceFare)}</span>
+                </div>
+               
+                {fareBreakdown.driverAllowance > 0 && (
+                  <div className="flex justify-between gap-3 py-1.5 border-b-2 border-white/30">
+                    <span className="text-gray-300">
+                      Driver bata
+                      <span className="block text-[11px] text-gray-500 font-normal">driver food & stay{fareBreakdown.bataPerDay ? ` · ₹${fareBreakdown.bataPerDay}/day${fareBreakdown.billableDays > 1 ? ` × ${fareBreakdown.billableDays} days` : ""}` : ""}</span>
+                    </span>
+                    <span className="text-gray-200 font-medium tabular-nums shrink-0">{formatCurrency(fareBreakdown.driverAllowance)}</span>
+                  </div>
+                )}
+                {fareBreakdown.waitingCharge > 0 && (
+                  <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                    <span className="text-gray-300">
+                      Waiting fee
+                      <span className="block text-[11px] text-gray-500 font-normal">first 30 min free</span>
+                    </span>
+                    <span className="text-gray-200 font-medium tabular-nums shrink-0">{formatCurrency(fareBreakdown.waitingCharge)}</span>
+                  </div>
+                )}
+                {fareBreakdown.nightCharge > 0 && (
+                  <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                    <span className="text-gray-300">Night charge</span>
+                    <span className="text-gray-200 font-medium tabular-nums shrink-0">{formatCurrency(fareBreakdown.nightCharge)}</span>
+                  </div>
+                )}
+                {fareBreakdown.airportCharge > 0 && (
+                  <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                    <span className="text-gray-300">
+                      Airport charge
+                      <span className="block text-[11px] text-gray-500 font-normal">airport pickup / drop fee</span>
+                    </span>
+                    <span className="text-gray-200 font-medium tabular-nums shrink-0">{formatCurrency(fareBreakdown.airportCharge)}</span>
+                  </div>
+                )}
+                {fareBreakdown.tollCharges > 0 && (
+                  <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                    <span className="text-gray-300">
+                      Toll charges
+                      <span className="block text-[11px] text-gray-500 font-normal">toll plazas on your route</span>
+                    </span>
+                    <span className="text-gray-200 font-medium tabular-nums shrink-0">{formatCurrency(fareBreakdown.tollCharges)}</span>
+                  </div>
+                )}
+                {fareBreakdown.permitCharges > 0 && (
+                  <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                    <span className="text-gray-300">
+                      Permit charges
+                      <span className="block text-[11px] text-gray-500 font-normal">interstate permit, if applicable</span>
+                    </span>
+                    <span className="text-gray-200 font-medium tabular-nums shrink-0">{formatCurrency(fareBreakdown.permitCharges)}</span>
+                  </div>
+                )}
+                
+              </div>
+              <div className="flex justify-between items-center gap-3 pt-2.5">
+                <span className="font-semibold text-white">
+                  Amount payable
+                  <span className="block text-[11px] text-gray-500 font-normal">pay cash to the driver for toll and permit charges</span>
+                </span>
+                <span className="font-display text-lg font-bold text-green-400 tabular-nums">{formatCurrency(fareBreakdown.total)}</span>
+              </div>
             </Motion.div>
           )}
         </Motion.div>

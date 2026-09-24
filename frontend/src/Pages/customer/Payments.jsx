@@ -64,7 +64,7 @@ const Payments = () => {
                     <td className="px-6 py-4 text-sm text-gray-400">
                       {new Date(p.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-white">₹{(p.amount / 100).toFixed(2)}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-white">₹{Number(p.amount / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td className="px-6 py-4 text-sm text-gray-400">{p.method || 'N/A'}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[p.status]}`}>{p.status}</span>
@@ -84,7 +84,7 @@ const Payments = () => {
             {payments.map((p) => (
               <div key={p._id} className="bg-white/5 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/10 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-1 min-w-0">
-                  <span className="text-sm font-semibold text-white shrink-0">₹{(p.amount / 100).toFixed(2)}</span>
+                  <span className="text-sm font-semibold text-white shrink-0">₹{Number(p.amount / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0 ${statusColors[p.status]}`}>{p.status}</span>
                 </div>
                 <div className="flex items-center justify-between gap-2 text-xs text-gray-400 mb-3">
@@ -108,7 +108,7 @@ const Payments = () => {
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-white/5 rounded-lg p-3">
                 <p className="text-xs text-gray-400">Amount</p>
-                <p className="text-lg font-bold text-white">₹{(selectedPayment.amount / 100).toFixed(2)}</p>
+                <p className="text-lg font-bold text-white">₹{Number(selectedPayment.amount / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
               <div className="bg-white/5 rounded-lg p-3">
                 <p className="text-xs text-gray-400">Status</p>

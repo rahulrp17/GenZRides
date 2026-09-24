@@ -11,7 +11,7 @@ const DriverCustomerRequests = () => (
     title="Customer Booking Requests"
     subtitle="Registered-customer rides for your cab type. Fresh requests auto-refresh every 10 seconds."
     liveSubtitle="Socket live · polling every 10s as backup"
-    actionLabel="View & Accept"
+    actionLabel="View"
     emptyTitle="No customer requests"
     emptyDescription="There are no registered-customer rides for your cab type right now. Check back later."
   />

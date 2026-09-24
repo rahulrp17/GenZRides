@@ -19,7 +19,16 @@ import {
 import { DateInput, TimeInput } from "@mantine/dates";
 import { NumberInput } from "@mantine/core";
 import { guestAPI } from "../../services/endpoints";
-import { loadDraft, saveDraft, minPickupISO } from "./guestDraft";
+import { loadDraft, saveDraft, minPickupISO, toLocalInputValue } from "./guestDraft";
+
+// Default pickup shown to first-time visitors: today's date with the time
+// set to current time + 1 hour (same Date rolls the day over past midnight,
+// so the pair is always safely past the 30-minute minimum).
+const defaultPickupAt = () => {
+  const d = new Date(Date.now() + 60 * 60 * 1000);
+  d.setSeconds(0, 0);
+  return toLocalInputValue(d);
+};
 import TrackRidePanel from "./TrackRidePanel";
 import RideMap from "../../components/customer/RideMap";
 import {
@@ -357,8 +366,10 @@ function DateTimeField({ id, label, value, minDate, minTime, onChange }) {
   }, [value]);
 
   const combine = (d, t) => {
-    if (!d) return "";
-    const [h, m] = (t || "00:00").split(":").map(Number);
+    // Never invent a time: a picked date without a picked time stays empty
+    // so validation asks for both instead of silently using midnight.
+    if (!d || !t) return "";
+    const [h, m] = t.split(":").map(Number);
     const dt = new Date(d);
     dt.setHours(h || 0, m || 0, 0, 0);
     return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(
@@ -426,7 +437,7 @@ const GuestBookingForm = () => {
   const [pickup, setPickup] = useState(null);
   const [drop, setDrop] = useState(null);
 
-  const [pickupAt, setPickupAt] = useState("");
+  const [pickupAt, setPickupAt] = useState(() => defaultPickupAt());
   const [tripDays, setTripDays] = useState(1);
 
   const [selectingPin, setSelectingPin] = useState(null);
@@ -586,7 +597,7 @@ const GuestBookingForm = () => {
       pickupISO = pickupAt;
     }
 
-    if (new Date(pickupISO) <= new Date(Date.now() + 25 * 60 * 1000)) {
+    if (new Date(pickupISO) <= new Date(Date.now() + 30 * 60 * 1000)) {
       toast.error("Pickup must be at least 30 minutes from now.");
       return;
     }

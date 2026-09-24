@@ -218,7 +218,7 @@ const AttachVehicle = () => {
           luggage: `${v.luggage ?? 2} Bags`,
           ac: v.isAC ? "AC" : "Non-AC",
           fuel: "Petrol",
-          price: `₹${v.oneWayBaseFare ?? 0} base`,
+          price: `₹${Number(v.oneWayBaseFare ?? 0).toLocaleString('en-IN')} base`,
           perKm: v.oneWayPerKm != null || v.roundTripPerKm != null
             ? `₹{v.oneWayPerKm ?? '—'}/km one-way · ₹{v.roundTripPerKm ?? '—'}/km round`
             : null,

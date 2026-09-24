@@ -22,6 +22,8 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { adminAPI, vehicleAPI } from "../../services/endpoints";
+import { BookingStatusBadge } from "../../utils/bookingStatus";
+import { fareTotal } from "../../utils/bookingStatusMeta";
 import { useCopyBooking } from "../../utils/bookingText";
 import { TableSkeleton } from "../../components/shared/Skeleton";
 import ErrorState from "../../components/shared/ErrorState";
@@ -95,6 +97,7 @@ const AdminCustomerBookings = () => {
     const handleRideUpdate = (data) => {
       queryClient.invalidateQueries({ queryKey: ["adminCustomerBookings"] });
       queryClient.invalidateQueries({ queryKey: ["adminCounts"] });
+      queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
       if (data?._id) {
         setSelectedBooking((prev) =>
           prev && prev._id === data._id ? { ...prev, ...data } : prev,
@@ -233,22 +236,8 @@ const AdminCustomerBookings = () => {
       />
     );
 
-  const statusColors = {
-    Pending: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
-    Accepted: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
-    "On The Way":
-      "bg-purple-500/20 text-purple-400 border border-purple-500/30",
-    Arrived: "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30",
-    Started: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30",
-    Reached: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
-    Completed:
-      "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
-    Cancelled: "bg-red-500/20 text-red-400 border border-red-500/30",
-  };
-
   const canAct = (b) =>
     b.bookingStatus !== "Completed" && b.bookingStatus !== "Cancelled";
-  const fareOf = (b) => b.finalFare || b.estimatedFare;
 
   const formatBookedOn = (iso) => {
     if (!iso) return "—";
@@ -301,6 +290,21 @@ const AdminCustomerBookings = () => {
       ),
     },
     {
+      header: "Driver",
+      cell: (b) => (
+        <div className="min-w-[130px] max-w-[190px]">
+          {b.driver?.user?.name ? (
+            <>
+              <p className="text-[13px] font-semibold text-white truncate">{b.driver.user.name}</p>
+              <p className="text-[11px] text-gray-500 truncate">{b.driver.user.phone || ""}</p>
+            </>
+          ) : (
+            <p className="text-[13px] text-gray-500 italic whitespace-nowrap">Driver Not Assigned</p>
+          )}
+        </div>
+      ),
+    },
+    {
       header: "Route",
       cell: (b) => (
         <div className="min-w-[180px] max-w-[260px]">
@@ -319,17 +323,18 @@ const AdminCustomerBookings = () => {
     },
     {
       header: "Status",
-      cell: (b) => (
-        <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ${statusColors[b.bookingStatus]}`}>
-          {b.bookingStatus}
-        </span>
-      ),
+      cell: (b) => <BookingStatusBadge status={b.bookingStatus} size="sm" />,
     },
     {
       header: "Fare",
       tdClassName: "text-right",
       thClassName: "text-right",
-      cell: (b) => <span className="font-bold text-white tabular-nums whitespace-nowrap">₹{(fareOf(b) ?? 0).toLocaleString("en-IN")}</span>,
+      cell: (b) => (
+        <span className="block tabular-nums whitespace-nowrap">
+          <span className="block text-[11px] text-gray-500">Approx ₹{(b.estimatedFare ?? 0).toLocaleString("en-IN")}</span>
+          <span className="block font-bold text-white">₹{fareTotal(b).toLocaleString("en-IN")}</span>
+        </span>
+      ),
     },
     {
       header: "Actions",
@@ -389,7 +394,7 @@ const AdminCustomerBookings = () => {
             Every registered-customer ride — track, approve, assign drivers, complete or cancel. Updates live.
           </p>
         </div>
-        <div className="relative mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="relative mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
           {[
             {
               label: "Total rides",
@@ -408,6 +413,15 @@ const AdminCustomerBookings = () => {
               value: stats.completedBookings ?? "–",
               icon: CheckCircle,
               tint: "text-emerald-300",
+            },
+            {
+              label: "Accepted Revenue",
+              value:
+                stats.customerAcceptedRevenue != null
+                  ? `₹${Number(stats.customerAcceptedRevenue).toLocaleString("en-IN")}`
+                  : "–",
+              icon: CheckCircle,
+              tint: "text-green-300",
             },
             {
               label: "Revenue",
@@ -576,13 +590,9 @@ const AdminCustomerBookings = () => {
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/50 to-transparent" />
                 <div className="relative grid sm:grid-cols-[1fr_212px] min-w-0">
                   {/* Route side */}
-                  <div className="p-4 sm:p-5 min-w-0">
-                    <div className="flex flex-wrap items-center gap-1.5 mb-3 min-w-0">
-                      <span
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold ${statusColors[b.bookingStatus]}`}
-                      >
-                        {b.bookingStatus}
-                      </span>
+                  <div className="p-3.5 sm:p-4 min-w-0">
+                    <div className="flex flex-wrap items-center gap-1.5 mb-2.5 min-w-0">
+                      <BookingStatusBadge status={b.bookingStatus} size="sm" />
                       <TripTypeBadge type={b.tripType} />
                       <span className="font-mono text-[12px] bg-purple-400/15 font-bold border border-purple-400/25 text-purple-500 px-2.5 py-1 rounded-full ">
                       #{b._id?.slice(-6).toUpperCase()}
@@ -642,13 +652,16 @@ const AdminCustomerBookings = () => {
                   </div>
 
                   {/* Fare rail */}
-                  <div className="relative flex sm:flex-col items-center sm:items-stretch justify-between gap-3 px-4 py-3.5 sm:p-5 bg-gradient-to-br from-violet-500/15 via-violet-500/5 to-transparent border-t sm:border-t-0 sm:border-l border-white/10 min-w-0">
+                  <div className="relative flex sm:flex-col items-center sm:items-stretch justify-between gap-2.5 px-4 py-3 sm:p-4 bg-gradient-to-br from-violet-500/15 via-violet-500/5 to-transparent border-t sm:border-t-0 sm:border-l border-white/10 min-w-0">
                     <div className="min-w-0 sm:text-right">
                       <p className="text-[10px] uppercase tracking-[0.12em] text-gray-400 font-semibold">
-                        Fare
+                        Total fare
                       </p>
-                      <p className="text-2xl sm:text-[26px] font-bold bg-gradient-to-r from-violet-200 to-violet-400 bg-clip-text text-transparent leading-tight">
-                        ₹{(fareOf(b) ?? 0).toLocaleString('en-IN')}
+                      <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-violet-200 to-violet-400 bg-clip-text text-transparent leading-tight">
+                        ₹{fareTotal(b).toLocaleString('en-IN')}
+                      </p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">
+                        Approx ₹{(b.estimatedFare ?? 0).toLocaleString('en-IN')}
                       </p>
                     </div>
                     <div className="flex sm:flex-col gap-1.5 shrink-0 sm:shrink">
@@ -717,7 +730,7 @@ const AdminCustomerBookings = () => {
             ))}
           </div>
           ) : (
-            <GlassTable columns={bookingColumns} rows={bookings} rowKey={(b) => b._id} />
+            <GlassTable columns={bookingColumns} rows={bookings} rowKey={(b) => b._id} density="compact" />
           )}
 
           <Pagination
@@ -737,11 +750,7 @@ const AdminCustomerBookings = () => {
         {selectedBooking && (
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[selectedBooking.bookingStatus]}`}
-              >
-                {selectedBooking.bookingStatus}
-              </span>
+              <BookingStatusBadge status={selectedBooking.bookingStatus} size="sm" />
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => copyBooking(selectedBooking)}
@@ -751,8 +760,13 @@ const AdminCustomerBookings = () => {
                 >
                   {copied ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
                 </button>
-                <span className="text-xl font-bold text-white">
-                  ₹{selectedBooking.finalFare || selectedBooking.estimatedFare}
+                <span className="text-right">
+                  <span className="block text-xl font-bold text-white tabular-nums">
+                    ₹{fareTotal(selectedBooking).toLocaleString("en-IN")}
+                  </span>
+                  <span className="block text-[11px] text-gray-500 tabular-nums">
+                    Approx ₹{(selectedBooking.estimatedFare ?? 0).toLocaleString("en-IN")}
+                  </span>
                 </span>
               </div>
             </div>

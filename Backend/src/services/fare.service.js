@@ -22,35 +22,42 @@ export const FARE_CONFIG = {
   // Rule 1 — one-way / drop-trip minimum billable km per day.
   oneWayMinKmPerDay: 130,
 
-  // Rule 2 — round-trip minimum running km per day.
+  // Rule 2 — round-trip minimum running km per day, applied to the
+  // trip total (one-way km × days).
   roundTripMinKmPerDay: 250,
   roundTripMinKmPerDayBengaluru: 300,
 
   // Rule 1+2 — driver bata (allowance) per day. The high rate
   // applies when total running km exceeds the threshold.
-  // One-way / drop uses 400 standard; round-trip is always 300 (per fare
-  // notes + tests). Separate constants keep the two policies explicit.
+  // One-way / drop uses 400 standard; round-trip is always 400 flat
+  // (per fare notes + tests). Separate constants keep the two policies
+  // explicit.
   driverBataStandard: 400,
   driverBataRoundTrip: 400,
   driverBataHighDistance: 600,
   driverBataHighDistanceThresholdKm: 400,
 
   // Rule 3 — fallback waiting rate/min when the vehicle has none set.
-  waitingChargePerMinute: 2,
+  waitingChargePerMinute: 2.5,
 };
 
 /* ===========================================================
    CALCULATE FARE — UNIFIED LOGIC
-   Both one-way and round-trip share the same core formula:
-     totalRunningKm  = travelledDistance × legs
-     chargeableDist  = max(0, totalRunningKm − baseKm)
-     distanceFare    = chargeableDist × perKm
-     totalFare       = baseFare + distanceFare + bata + extras
+   One-way core formula:
+      travelledDistance = max(routeKm, days × minPerDay)
+      totalRunningKm  = travelledDistance (1 leg)
+   Round-trip core formula:
+      totalRunningKm  = max(routeKm × days, days × minPerDay)
+      chargeableDist  = max(0, totalRunningKm − roundTripBaseKm)
+      distanceFare    = chargeableDist × roundTripPerKm
+      driverBata      = ₹400 × days (no slabs, no threshold)
+      totalFare       = baseFare + distanceFare + bata (+ extras)
 
    Round-trip differences:
-     • legs = 2 (out + return)
-     • driverBataHighDistance threshold is NEVER applied
-       (always ₹300/day standard rate)
+   • total runs one-way km × days (out + return across the days),
+     floored at the per-day minimum — never doubled on top of it
+   • driverBataHighDistance threshold is NEVER applied
+     (always ₹400/day standard rate)
      • night charge is never added
      • waiting / toll / permit are not charged
 =========================================================== */
@@ -130,8 +137,11 @@ export const calculateFare = async ({
      UNIFIED DISTANCE FARE
   =========================== */
 
-  const legs = isRoundTrip ? 2 : 1;
-  const totalRunningKm = travelledDistance * legs;
+  // Round trips bill one-way km × days (floored at the daily minimum),
+  // so a 2-day 326 km trip totals 652 km — not a doubled minimum.
+  const totalRunningKm = isRoundTrip
+    ? Math.max(distance * billableDays, billableDays * minKmPerDay)
+    : travelledDistance;
 
   const chargeableDistance = Math.max(0, totalRunningKm - baseKm);
   const distanceFare = chargeableDistance * perKm;
@@ -140,8 +150,8 @@ export const calculateFare = async ({
      DRIVER BATA
      One-way/drop: high-distance slab (₹600) when total running
        km > 400 km; per-vehicle override via driverBataHighDistance.
-     Round trip: ALWAYS standard rate (₹300/day × days).
-       The 400 km threshold is never applied.
+   Round trip: ALWAYS standard rate (₹400/day × days).
+        The 400 km threshold is never applied.
   =========================== */
 
   let bataPerDay;
@@ -265,7 +275,14 @@ export const calculateFare = async ({
     estimatedFare,
     fareBreakdown: {
       ...rounded,
-      billedDistanceKm: round2(travelledDistance),
+      // Displayed billed figure: on round trips the running total minus
+      // one daily-minimum block (e.g. 652 − 250 = 402). Display only —
+      // the charged distance (chargeableDistance) is untouched.
+      billedDistanceKm: round2(
+        isRoundTrip
+          ? Math.max(0, totalRunningKm - minKmPerDay)
+          : travelledDistance
+      ),
       totalRunningKm: round2(totalRunningKm),
       baseKm,
       chargeableDistance: round2(chargeableDistance),

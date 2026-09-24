@@ -119,7 +119,7 @@ const Invoices = () => {
                           {b.pickup?.address} → {b.drop?.address}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-white whitespace-nowrap">₹{getInvoiceAmount(b)}</td>
+                      <td className="px-6 py-4 text-sm font-semibold text-white whitespace-nowrap">₹{Number(getInvoiceAmount(b) ?? 0).toLocaleString('en-IN')}</td>
                       <td className="px-6 py-4 text-sm text-slate-200 whitespace-nowrap">
                         {new Date(b.completedAt || b.updatedAt).toLocaleDateString('en-IN')}
                       </td>
@@ -144,7 +144,7 @@ const Invoices = () => {
               <div key={b._id} className="bg-white/5 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/10 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-2 min-w-0">
                   <span className="text-xs font-mono text-slate-200 shrink-0">#{b._id.slice(-8).toUpperCase()}</span>
-                  <span className="text-sm font-bold text-white shrink-0">₹{getInvoiceAmount(b)}</span>
+                  <span className="text-sm font-bold text-white shrink-0">₹{Number(getInvoiceAmount(b) ?? 0).toLocaleString('en-IN')}</span>
                 </div>
                 <p className="text-sm text-slate-200/90 truncate mb-1 min-w-0">{b.pickup?.address} → {b.drop?.address}</p>
                 <p className="text-xs text-slate-200/60 mb-3">

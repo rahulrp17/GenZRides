@@ -29,6 +29,7 @@ import {
   BookingFareRail,
   RailDetailsBtn,
   BookingDetailModal,
+  DriverCell,
   TripTypeBadge,
 } from "./bookingShared";
 import {
@@ -251,6 +252,7 @@ const AdminCustomerBookingRequests = () => {
         </div>
       ),
     },
+    { header: "Driver", cell: (b) => <DriverCell b={b} /> },
     {
       header: "Route",
       cell: (b) => (
@@ -358,7 +360,7 @@ const AdminCustomerBookingRequests = () => {
           ))}
         </div>
       ) : (
-        <GlassTable columns={requestColumns} rows={bookings} rowKey={(b) => b._id} />
+        <GlassTable columns={requestColumns} rows={bookings} rowKey={(b) => b._id} density="compact" />
       )}
 
       <BookingDetailModal

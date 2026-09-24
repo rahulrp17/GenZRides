@@ -49,7 +49,7 @@ const VehicleCard = React.memo(({ v, onEdit, onToggle, onDelete }) => (
         <h3 className="text-lg font-bold text-white leading-tight">{v.name}</h3>
         {v.driverBataHighDistance != null && (
           <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/20 shrink-0" title="Custom high-distance driver bata">
-            ₹{v.driverBataHighDistance}/day
+            ₹{Number(v.driverBataHighDistance ?? 0).toLocaleString('en-IN')}/day
           </span>
         )}
       </div>
@@ -118,17 +118,17 @@ const VehicleCard = React.memo(({ v, onEdit, onToggle, onDelete }) => (
         <div className="flex flex-wrap gap-1.5 mb-4">
           {v.nightCharge > 0 && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/15 text-purple-300 border border-purple-500/20">
-              <Moon size={10} /> ₹{v.nightCharge} night
+                  <Moon size={10} /> ₹{Number(v.nightCharge ?? 0).toLocaleString('en-IN')} night
             </span>
           )}
           {v.waitingChargePerMinute > 0 && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/15 text-amber-300 border border-amber-500/20">
-              <Clock size={10} /> ₹{v.waitingChargePerMinute}/min wait
+                  <Clock size={10} /> ₹{Number(v.waitingChargePerMinute ?? 0).toLocaleString('en-IN')}/min wait
             </span>
           )}
           {v.driverAllowance > 0 && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">
-              <Gauge size={10} /> ₹{v.driverAllowance} bata
+                  <Gauge size={10} /> ₹{Number(v.driverAllowance ?? 0).toLocaleString('en-IN')} bata
             </span>
           )}
         </div>

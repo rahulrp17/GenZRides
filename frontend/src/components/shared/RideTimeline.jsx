@@ -12,8 +12,8 @@ import {
 const STAGES = [
   { key: 'Accepted', label: 'Driver Assigned', sublabel: 'Ride confirmed', icon: CheckCircle, tsKey: 'acceptedAt' },
   { key: 'On The Way', label: 'Driver On The Way', sublabel: 'Heading to pickup', icon: Car, tsKey: 'onTheWayAt' },
-  { key: 'Arrived', label: 'Arrived at Pickup', sublabel: 'Driver is here', icon: MapPin, tsKey: 'arrivedAt' },
-  { key: 'Started', label: 'Trip in Progress', sublabel: 'Enjoy your ride', icon: Navigation, tsKey: 'startedAt' },
+  { key: 'Arrived', label: 'Driver Arrived', sublabel: 'Driver is here', icon: MapPin, tsKey: 'arrivedAt' },
+  { key: 'Started', label: 'Ride Started', sublabel: 'Enjoy your ride', icon: Navigation, tsKey: 'startedAt' },
   { key: 'Reached', label: 'Reached Destination', sublabel: 'Verifying payment', icon: MapPin, tsKey: 'reachedAt' },
   { key: 'Completed', label: 'Ride Completed', sublabel: 'Payment done, trip finished', icon: Flag, tsKey: 'completedAt' },
 ];
@@ -42,10 +42,10 @@ const RideTimeline = ({ booking, currentStatusIndex }) => {
   }, [currentStatusIndex, isCancelled]);
 
   const activeLabel = isCancelled
-    ? 'Cancelled'
+    ? 'Booking Cancelled'
     : isCompleted
-      ? 'Completed'
-      : STAGES[currentStatusIndex]?.label || 'Pending';
+      ? 'Ride Completed'
+      : STAGES[currentStatusIndex]?.label || 'Booking Pending';
 
   return (
     <div className="relative bg-white/5 backdrop-blur-lg rounded-2xl p-5 shadow-sm border border-white/10 overflow-hidden min-w-0">

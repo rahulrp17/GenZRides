@@ -11,7 +11,7 @@ const DriverInstantBookings = () => (
     title="Instant Customer Bookings"
     subtitle="Verified guest rides for your cab type. Fresh requests auto-refresh every 10 seconds."
     liveSubtitle="Socket live · polling every 10s as backup"
-    actionLabel="View & Accept"
+    actionLabel="View"
     emptyTitle="No instant bookings"
     emptyDescription="There are no verified guest rides for your cab type right now. Check back later."
   />

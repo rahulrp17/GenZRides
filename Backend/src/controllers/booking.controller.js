@@ -441,7 +441,7 @@ export const updatePaymentStatus = async (
       await bookingService.updatePaymentStatus(
         req.params.id,
         req.user._id,
-        req.body.paymentStatus
+        Number(req.body.amount)
       );
 
     try {
@@ -452,7 +452,7 @@ export const updatePaymentStatus = async (
 
     res.status(200).json({
       success: true,
-      message: `Payment marked as ${req.body.paymentStatus.toLowerCase()}.`,
+      message: result.message,
       data: result,
     });
   } catch (error) {

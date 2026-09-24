@@ -38,8 +38,15 @@ import { withTransaction } from "../config/transaction.js";
 
 export const createBooking = async (
   customerId,
-  bookingData
+  bookingData,
+  options = {}
 ) => {
+  // Guest snapshots are accepted ONLY from the guest pipeline
+  // (createGuestBooking → allowGuestSnapshot: true). Authenticated
+  // bookings must never create/store guest contact data, even if a
+  // caller smuggles guest fields into the request body.
+  const { allowGuestSnapshot = false } = options;
+
   const {
     pickup,
     drop,
@@ -60,6 +67,14 @@ export const createBooking = async (
     // Registered customer bookings default to "Approved".
     approvalStatus = "Approved",
   } = bookingData;
+
+  const guestSnapshot = allowGuestSnapshot
+    ? {
+        ...(guestName ? { guestName: String(guestName).trim() } : {}),
+        ...(guestEmail ? { guestEmail: String(guestEmail).trim().toLowerCase() } : {}),
+        ...(guestPhone ? { guestPhone: String(guestPhone).trim() } : {}),
+      }
+    : {};
 
   /* ===========================
      VALIDATION
@@ -142,11 +157,12 @@ export const createBooking = async (
 
       customerNotes,
 
-      // Snapshot guest contact when provided (guest flow). Logged-in flow
-      // leaves these null — `getBookingEmailFields` falls back to User.
-      ...(guestName ? { guestName: String(guestName).trim() } : {}),
-      ...(guestEmail ? { guestEmail: String(guestEmail).trim().toLowerCase() } : {}),
-      ...(guestPhone ? { guestPhone: String(guestPhone).trim() } : {}),
+      // Snapshot guest contact only for the guest pipeline. The
+      // authenticated flow always leaves these null, so admin emails and
+      // dashboards resolve the customer's real account email via
+      // `getBookingEmailFields` → User. A placeholder guest address can
+      // never be created or stored on a logged-in booking.
+      ...guestSnapshot,
 
       bookingStatus: "Pending",
 
@@ -401,7 +417,7 @@ export const createGuestBooking = async (guestData) => {
     guestPhone,
     // Instant bookings wait for admin verification before dispatch.
     approvalStatus: "Pending Approval",
-  });
+  }, { allowGuestSnapshot: true });
 
 return {
     ...result,
@@ -1487,11 +1503,11 @@ export const reachDestination = async (
 export const updatePaymentStatus = async (
   bookingId,
   driverUserId,
-  paymentStatus
+  amount
 ) => {
-  if (!["Paid", "Unpaid"].includes(paymentStatus)) {
+  if (amount == null || Number.isNaN(Number(amount)) || Number(amount) <= 0) {
     throw new Error(
-      "Payment status must be Paid or Unpaid."
+      "Collected amount must be greater than zero."
     );
   }
 
@@ -1507,7 +1523,7 @@ export const updatePaymentStatus = async (
 
   if (booking.bookingStatus !== "Reached") {
     throw new Error(
-      "Payment can only be verified after reaching the destination."
+      "Payment can only be collected after reaching the destination."
     );
   }
 
@@ -1528,30 +1544,25 @@ export const updatePaymentStatus = async (
     );
   }
 
-  booking.paymentStatus = paymentStatus;
+  booking.collectedAmount = Number(amount);
+  booking.paymentStatus = "Paid";
 
   await booking.save();
 
   await notifyUser({
     user: booking.customer,
-    title:
-      paymentStatus === "Paid"
-        ? "Payment Successful"
-        : "Payment Pending",
-    message:
-      paymentStatus === "Paid"
-        ? `Payment of ₹${booking.finalFare || booking.estimatedFare} was successful.`
-        : "Your driver marked the payment as unpaid. Please complete the payment.",
+    title: "Payment Successful",
+    message: `Payment of ₹${booking.collectedAmount} was collected.`,
     type: "Payment",
     booking: booking._id,
     data: {
-      amount: booking.finalFare || booking.estimatedFare,
+      amount: booking.collectedAmount,
     },
   });
 
   return {
     success: true,
-    message: `Payment marked as ${paymentStatus.toLowerCase()}.`,
+    message: `Payment of ₹${booking.collectedAmount} recorded.`,
     booking,
   };
 };
@@ -1607,8 +1618,12 @@ export const completeRide = async (
       the wallet twice on standalone MongoDB.
   ========================================== */
 
+  // Total fare comes from the driver's payment input when present
+  // (cash actually collected); otherwise the booking-time estimate.
   const finalizedFare =
-    booking.finalFare || booking.estimatedFare;
+    booking.collectedAmount > 0
+      ? booking.collectedAmount
+      : booking.finalFare || booking.estimatedFare;
 
   const result = await withTransaction(async (session) => {
     const completed = await Booking.findOneAndUpdate(
@@ -1799,6 +1814,11 @@ export const getAvailableBookings = async (
     }
 
     query.vehicleType = driverProfile.vehicleType;
+
+    // Reject ≠ Cancel: a rejected request stays open for other drivers
+    // (routed via the dispatch queue), but it is never shown again to
+    // the driver who rejected it.
+    query.rejectedDrivers = { $ne: driverProfile._id };
   }
 
   const bookings = await Booking.find(query)

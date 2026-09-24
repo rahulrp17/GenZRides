@@ -312,7 +312,7 @@ const ManageDrivers = () => {
               <div className="bg-white/5 rounded-xl p-3"><p className="text-xs text-gray-500">Rating</p><p className="font-medium text-white">{'⭐'} {selectedDriver.rating?.toFixed(1) || '5.0'} ({selectedDriver.totalRatings ?? 0} ratings)</p></div>
               <div className="bg-white/5 rounded-xl p-3"><p className="text-xs text-gray-500">Availability</p><p className="font-medium text-white">{selectedDriver.isOnline ? 'Online' : 'Offline'} · {selectedDriver.isAvailable ? 'Available' : 'Busy'}</p></div>
               <div className="bg-white/5 rounded-xl p-3"><p className="text-xs text-gray-500">Trips</p><p className="font-medium text-white">{selectedDriver.completedTrips ?? 0} completed / {selectedDriver.totalTrips ?? 0} total{selectedDriver.completionRate != null ? ` · ${selectedDriver.completionRate}%` : ''}</p></div>
-              <div className="bg-white/5 rounded-xl p-3"><p className="text-xs text-gray-500">Earnings</p><p className="font-medium text-white">₹{selectedDriver.totalEarnings ?? 0} total · ₹{selectedDriver.todayEarnings ?? 0} today</p></div>
+              <div className="bg-white/5 rounded-xl p-3"><p className="text-xs text-gray-500">Earnings</p><p className="font-medium text-white">₹{Number(selectedDriver.totalEarnings ?? 0).toLocaleString('en-IN')} total · ₹{Number(selectedDriver.todayEarnings ?? 0).toLocaleString('en-IN')} today</p></div>
             </div>
 
             <div>

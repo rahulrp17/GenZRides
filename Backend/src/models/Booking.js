@@ -145,6 +145,19 @@ const bookingSchema = new mongoose.Schema(
       min: 0,
     },
 
+    /* ==========================
+       CASH COLLECTED BY DRIVER
+       Amount the customer actually handed over, entered by the
+       driver on the Current Ride page after reaching the
+       destination. Becomes the total fare at completion.
+    ========================== */
+
+    collectedAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
     tipAmount: {
       type: Number,
       default: 0,

@@ -16,13 +16,14 @@ import EmptyState from '../../components/shared/EmptyState';
 import RideTimeline from '../../components/shared/RideTimeline';
 import CancelReasonDialog from '../../components/shared/CancelReasonDialog';
 import { useRideTime } from '../../components/shared/RideTimer';
+import { displayStatus } from '../../utils/bookingStatusMeta';
 
 const GOOGLE_MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
 const STATUS_FLOW = [
   { key: 'Accepted', label: 'Driver Assigned', sublabel: 'Ride confirmed', icon: CheckCircle, color: 'emerald', ring: 'ring-emerald-300', bg: 'bg-emerald-500', text: 'text-emerald-400', light: 'bg-emerald-50', tsKey: 'acceptedAt' },
-  { key: 'On The Way', label: 'On The Way', sublabel: 'Driver heading to you', icon: Car, color: 'blue', ring: 'ring-blue-300', bg: 'bg-blue-500', text: 'text-blue-600', light: 'bg-blue-50', tsKey: 'onTheWayAt' },
-  { key: 'Arrived', label: 'Arrived at Pickup', sublabel: 'Driver is here', icon: MapPin, color: 'purple', ring: 'ring-purple-300', bg: 'bg-purple-500', text: 'text-purple-600', light: 'bg-purple-50', tsKey: 'arrivedAt' },
+  { key: 'On The Way', label: 'Driver On The Way', sublabel: 'Driver heading to you', icon: Car, color: 'blue', ring: 'ring-blue-300', bg: 'bg-blue-500', text: 'text-blue-600', light: 'bg-blue-50', tsKey: 'onTheWayAt' },
+  { key: 'Arrived', label: 'Driver Arrived', sublabel: 'Driver is here', icon: MapPin, color: 'purple', ring: 'ring-purple-300', bg: 'bg-purple-500', text: 'text-purple-600', light: 'bg-purple-50', tsKey: 'arrivedAt' },
   { key: 'Started', label: 'Ride Started', sublabel: 'Trip in progress', icon: Navigation, color: 'indigo', ring: 'ring-indigo-300', bg: 'bg-indigo-500', text: 'text-indigo-400', light: 'bg-indigo-50', tsKey: 'startedAt' },
   { key: 'Reached', label: 'Reached Destination', sublabel: 'Verifying payment', icon: MapPin, color: 'amber', ring: 'ring-amber-300', bg: 'bg-amber-500', text: 'text-amber-400', light: 'bg-amber-50', tsKey: 'reachedAt' },
   { key: 'Completed', label: 'Ride Completed', sublabel: 'Trip finished', icon: CheckCircle, color: 'emerald', ring: 'ring-emerald-300', bg: 'bg-emerald-600', text: 'text-emerald-400', light: 'bg-emerald-50', tsKey: 'completedAt' },
@@ -508,14 +509,7 @@ const CurrentRideCustomer = () => {
               <div>
                 <p className="text-sm opacity-80">Booking #{booking._id?.slice(-8).toUpperCase()}</p>
                 <h2 className="text-lg font-bold mt-0.5">
-                  {isCancelled ? 'Ride Cancelled' :
-                   isCompleted ? 'Ride Completed!' :
-                   booking.bookingStatus === 'Accepted' ? 'Driver Assigned!' :
-                   booking.bookingStatus === 'On The Way' ? 'Driver En Route' :
-                   booking.bookingStatus === 'Arrived' ? 'Driver Arrived!' :
-                   booking.bookingStatus === 'Started' ? 'Ride In Progress' :
-                   booking.bookingStatus === 'Reached' ? 'Reached Destination' :
-                   booking.bookingStatus}
+                  {displayStatus(booking.bookingStatus)}
                 </h2>
               </div>
               <div className={`w-11 h-11 rounded-full flex items-center justify-center ${
@@ -629,7 +623,7 @@ const CurrentRideCustomer = () => {
                 <MapPin size={12} className="text-gray-500" />
                 <p className="text-xs text-gray-400">Fare</p>
               </div>
-              <p className="text-lg font-bold text-indigo-400">₹{booking.finalFare || booking.estimatedFare}</p>
+              <p className="text-lg font-bold text-indigo-400">₹{Number(booking.finalFare || booking.estimatedFare || 0).toLocaleString('en-IN')}</p>
             </div>
             <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-4 shadow-sm border border-white/10">
               <div className="flex items-center gap-2 mb-1">
@@ -637,8 +631,8 @@ const CurrentRideCustomer = () => {
                 <p className="text-xs text-gray-400">Payment</p>
               </div>
               <p className="text-sm font-bold text-white">
-                {booking.paymentMethod}
-                {' · '}
+                
+                
                 <span className={booking.paymentStatus === 'Paid' ? 'text-emerald-400' : booking.paymentStatus === 'Unpaid' ? 'text-red-400' : 'text-amber-400'}>
                   {booking.paymentStatus || 'Pending'}
                 </span>
@@ -785,7 +779,7 @@ const CurrentRideCustomer = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-white/5 rounded-xl p-3">
                   <p className="text-xs text-gray-400">Final Fare</p>
-                  <p className="text-lg font-bold text-emerald-400">₹{booking.finalFare || booking.estimatedFare}</p>
+                  <p className="text-lg font-bold text-emerald-400">₹{Number(booking.finalFare || booking.estimatedFare || 0).toLocaleString('en-IN')}</p>
                 </div>
                 <div className="bg-white/5 rounded-xl p-3">
                   <p className="text-xs text-gray-400">Payment Status</p>

@@ -142,7 +142,7 @@ const Reviews = () => {
               >
                 {completedBookings.map((b) => (
                   <option key={b._id} value={b._id} className="bg-gray-900">
-                    {b.pickup?.address?.slice(0, 24) || 'Ride'} → {b.drop?.address?.slice(0, 24) || ''} · ₹{b.finalFare ?? 0}
+                    {b.pickup?.address?.slice(0, 24) || 'Ride'} → {b.drop?.address?.slice(0, 24) || ''} · ₹{Number(b.finalFare ?? 0).toLocaleString('en-IN')}
                   </option>
                 ))}
               </select>

@@ -74,7 +74,7 @@ const ManageWithdrawals = () => {
               {withdrawals.map((w) => (
                 <tr key={w._id} className="border-b border-white/5 hover:bg-white/5 transition">
                   <td className="px-6 py-4 text-sm font-medium text-white">{w.driver?.user?.name || 'Driver'}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-white">₹{w.amount}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-white">₹{Number(w.amount ?? 0).toLocaleString('en-IN')}</td>
                   <td className="px-6 py-4 text-sm text-gray-300">{w.bankName}</td>
                   <td className="px-6 py-4 text-sm font-mono text-gray-300">{w.ifscCode}</td>
                   <td className="px-6 py-4">
@@ -112,7 +112,7 @@ const ManageWithdrawals = () => {
                 <p className="text-sm font-medium text-white truncate">{w.driver?.user?.name || 'Driver'}</p>
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ${statusColors[w.status]}`}>{w.status}</span>
               </div>
-              <p className="text-lg font-bold text-white mb-1">₹{w.amount}</p>
+                <p className="text-lg font-bold text-white mb-1">₹{Number(w.amount ?? 0).toLocaleString('en-IN')}</p>
               <p className="text-xs text-gray-500 mb-3 truncate">{w.bankName || '—'} · {w.ifscCode || '—'}</p>
               {w.status === 'Pending' && (
                 <div className="flex gap-2">

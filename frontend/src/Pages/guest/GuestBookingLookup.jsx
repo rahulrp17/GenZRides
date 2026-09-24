@@ -19,6 +19,9 @@ import {
   Wallet,
   Ban,
   ShieldCheck,
+  RefreshCw,
+  Receipt,
+  History,
 } from "lucide-react";
 import SEO from "../../components/SEO";
 import Navbar from "../../Component/Navbar/Navbar";
@@ -29,6 +32,7 @@ import { guestAPI } from "../../services/endpoints";
 import { hero2 } from "../../assets/images";
 import { Reveal } from "../../Component/Landing/Reveal";
 import { formatTripDuration } from "../../utils/formatDuration";
+import { BookingStatusBadge } from "../../utils/bookingStatus";
 
 const fmtWhen = (iso) =>
   iso
@@ -44,18 +48,23 @@ const fmtWhen = (iso) =>
 const formatCurrency = (n) =>
   n == null ? "—" : `₹${Number(n).toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
-const STATUS_STYLE = {
-  Pending: "bg-amber-500/15 border-amber-500/40 text-amber-300",
-  Accepted: "bg-blue-500/15 border-blue-500/40 text-blue-300",
-  "On The Way": "bg-sky-500/15 border-sky-500/40 text-sky-300",
-  Arrived: "bg-cyan-500/15 border-cyan-500/40 text-cyan-300",
-  Started: "bg-indigo-500/15 border-indigo-500/40 text-indigo-300",
-  Reached: "bg-green-500/15 border-green-500/40 text-green-300",
-  Completed: "bg-green-500/15 border-green-500/40 text-green-300",
-  Cancelled: "bg-red-500/15 border-red-500/40 text-red-300",
-};
-
+// Raw backend statuses that still allow a guest cancel.
 const CANCELLABLE = new Set(["Pending", "Accepted", "On The Way", "Arrived", "Started", "Reached"]);
+
+// Compact labeled section card for the detail page.
+const Section = ({ icon, title, action, children }) => (
+  <div className="mt-4 bg-white/5 border border-white/10 rounded-2xl p-4">
+    <div className="flex items-center justify-between gap-2 mb-2">
+      <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold flex items-center gap-1.5">
+        {icon}
+        {title}
+      </p>
+      {action}
+    </div>
+    {children}
+  </div>
+);
+
 
 const readLs = (key) => {
   try {
@@ -198,25 +207,61 @@ const GuestBookingLookup = () => {
           )}
 
           {booking && (
-            <Reveal delay={0.08} className="mt-1 md:mt-6 bg-gradient-to-br from-emerald-500/10 via-white/5 to-transparent backdrop-blur-lg rounded-[30px] border border-emerald-500/20 p-6 sm:p-8 overflow-hidden">
-              <div className="flex items-end justify-between gap-3 flex-wrap">
-                <div>
-                  <h3 className="font-display text-lg sm:text-xl font-bold text-white">BookingId: #{booking.ref}</h3>
+            <Reveal delay={0.08} className="mt-1 md:mt-6 bg-gradient-to-br from-emerald-500/10 via-white/5 to-transparent backdrop-blur-lg rounded-[30px] border border-emerald-500/20 p-5 sm:p-7 overflow-hidden">
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div className="min-w-0">
+                  <h3 className="font-display text-lg sm:text-xl font-bold text-white">Booking #{booking.ref}</h3>
                   <p className="text-sm text-gray-400 mt-1">{booking.guestName ? `Booked by ${booking.guestName}` : "Instant booking"}</p>
                 </div>
-                
-                <span className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs sm:text-sm font-semibold ${STATUS_STYLE[status] || "bg-white/5 border-white/10 text-gray-300"}`}>
-                 {status === "Cancelled" ? <XCircle size={14} /> : <Clock3 size={14} />}
-                  {status}
-                </span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <BookingStatusBadge status={status} />
+                  <button
+                    type="button"
+                    onClick={() => handleLookup()}
+                    disabled={loading}
+                    title="Refresh status"
+                    aria-label="Refresh status"
+                    className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-white/5 border border-white/10 text-gray-300 rounded-xl hover:bg-white/10 hover:text-white transition disabled:opacity-50"
+                  >
+                    <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+                  </button>
+                </div>
               </div>
 
+              {booking.approvalStatus === "Pending Approval" && status !== "Cancelled" && (
+                <div className="mt-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl px-4 py-2.5 text-[13px] text-amber-200">
+                  Waiting for admin approval — this usually takes a few minutes. Your driver is assigned right after.
+                </div>
+              )}
+              {booking.approvalStatus === "Rejected" && (
+                <div className="mt-4 bg-red-500/10 border border-red-500/30 rounded-2xl px-4 py-2.5 text-[13px] text-red-200">
+                  Sorry, this request was not approved. Call us and we&apos;ll arrange your ride right away.
+                </div>
+              )}
+
               {status === "Cancelled" && (
-                <div className="mt-5 bg-red-500/10 border border-red-500/30 rounded-2xl px-4 py-3 text-sm text-gray-200">
+                <div className="mt-4 bg-red-500/10 border border-red-500/30 rounded-2xl px-4 py-3 text-sm text-gray-200">
                   {booking.cancelledAt && <>Cancelled on {fmtWhen(booking.cancelledAt)}. </>}
                   {booking.cancelReason && booking.cancelReason !== "No reason provided" && <span className="text-red-300">Reason: {booking.cancelReason}</span>}
                 </div>
               )}
+
+              {/* Customer */}
+              <Section icon={<User size={12} className="text-green-400" />} title="Customer">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-white truncate">{booking.guestName || "Guest"}</p>
+                    {booking.guestPhone && (
+                      <p className="text-xs text-gray-400 mt-0.5">{booking.guestPhone}</p>
+                    )}
+                  </div>
+                  {booking.guestPhone && (
+                    <a href={`tel:${booking.guestPhone}`} className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 text-gray-200 rounded-full px-4 py-2 text-[13px] font-semibold hover:border-green-500/50 hover:text-green-300 transition shrink-0">
+                      <Phone size={13} className="text-green-400" /> {booking.guestPhone}
+                    </a>
+                  )}
+                </div>
+              </Section>
 
               {/* Route timeline */}
               <div className="relative pl-6 sm:pl-7 mt-6 space-y-5">
@@ -253,9 +298,8 @@ const GuestBookingLookup = () => {
                 ))}
               </div>
 
-              {/* Driver card */}
-              <div className="mt-6 bg-white/5 border border-white/10 rounded-2xl p-4">
-                <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold flex items-center gap-1.5 mb-2.5"><User size={12} className="text-green-400" /> Your driver</p>
+              {/* Driver */}
+              <Section icon={<CarFront size={12} className="text-green-400" />} title="Driver">
                 {booking.driver ? (
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
@@ -266,7 +310,7 @@ const GuestBookingLookup = () => {
                       </p>
                     </div>
                     {booking.driver.phone && (
-                      <a href={`tel:${booking.driver.phone}`} className="inline-flex items-center gap-1.5 bg-green-500/15 border border-green-500/30 text-green-300 rounded-full px-4 py-2 text-sm font-semibold hover:bg-green-500/25 transition">
+                      <a href={`tel:${booking.driver.phone}`} className="inline-flex items-center gap-1.5 bg-green-500/15 border border-green-500/30 text-green-300 rounded-full px-4 py-2 text-sm font-semibold hover:bg-green-500/25 transition shrink-0">
                         <Phone size={14} /> Call driver
                       </a>
                     )}
@@ -274,19 +318,72 @@ const GuestBookingLookup = () => {
                 ) : (
                   <p className="text-sm text-gray-400">No driver assigned yet. Our dispatch team is finding the right cab for your route.</p>
                 )}
-              </div>
+              </Section>
 
-              {/* Fare */}
-              <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-white/10 pt-5">
-                <div className="flex items-center gap-2 text-gray-300 min-w-0">
-                  <Wallet size={16} className="text-emerald-400 shrink-0" />
-                  <span className="text-sm">Fare estimate · {booking.paymentMethod === "Cash" ? "pay cash to the driver" : "online payment"}</span>
+              {/* Timestamps */}
+              <Section icon={<History size={12} className="text-green-400" />} title="Timestamps">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[13px]">
+                  <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                    <Clock3 size={12} className="text-gray-500 shrink-0" />
+                    <span className="truncate">Booked · {fmtWhen(booking.createdAt)}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                    <CalendarDays size={12} className="text-blue-400 shrink-0" />
+                    <span className="truncate">Pickup · {fmtWhen(booking.pickupDateTime)}</span>
+                  </div>
+                  {booking.cancelledAt && (
+                    <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
+                      <XCircle size={12} className="text-red-400 shrink-0" />
+                      <span className="truncate">Cancelled · {fmtWhen(booking.cancelledAt)}</span>
+                    </div>
+                  )}
                 </div>
-                <span className="font-display text-2xl sm:text-3xl font-bold text-emerald-300">{formatCurrency(booking.finalFare || booking.estimatedFare)}</span>
-              </div>
-              {booking.distance != null && (
-                <p className="mt-2 text-xs text-gray-500">{Number(booking.distance).toFixed(1)} km{booking.duration != null ? ` · ${formatTripDuration(booking.duration)}` : ""}</p>
-              )}
+              </Section>
+
+              {/* Trip receipt — invoice-style fare summary */}
+              <Section
+                icon={<Receipt size={12} className="text-green-400" />}
+                title="Trip Receipt"
+                action={
+                  <span className="text-[11px] text-gray-500 tabular-nums">{fmtWhen(booking.pickupDateTime)}</span>
+                }
+              >
+                <div className="text-[13px]">
+                  <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                    <span className="text-gray-400">Distance travelled</span>
+                    <span className="text-white font-medium tabular-nums shrink-0">
+                      {booking.distance != null ? `${Number(booking.distance).toFixed(1)} km` : "—"}
+                      {booking.duration != null ? ` · ${formatTripDuration(booking.duration)}` : ""}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                    <span className="text-gray-400">Cab & trip</span>
+                    <span className="text-white font-medium truncate">
+                      {booking.vehicleType || "—"}{booking.tripType ? ` · ${booking.tripType}` : ""}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-3 py-1.5 border-b border-dashed border-white/5">
+                    <span className="text-gray-400">Payment mode</span>
+                    <span className="text-white font-medium">
+                      {booking.paymentMethod || "Cash"} · {booking.paymentStatus || "Pending"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center gap-3 pt-2">
+                    <span className="text-gray-200 font-semibold">
+                      Amount payable
+                      <span className="block text-[11px] text-gray-500 font-normal">
+                        {booking.paymentMethod === "Cash" ? "pay cash to the driver" : "online payment"}
+                      </span>
+                    </span>
+                    <span className="font-display text-xl font-bold text-emerald-300 tabular-nums">
+                      {formatCurrency(booking.finalFare || booking.estimatedFare)}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-gray-500 mt-2">
+                  Tolls & permits (if any) are charged at actuals on the road.
+                </p>
+              </Section>
 
               {/* Cancel */}
               {cancellable && (

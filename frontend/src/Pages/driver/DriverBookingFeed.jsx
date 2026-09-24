@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import {
   Calendar, MapPin, Clock, Car, Navigation, Ban,
-  RefreshCw, ChevronRight, Wallet, Sparkles, ArrowRight, Repeat,
+  RefreshCw, Wallet, Sparkles, ArrowRight, Repeat,
+  Check, Eye, Loader2,
 } from 'lucide-react';
 import { bookingAPI, driverAPI } from '../../services/endpoints';
 import { TableSkeleton } from '../../components/shared/Skeleton';
@@ -14,6 +16,8 @@ import ViewToggle from '../../components/shared/ViewToggle';
 import GlassTable from '../../components/shared/GlassTable';
 import useDebounce from '../../hooks/useDebounce';
 import { useSocket } from '../../Context/SocketContext';
+import { BookingStatusBadge } from '../../utils/bookingStatus';
+import { displayStatus } from '../../utils/bookingStatusMeta';
 import { motion as Motion } from 'framer-motion';
 
 const PAY_TABS = [
@@ -27,17 +31,6 @@ const SORTS = [
   { id: 'fare', label: 'Highest fare' },
   { id: 'distance', label: 'Shortest trip' },
 ];
-
-const STATUS_STYLES = {
-  Pending: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
-  Accepted: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
-  'On The Way': 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
-  Arrived: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
-  Started: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
-  Reached: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
-  Completed: 'bg-green-500/15 text-green-300 border-green-400/30',
-  Cancelled: 'bg-rose-500/15 text-rose-300 border-rose-400/30',
-};
 
 // Parameterized opportunity feed. `mode` picks the source:
 // - "instant": verified guest bookings (scope=instant)
@@ -114,6 +107,73 @@ const DriverBookingFeed = ({
 
   const activeRide = currentRideData?.data;
   const hasActiveRide = gateOnActiveRide && !!activeRide && !['Completed', 'Cancelled'].includes(activeRide.bookingStatus);
+
+  // Reject ≠ Cancel: the request stays open for other drivers (routed via
+  // the dispatch queue) but never shows again to the rejecting driver.
+  const rejectMutation = useMutation({
+    mutationFn: async (id) => (await bookingAPI.reject(id)).data,
+    onSuccess: () => {
+      toast.success("Request rejected. It won't be shown again.");
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      queryClient.invalidateQueries({ queryKey: ['currentRide'] });
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || 'Failed to reject request');
+    },
+  });
+
+  // Only unassigned pending requests can be accepted/rejected. Assigned
+  // rides (My Bookings) use the driver-cancel policy instead.
+  const canAct = (b) => mode !== 'mine' && !b.driver && b.bookingStatus === 'Pending';
+
+  const [acceptingId, setAcceptingId] = useState(null);
+  const acceptMutation = useMutation({
+    mutationFn: async (id) => (await bookingAPI.accept(id)).data,
+    onSuccess: () => {
+      toast.success('Booking accepted successfully!');
+      ['driverAvailableBookings', 'driverInstantBookings', 'driverCustomerRequests', 'driverMyBookings', 'currentRide'].forEach((k) =>
+        queryClient.invalidateQueries({ queryKey: [k] })
+      );
+      setAcceptingId(null);
+      navigate('/driver/ride');
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || 'Failed to accept booking', { duration: 4000 });
+      setAcceptingId(null);
+    },
+  });
+
+  // One-tap accept with the same live-GPS gate as the detail page: seed
+  // the backend with a fresh fix (best-effort), then accept. Without a
+  // fix, fall through to the detail page which explains the requirement.
+  const handleAccept = (id) => {
+    if (acceptMutation.isPending) return;
+    setAcceptingId(id);
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setAcceptingId(null);
+      openBooking(id);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          await driverAPI.updateLocation({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+          });
+        } catch {
+          // Non-fatal: accept proceeds with the verified live fix.
+        }
+        acceptMutation.mutate(id);
+      },
+      () => {
+        setAcceptingId(null);
+        toast.error('Enable location to accept — opening details.', { duration: 4000 });
+        openBooking(id);
+      },
+      { enableHighAccuracy: false, maximumAge: 60_000, timeout: 10_000 }
+    );
+  };
 
   // Return the list in real time when rides complete/cancel
   useEffect(() => {
@@ -221,16 +281,6 @@ const DriverBookingFeed = ({
     );
   };
 
-  const StatusBadge = ({ status }) => (
-    <span
-      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border backdrop-blur whitespace-nowrap ${
-        STATUS_STYLES[status] || STATUS_STYLES.Pending
-      }`}
-    >
-      {status || 'Pending'}
-    </span>
-  );
-
   // Table view columns — same data and actions as the cards.
   const bookingColumns = [
     {
@@ -272,7 +322,7 @@ const DriverBookingFeed = ({
       ? [
           {
             header: 'Status',
-            cell: (b) => <StatusBadge status={b.bookingStatus} />,
+            cell: (b) => <BookingStatusBadge status={b.bookingStatus} size="sm" />,
           },
         ]
       : []),
@@ -289,15 +339,43 @@ const DriverBookingFeed = ({
     {
       header: '',
       tdClassName: 'text-right',
-      cell: (b) => (
-        <button
-          onClick={() => openBooking(b._id)}
-          aria-label={`${actionLabel} ${b._id?.slice(-6)}`}
-          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[40px] bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-xs font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] active:scale-[0.98] transition-all whitespace-nowrap"
-        >
-          {actionLabel}
-        </button>
-      ),
+      cell: (b) => {
+        const acting = acceptingId === b._id || rejectMutation.isPending;
+        return (
+          <span className="inline-flex items-center justify-end gap-1.5">
+            <button
+              onClick={() => openBooking(b._id)}
+              title="View details"
+              aria-label={`View booking ${b._id?.slice(-6)}`}
+              className="p-2 min-w-[40px] min-h-[40px] inline-flex items-center justify-center bg-white/5 border border-white/10 text-gray-300 rounded-2xl text-xs hover:bg-white/10 transition"
+            >
+              <Eye size={14} />
+            </button>
+            {canAct(b) && (
+              <>
+                <button
+                  onClick={() => handleAccept(b._id)}
+                  disabled={acting}
+                  title="Accept request"
+                  aria-label={`Accept booking ${b._id?.slice(-6)}`}
+                  className="p-2 min-w-[40px] min-h-[40px] inline-flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-xs hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {acceptingId === b._id ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                </button>
+                <button
+                  onClick={() => rejectMutation.mutate(b._id)}
+                  disabled={acting}
+                  title="Reject request"
+                  aria-label={`Reject request ${b._id?.slice(-6)}`}
+                  className="p-2 min-w-[40px] min-h-[40px] inline-flex items-center justify-center bg-red-500/15 border border-red-500/25 text-red-300 rounded-2xl text-xs hover:bg-red-500/25 transition disabled:opacity-50"
+                >
+                  <Ban size={14} />
+                </button>
+              </>
+            )}
+          </span>
+        );
+      },
     },
   ];
 
@@ -358,7 +436,7 @@ const DriverBookingFeed = ({
             <Ban size={17} className="text-amber-400" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-white">Active ride · {activeRide.bookingStatus}</p>
+            <p className="text-sm font-semibold text-white">Active ride · {displayStatus(activeRide.bookingStatus)}</p>
             <p className="text-xs text-slate-200/70 mt-1">
               New requests are paused until your current ride completes or is cancelled.
             </p>
@@ -480,7 +558,7 @@ const DriverBookingFeed = ({
                       </span>
                     )}
                     <TripTypeBadge type={b.tripType} />
-                    {showStatus && <StatusBadge status={b.bookingStatus} />}
+                    {showStatus && <BookingStatusBadge status={b.bookingStatus} size="sm" />}
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] text-gray-500">
                       <Clock size={11} /> {formatDateTime(b.pickupDateTime)}
                     </span>
@@ -526,19 +604,46 @@ const DriverBookingFeed = ({
                   <div className="min-w-0 sm:text-right">
                     <p className="text-[10px] uppercase tracking-[0.12em] text-gray-400 font-semibold">Est. fare</p>
                     <p className="text-2xl sm:text-[26px] font-bold bg-gradient-to-r from-emerald-300 to-green-400 bg-clip-text text-transparent leading-tight">
-                      ₹{b.estimatedFare ?? 0}
+                      ₹{Number(b.estimatedFare ?? 0).toLocaleString('en-IN')}
                     </p>
                     <p className="text-[11px] text-gray-500 mt-0.5 hidden sm:block">Fare locked on accept</p>
                   </div>
                   <button
                     onClick={() => openBooking(b._id)}
-                    aria-label={`${actionLabel} ${b._id?.slice(-6)}`}
-                    className="shrink-0 inline-flex items-center justify-center gap-1.5 px-5 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-sm font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all"
+                    aria-label={`View booking ${b._id?.slice(-6)}`}
+                    className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-white/5 border border-white/10 text-gray-200 rounded-2xl text-sm font-semibold hover:bg-white/10 active:scale-[0.98] transition-all"
                   >
-                    <span className="sm:hidden">{actionLabel === 'View & Accept' ? 'View' : actionLabel}</span>
+                    <Eye size={15} />
                     <span className="hidden sm:inline">{actionLabel}</span>
-                    <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
                   </button>
+                  {canAct(b) && (
+                    <button
+                      onClick={() => handleAccept(b._id)}
+                      disabled={acceptingId === b._id || rejectMutation.isPending}
+                      title="Accept request"
+                      aria-label={`Accept booking ${b._id?.slice(-6)}`}
+                      className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-sm font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                    >
+                      {acceptingId === b._id ? (
+                        <Loader2 size={15} className="animate-spin" />
+                      ) : (
+                        <Check size={15} />
+                      )}
+                      <span className="hidden sm:inline">Accept</span>
+                    </button>
+                  )}
+                  {canAct(b) && (
+                    <button
+                      onClick={() => rejectMutation.mutate(b._id)}
+                      disabled={rejectMutation.isPending || acceptingId === b._id}
+                      title="Reject request — it stays open for other drivers"
+                      aria-label={`Reject request ${b._id?.slice(-6)}`}
+                      className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-red-500/15 border border-red-500/25 text-red-300 rounded-2xl text-sm font-semibold hover:bg-red-500/25 active:scale-[0.98] transition-all disabled:opacity-50"
+                    >
+                      <Ban size={15} />
+                      <span className="hidden sm:inline">Reject</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </Motion.article>

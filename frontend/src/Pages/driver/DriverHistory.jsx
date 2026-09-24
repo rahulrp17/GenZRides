@@ -6,6 +6,8 @@ import { TableSkeleton } from '../../components/shared/Skeleton';
 import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
+import { fareApprox, fareTotal } from '../../utils/bookingStatusMeta';
+import { BookingStatusBadge } from '../../utils/bookingStatus';
 import { motion as Motion } from 'framer-motion';
 
 const DriverHistory = () => {
@@ -32,13 +34,6 @@ const DriverHistory = () => {
 
   const rides = data?.data?.rides || (Array.isArray(data?.data) ? data.data : []) || [];
   const pagination = data?.data?.pagination || {};
-
-  const statusColors = {
-    Completed: 'bg-emerald-500/10 text-emerald-400',
-    Cancelled: 'bg-red-500/10 text-red-400',
-    Reached: 'bg-amber-500/10 text-amber-400',
-    'No Show': 'bg-amber-500/10 text-amber-400',
-  };
 
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -72,7 +67,8 @@ const DriverHistory = () => {
                   <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Route</th>
                   <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Date</th>
                   <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Status</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Fare</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Approx Fare</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Total Fare</th>
                   <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase">Earning</th>
                 </tr>
               </thead>
@@ -90,12 +86,11 @@ const DriverHistory = () => {
                       {new Date(r.completedAt || r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[r.bookingStatus] || 'bg-white/10 text-gray-400'}`}>
-                        {r.bookingStatus}
-                      </span>
+                      <BookingStatusBadge status={r.bookingStatus} size="sm" />
                     </td>
-                    <td className="px-6 py-4 text-sm font-medium">₹{r.finalFare || 0}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-emerald-400">₹{r.driverEarning ?? r.finalFare ?? 0}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-300">₹{Number(fareApprox(r)).toLocaleString('en-IN')}</td>
+                    <td className="px-6 py-4 text-sm font-medium">₹{Number(fareTotal(r)).toLocaleString('en-IN')}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-emerald-400">₹{Number(r.driverEarning ?? r.finalFare ?? 0).toLocaleString('en-IN')}</td>
                   </tr>
                 ))}
               </tbody>
@@ -106,10 +101,12 @@ const DriverHistory = () => {
             {rides.map((r) => (
               <div key={r._id} className="bg-white/5 rounded-xl p-4 shadow-sm border border-white/10">
                 <div className="flex items-center justify-between mb-2">
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[r.bookingStatus] || 'bg-white/10 text-gray-400'}`}>
-                    {r.bookingStatus}
-                  </span>
-                  <span className="text-sm font-bold text-emerald-400">₹{r.driverEarning ?? r.finalFare ?? 0}</span>
+                  <BookingStatusBadge status={r.bookingStatus} size="sm" />
+                  <span className="text-sm font-bold text-emerald-400">₹{Number(r.driverEarning ?? r.finalFare ?? 0).toLocaleString('en-IN')}</span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-gray-400 mb-2">
+                  <span>Approx: <span className="text-gray-200 font-semibold">₹{Number(fareApprox(r)).toLocaleString('en-IN')}</span></span>
+                  <span>Total: <span className="text-white font-semibold">₹{Number(fareTotal(r)).toLocaleString('en-IN')}</span></span>
                 </div>
                 <div className="space-y-1 text-sm text-gray-400">
                   <div className="flex items-center gap-2"><MapPin size={12} className="text-emerald-500" /> <span className="truncate">{r.pickup?.address}</span></div>

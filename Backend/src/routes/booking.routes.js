@@ -50,7 +50,9 @@ router.post("/guest/visit", guestBookingLimiter, validate(guestVisitSchema), cre
 router.post("/guest/confirm", guestBookingLimiter, validate(guestConfirmSchema), confirmVisit);
 
 // Public guest self-service (no JWT): ref + phone prove ownership.
-router.post("/guest/lookup", guestBookingLimiter, validate(guestLookupSchema), lookupGuestBooking);
+// Deliberately NOT rate-limited: guests poll this while tracking, and the
+// 8-char reference plus phone check already gates access per booking.
+router.post("/guest/lookup", validate(guestLookupSchema), lookupGuestBooking);
 router.patch("/guest/:id/cancel", guestBookingLimiter, validateParams(bookingIdSchema), validate(guestCancelSchema), guestCancelBooking);
 
 // Customer routes

@@ -587,6 +587,9 @@ const DriverRegister = () => {
     <div className="space-y-6">
       <p className="text-sm text-slate-400">Upload clear photos of your documents and vehicle.</p>
 
+      {/* Sticky, independently scrollable document list on desktop so the
+          step header and Back/Next buttons stay visible while uploading. */}
+      <div className="space-y-6 lg:sticky lg:top-6 lg:max-h-[62vh] lg:overflow-y-auto lg:overscroll-contain lg:rounded-2xl lg:border lg:border-white/5 lg:bg-black/20 lg:p-4 [scrollbar-width:thin] [scrollbar-color:rgba(52,211,153,0.4)_transparent]">
       <div>
         <p className={labelClass}>Aadhaar Front Photo</p>
         <label className="block border-2 border-dashed border-white/10 rounded-xl p-6 text-center hover:border-green-500/60 transition cursor-pointer">
@@ -757,6 +760,7 @@ const DriverRegister = () => {
           <input type="file" accept="image/*" className="hidden"
             onChange={(e) => handleFileChange('insuranceFile', e.target.files)} />
         </label>
+      </div>
       </div>
     </div>
   );

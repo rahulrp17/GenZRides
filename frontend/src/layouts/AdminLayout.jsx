@@ -1,22 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, Navigate, useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import {  Home,  Users,  Car,  Calendar,  Wallet,  Star,  Bell,  LogOut,  Menu,  ChevronDown,  Settings,  LayoutPanelLeft,  User,  PanelLeftClose,  PanelLeftOpen,  Zap,} from "lucide-react";
+import {  Home,  Users,  Car,  Calendar,  Wallet,  Star,  Bell,  LogOut,  Menu,  ChevronDown,  Settings,  LayoutPanelLeft,  User,  PanelLeftClose,  PanelLeftOpen,} from "lucide-react";
 import useAuth from "../hooks/useAuth";
 import SEO from "../components/SEO";
 import PushListener from "../components/PushListener";
 import AutoPushSync from "../components/AutoPushSync";
-import { useAdminCounts } from "../Pages/admin/bookingUtils";
+import SidebarNav from "../components/shared/SidebarNav";
+import { useAdminCounts, useIncompleteVisitorCount } from "../Pages/admin/bookingUtils";
 import { motion as Motion } from "framer-motion";
 
 const navItems = [
   { path: "/", label: "Home", icon: Home, end: true },
   { path: "/admin", label: "Dashboard", icon: LayoutPanelLeft, end: true },
-  { path: "/admin/bookings", label: "Customer Bookings", icon: Calendar },
-  { path: "/admin/booking-requests", label: "Customer Requests", icon: Bell, countKey: "pendingCustomerRequests" },
-  { path: "/admin/instant-bookings", label: "Instant Bookings", icon: Zap },
-  { path: "/admin/instant-bookings/requests", label: "Instant Requests", icon: Bell, countKey: "pendingInstantRequests" },
-  { path: "/admin/visitors", label: "Visitors", icon: Users },
+  {
+    label: "Bookings",
+    icon: Calendar,
+    children: [
+      { path: "/admin/bookings", label: "Customer Bookings" },
+      { path: "/admin/booking-requests", label: "Customer Requests", countKey: "pendingCustomerRequests" },
+      { path: "/admin/instant-bookings", label: "Instant Customer" },
+      { path: "/admin/instant-bookings/requests", label: "Instant Requests", countKey: "pendingInstantRequests" },
+    ],
+  },
+  { path: "/admin/visitors", label: "Visitors", icon: Users, countKey: "incompleteVisitors" },
   { path: "/admin/customers", label: "Customers", icon: Users },
   { path: "/admin/drivers", label: "Drivers", icon: Car },
   { path: "/admin/vehicles", label: "Vehicles", icon: Settings },
@@ -26,27 +33,6 @@ const navItems = [
   { path: "/admin/profile", label: "Profile", icon: User },
 ];
 
-// Live pending-queue badge for request nav items. Hidden when the count is
-// zero; collapses to a dot when the sidebar is collapsed.
-const NavBadge = ({ countKey, collapsed }) => {
-  const { data } = useAdminCounts();
-  const count = Number(data?.[countKey] || 0);
-  if (!count) return null;
-  if (collapsed) {
-    return (
-      <span
-        aria-label={`${count} pending`}
-        className="hidden lg:block absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.9)]"
-      />
-    );
-  }
-  return (
-    <span className="ml-auto min-w-[22px] h-[22px] px-1.5 inline-flex items-center justify-center rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-bold tabular-nums">
-      {count > 99 ? "99+" : count}
-    </span>
-  );
-};
-
 const AdminLayout = () => {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
@@ -54,6 +40,13 @@ const AdminLayout = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  // Live badge counts (real backend data, socket-invalidated).
+  const { data: queueCounts } = useAdminCounts();
+  const { data: incompleteVisitors } = useIncompleteVisitorCount();
+  const badgeCounts = {
+    ...(queueCounts || {}),
+    incompleteVisitors: incompleteVisitors || 0,
+  };
   useEffect(() => {
     if (!dropdownOpen) return;
     const onOutside = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false); };
@@ -97,16 +90,16 @@ const AdminLayout = () => {
       </AnimatePresence>
 
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-72 shrink-0 border-r border-white/10 bg-[#070c0a]/90 backdrop-blur-xl transition-[width,translate] duration-300 ease-out ${
+        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-60 shrink-0 border-r border-white/10 bg-[#070c0a]/90 backdrop-blur-xl transition-[width,translate] duration-300 ease-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        } ${sidebarExpanded ? "" : "lg:w-20"}`}
+        } ${sidebarExpanded ? "" : "lg:w-16"}`}
       >
         <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-green-400/50 to-transparent" />
         <div className="flex h-full flex-col">
-          <div className={`flex h-16 shrink-0 items-center border-b border-white/5 ${sidebarExpanded ? "gap-2 px-5" : "px-4 lg:justify-center lg:px-2"}`}>
+          <div className={`flex h-14 shrink-0 items-center border-b border-white/5 ${sidebarExpanded ? "gap-2 px-4" : "px-3 lg:justify-center lg:px-2"}`}>
             {sidebarExpanded ? (
               <div className="min-w-0">
-                <h1 className="truncate text-lg font-bold text-white">
+                <h1 className="truncate text-base font-bold text-white">
                   Gen<span className="text-green-400">Z</span>Rides
                 </h1>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-gray-500">Admin</p>
@@ -114,54 +107,32 @@ const AdminLayout = () => {
             ) : (
               <>
                 <div className="min-w-0 lg:hidden">
-                  <h1 className="truncate text-lg font-bold text-white">
+                  <h1 className="truncate text-base font-bold text-white">
                     Gen<span className="text-green-400">Z</span>Rides
                   </h1>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-gray-500">Admin</p>
                 </div>
-                <img src="/logo5.png" alt="GenZRides logo" title="GenZRides" className="hidden h-10 w-10 shrink-0 rounded-xl object-cover ring-1 ring-green-500/40 shadow-[0_0_24px_rgba(34,197,94,0.35)] lg:block" />
+                <img src="/logo5.png" alt="GenZRides logo" title="GenZRides" className="hidden h-9 w-9 shrink-0 rounded-xl object-cover ring-1 ring-green-500/40 shadow-[0_0_24px_rgba(34,197,94,0.35)] lg:block" />
               </>
             )}
           </div>
 
-          <nav className={`flex-1 space-y-1 overflow-y-auto ${sidebarExpanded ? "p-3" : "p-3 lg:p-2"}`}>
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.end}
-                onClick={() => setSidebarOpen(false)}
-                title={sidebarExpanded ? undefined : item.label}
-                className={({ isActive }) =>
-                  `group relative flex items-center rounded-xl text-sm font-medium transition-all duration-200 ${
-                    sidebarExpanded
-                      ? "gap-3 px-3.5 py-2.5"
-                      : "gap-3 px-3.5 py-2.5 lg:mx-auto lg:h-11 lg:w-11 lg:justify-center lg:gap-0 lg:px-0 lg:py-0"
-                  } ${
-                    isActive
-                      ? "border border-green-500/30 bg-green-500/10 text-green-300 shadow-[0_0_20px_rgba(34,197,94,0.18)]"
-                      : "border border-transparent text-gray-400 hover:border-white/10 hover:bg-white/5 hover:text-white"
-                  }`
-                }
-              >
-                <item.icon size={20} className="shrink-0 transition-transform duration-200 group-hover:scale-110" />
-                <span className={`truncate ${sidebarExpanded ? "" : "lg:hidden"}`}>{item.label}</span>
-                {item.countKey && (
-                  <NavBadge countKey={item.countKey} collapsed={!sidebarExpanded} />
-                )}
-              </NavLink>
-            ))}
-          </nav>
+          <SidebarNav
+            items={navItems}
+            expanded={sidebarExpanded || sidebarOpen}
+            badgeCounts={badgeCounts}
+            onNavigate={() => setSidebarOpen(false)}
+          />
 
-          <div className={`shrink-0 border-t border-white/5 ${sidebarExpanded ? "p-3" : "p-3 lg:p-2"}`}>
+          <div className={`shrink-0 border-t border-white/5 ${sidebarExpanded ? "p-2.5" : "p-2.5 lg:p-2"}`}>
             <button
               onClick={handleLogout}
               title={sidebarExpanded ? undefined : "Sign Out"}
-              className={`flex w-full items-center rounded-xl text-sm font-medium text-red-400/90 transition hover:bg-red-500/10 hover:text-red-300 ${
-                sidebarExpanded ? "gap-3 px-3.5 py-2.5" : "gap-3 px-3.5 py-2.5 lg:mx-auto lg:h-11 lg:w-11 lg:justify-center lg:gap-0 lg:px-0 lg:py-0"
+              className={`group relative flex w-full items-center rounded-xl text-[13px] font-medium text-red-400/90 transition hover:bg-red-500/10 hover:text-red-300 ${
+                sidebarExpanded ? "gap-2.5 px-3 py-2" : "gap-2.5 px-3 py-2 lg:mx-auto lg:h-10 lg:w-10 lg:justify-center lg:gap-0 lg:px-0 lg:py-0"
               }`}
             >
-              <LogOut size={20} className="shrink-0" />
+              <LogOut size={18} className="shrink-0" />
               <span className={sidebarExpanded ? "" : "lg:hidden"}>Sign Out</span>
             </button>
           </div>
@@ -198,10 +169,14 @@ const AdminLayout = () => {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-3 px-3 py-2 hover:bg-white/5 rounded-xl transition"
               >
-                <div className="w-9 h-9 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center">
-                  <span className="font-semibold text-sm">
-                    {user?.name?.charAt(0)?.toUpperCase() || "A"}
-                  </span>
+                <div className="w-9 h-9 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center overflow-hidden shrink-0">
+                  {user?.profileImage ? (
+                    <img src={user.profileImage} alt="" className="w-9 h-9 rounded-full object-cover" />
+                  ) : (
+                    <span className="font-semibold text-sm">
+                      {user?.name?.charAt(0)?.toUpperCase() || "A"}
+                    </span>
+                  )}
                 </div>
                 <div className="hidden sm:block text-left">
                   <p className="text-sm font-medium text-white">

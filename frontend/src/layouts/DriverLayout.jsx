@@ -3,7 +3,7 @@ import { NavLink, Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import {
   Home, Car, Clock, Wallet, Star, Bell, User,
-  FileText, LogOut, Menu, ChevronDown, IndianRupee, LayoutPanelLeft, Calendar, PanelLeftClose, PanelLeftOpen, Zap, ClipboardList
+  FileText, LogOut, Menu, ChevronDown, IndianRupee, LayoutPanelLeft, Calendar, PanelLeftClose, PanelLeftOpen
 } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 import { useSocket } from '../Context/SocketContext';
@@ -12,14 +12,21 @@ import SEO from '../components/SEO';
 import PushListener from '../components/PushListener';
 import AutoPushSync from '../components/AutoPushSync';
 import DriverLocationSharer from '../components/DriverLocationSharer';
+import SidebarNav from '../components/shared/SidebarNav';
 import { motion as Motion } from 'framer-motion';
 
 const navItems = [
   { path: '/', label: 'Home', icon: Home, end: true },
   { path: '/driver', label: 'Dashboard', icon: LayoutPanelLeft, end: true },
-  { path: '/driver/instant-bookings', label: 'Instant Bookings', icon: Zap },
-  { path: '/driver/customer-requests', label: 'Customer Requests', icon: Calendar },
-  { path: '/driver/my-bookings', label: 'My Bookings', icon: ClipboardList },
+  {
+    label: 'Bookings',
+    icon: Calendar,
+    children: [
+      { path: '/driver/my-bookings', label: 'My Bookings' },
+      { path: '/driver/instant-bookings', label: 'Instant Bookings Request' },
+      { path: '/driver/customer-requests', label: 'Customer Booking Request' },
+    ],
+  },
   { path: '/driver/ride', label: 'Current Ride', icon: Car },
   { path: '/driver/history', label: 'Ride History', icon: Clock },
   { path: '/driver/earnings', label: 'Earnings', icon: IndianRupee },
@@ -135,16 +142,16 @@ const DriverLayout = () => {
       </AnimatePresence>
 
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-72 shrink-0 border-r border-white/10 bg-[#070c0a]/90 backdrop-blur-xl transition-[width,translate] duration-300 ease-out ${
+        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-60 shrink-0 border-r border-white/10 bg-[#070c0a]/90 backdrop-blur-xl transition-[width,translate] duration-300 ease-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        } ${sidebarExpanded ? "" : "lg:w-20"}`}
+        } ${sidebarExpanded ? "" : "lg:w-16"}`}
       >
         <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-green-400/50 to-transparent" />
         <div className="flex h-full flex-col">
-          <div className={`flex h-16 shrink-0 items-center border-b border-white/5 ${sidebarExpanded ? "gap-2 px-5" : "px-4 lg:justify-center lg:px-2"}`}>
+          <div className={`flex h-14 shrink-0 items-center border-b border-white/5 ${sidebarExpanded ? "gap-2 px-4" : "px-3 lg:justify-center lg:px-2"}`}>
             {sidebarExpanded ? (
               <div className="min-w-0">
-                <h1 className="truncate text-lg font-bold text-white">
+                <h1 className="truncate text-base font-bold text-white">
                   Gen<span className="text-green-400">Z</span>Rides
                 </h1>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-gray-500">Driver</p>
@@ -152,51 +159,31 @@ const DriverLayout = () => {
             ) : (
               <>
                 <div className="min-w-0 lg:hidden">
-                  <h1 className="truncate text-lg font-bold text-white">
+                  <h1 className="truncate text-base font-bold text-white">
                     Gen<span className="text-green-400">Z</span>Rides
                   </h1>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-gray-500">Driver</p>
                 </div>
-                <img src="/logo5.png" alt="GenZRides logo" title="GenZRides" className="hidden h-10 w-10 shrink-0 rounded-xl object-cover ring-1 ring-green-500/40 shadow-[0_0_24px_rgba(34,197,94,0.35)] lg:block" />
+                <img src="/logo5.png" alt="GenZRides logo" title="GenZRides" className="hidden h-9 w-9 shrink-0 rounded-xl object-cover ring-1 ring-green-500/40 shadow-[0_0_24px_rgba(34,197,94,0.35)] lg:block" />
               </>
             )}
           </div>
 
-          <nav className={`flex-1 space-y-1 overflow-y-auto ${sidebarExpanded ? "p-3" : "p-3 lg:p-2"}`}>
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.end}
-                onClick={() => setSidebarOpen(false)}
-                title={sidebarExpanded ? undefined : item.label}
-                className={({ isActive }) =>
-                  `group flex items-center rounded-xl text-sm font-medium transition-all duration-200 ${
-                    sidebarExpanded
-                      ? "gap-3 px-3.5 py-2.5"
-                      : "gap-3 px-3.5 py-2.5 lg:mx-auto lg:h-11 lg:w-11 lg:justify-center lg:gap-0 lg:px-0 lg:py-0"
-                  } ${
-                    isActive
-                      ? "border border-green-500/30 bg-green-500/10 text-green-300 shadow-[0_0_20px_rgba(34,197,94,0.18)]"
-                      : "border border-transparent text-gray-400 hover:border-white/10 hover:bg-white/5 hover:text-white"
-                  }`
-                }
-              >
-                <item.icon size={20} className="shrink-0 transition-transform duration-200 group-hover:scale-110" />
-                <span className={`truncate ${sidebarExpanded ? "" : "lg:hidden"}`}>{item.label}</span>
-              </NavLink>
-            ))}
-          </nav>
+          <SidebarNav
+            items={navItems}
+            expanded={sidebarExpanded || sidebarOpen}
+            onNavigate={() => setSidebarOpen(false)}
+          />
 
-          <div className={`shrink-0 border-t border-white/5 ${sidebarExpanded ? "p-3" : "p-3 lg:p-2"}`}>
+          <div className={`shrink-0 border-t border-white/5 ${sidebarExpanded ? "p-2.5" : "p-2.5 lg:p-2"}`}>
             <button
               onClick={handleLogout}
               title={sidebarExpanded ? undefined : "Sign Out"}
-              className={`flex w-full items-center rounded-xl text-sm font-medium text-red-400/90 transition hover:bg-red-500/10 hover:text-red-300 ${
-                sidebarExpanded ? "gap-3 px-3.5 py-2.5" : "gap-3 px-3.5 py-2.5 lg:mx-auto lg:h-11 lg:w-11 lg:justify-center lg:gap-0 lg:px-0 lg:py-0"
+              className={`group relative flex w-full items-center rounded-xl text-[13px] font-medium text-red-400/90 transition hover:bg-red-500/10 hover:text-red-300 ${
+                sidebarExpanded ? "gap-2.5 px-3 py-2" : "gap-2.5 px-3 py-2 lg:mx-auto lg:h-10 lg:w-10 lg:justify-center lg:gap-0 lg:px-0 lg:py-0"
               }`}
             >
-              <LogOut size={20} className="shrink-0" />
+              <LogOut size={18} className="shrink-0" />
               <span className={sidebarExpanded ? "" : "lg:hidden"}>Sign Out</span>
             </button>
           </div>

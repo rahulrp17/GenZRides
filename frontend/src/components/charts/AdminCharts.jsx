@@ -1,32 +1,63 @@
-import React from 'react';
-import {
-  BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-} from 'recharts';
+import React, { useEffect, useRef } from "react";
+import * as echarts from "echarts";
 
-const COLORS = ['#f59e0b', '#10b981', '#ef4444', '#818cf8'];
-const BAR_COLORS = ['#818cf8', '#34d399', '#60a5fa'];
+const fmtIN = (n) => Number(n || 0).toLocaleString("en-IN");
 
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-3.5 min-w-[140px]">
-        <p className="text-xs font-semibold text-white mb-1.5 tracking-wide">{label || payload[0]?.name}</p>
-        {payload.map((entry, i) => (
-          <div key={i} className="flex items-center justify-between gap-4 text-sm">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color || entry.payload?.fill }} />
-              <span className="text-gray-400">{entry.name}</span>
-            </span>
-            <span className="font-semibold text-white">
-              {typeof entry.value === 'number' ? entry.value.toLocaleString('en-IN') : entry.value}
-            </span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  return null;
+const AXIS_LABEL = { fontSize: 12, color: "#9ca3af" };
+const SPLIT_LINE = { lineStyle: { color: "rgba(255,255,255,0.06)", type: [4, 4] } };
+const DARK_TOOLTIP = {
+  backgroundColor: "rgba(15,23,42,0.95)",
+  borderColor: "rgba(255,255,255,0.1)",
+  textStyle: { color: "#fff", fontSize: 12 },
+};
+const LEGEND = {
+  type: "scroll",
+  bottom: 0,
+  icon: "circle",
+  itemWidth: 8,
+  itemHeight: 8,
+  pageIconColor: "#34d399",
+  pageIconInactiveColor: "#4b5563",
+  pageTextStyle: { color: "#9ca3af" },
+  textStyle: { color: "#9ca3af", fontSize: 12 },
+};
+const grad = (from, to) =>
+  new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+    { offset: 0, color: from },
+    { offset: 1, color: to },
+  ]);
+
+/* ===========================================================
+   Responsive ECharts wrapper: resizes with its container on
+   every breakpoint (mobile → tablet → desktop) and disposes
+   cleanly on unmount.
+========================================================== */
+
+const EChart = ({ option, height = 280 }) => {
+  const ref = useRef(null);
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const chart = echarts.init(ref.current, null, { renderer: "canvas" });
+    chartRef.current = chart;
+    const ro = new ResizeObserver(() => chart.resize());
+    ro.observe(ref.current);
+    const onResize = () => chart.resize();
+    window.addEventListener("resize", onResize);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", onResize);
+      chart.dispose();
+      chartRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    chartRef.current?.setOption(option, { notMerge: true });
+  }, [option]);
+
+  return <div ref={ref} style={{ width: "100%", height }} />;
 };
 
 const EmptyChart = ({ message }) => (
@@ -40,7 +71,7 @@ const EmptyChart = ({ message }) => (
   </div>
 );
 
-const ChartCard = ({ children, title, subtitle, accentColor = 'green', className = '' }) => (
+const ChartCard = ({ children, title, subtitle, accentColor = "green", className = "" }) => (
   <div className={`relative overflow-hidden bg-white/[0.04] backdrop-blur-xl rounded-[28px] border border-white/[0.08] p-5 sm:p-6 min-w-0 ${className}`}>
     <div className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-${accentColor}-400/50 to-transparent`} />
     <h3 className="font-display text-base font-bold text-white tracking-tight">{title}</h3>
@@ -49,6 +80,13 @@ const ChartCard = ({ children, title, subtitle, accentColor = 'green', className
   </div>
 );
 
+const STATUS_COLORS = {
+  Pending: "#f59e0b",
+  Completed: "#10b981",
+  Cancelled: "#ef4444",
+  "In Progress": "#818cf8",
+};
+
 const AdminCharts = ({ stats = {} }) => {
   const total = Number(stats.totalBookings || 0);
   const pending = Number(stats.pendingBookings || 0);
@@ -56,253 +94,204 @@ const AdminCharts = ({ stats = {} }) => {
   const cancelled = Number(stats.cancelledBookings || 0);
   const inProgress = Math.max(0, total - pending - completed - cancelled);
 
-  /* ── Pie: Bookings by Status ─────────────────────────────── */
+  /* ── Donut: Bookings by Status ───────────────────────────── */
   const statusData = [
-    { name: 'Pending', value: pending },
-    { name: 'Completed', value: completed },
-    { name: 'Cancelled', value: cancelled },
-    { name: 'In Progress', value: inProgress },
+    { name: "Pending", value: pending },
+    { name: "Completed", value: completed },
+    { name: "Cancelled", value: cancelled },
+    { name: "In Progress", value: inProgress },
   ];
   const hasStatusData = statusData.some((d) => d.value > 0);
+  const statusOption = {
+    tooltip: { ...DARK_TOOLTIP, trigger: "item", formatter: (p) => `${p.name}: ${fmtIN(p.value)} (${p.percent}%)` },
+    legend: LEGEND,
+    series: [
+      {
+        type: "pie",
+        radius: ["55%", "75%"],
+        center: ["50%", "44%"],
+        avoidLabelOverlap: true,
+        // Tiny slices hide their label automatically so nothing overflows
+        // on narrow phone screens; values stay one tap away in the tooltip.
+        minShowLabelAngle: 18,
+        itemStyle: { borderColor: "#0f172a", borderWidth: 2, borderRadius: 6 },
+        // Labels live INSIDE the slices (never outside the chart), so the
+        // donut stays premium and overlap-free from 320px phones upward.
+        label: {
+          position: "inside",
+          color: "#fff",
+          fontSize: 11,
+          fontWeight: 600,
+          lineHeight: 14,
+          formatter: (p) => (p.percent >= 9 ? `${p.name}\n${Math.round(p.percent)}%` : ""),
+        },
+        labelLine: { show: false },
+        emphasis: { scale: true, scaleSize: 4 },
+        data: statusData.map((d) => ({
+          ...d,
+          itemStyle: { color: STATUS_COLORS[d.name] },
+        })),
+      },
+    ],
+  };
 
   /* ── Bar: Revenue by Trip Type ───────────────────────────── */
   const revenueData = [
-    { name: 'One-Way', revenue: Number(stats.oneWayRevenue || 0) },
-    { name: 'Round-Trip', revenue: Number(stats.roundTripRevenue || 0) },
+    { name: "One-Way", value: Number(stats.oneWayRevenue || 0), colors: ["#818cf8", "#6366f1"] },
+    { name: "Round-Trip", value: Number(stats.roundTripRevenue || 0), colors: ["#34d399", "#10b981"] },
   ];
-  const hasRevenueData = revenueData.some((d) => d.revenue > 0);
+  const hasRevenueData = revenueData.some((d) => d.value > 0);
+  const revenueOption = {
+    tooltip: {
+      ...DARK_TOOLTIP,
+      trigger: "axis",
+      axisPointer: { type: "shadow", shadowStyle: { color: "rgba(255,255,255,0.03)" } },
+      valueFormatter: (v) => `₹${fmtIN(v)}`,
+    },
+    grid: { left: 8, right: 16, top: 12, bottom: 0, containLabel: true },
+    xAxis: { type: "category", data: revenueData.map((d) => d.name), axisLabel: AXIS_LABEL, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: {
+      type: "value",
+      axisLabel: { ...AXIS_LABEL, formatter: (v) => `₹${(v / 1000).toFixed(0)}k` },
+      splitLine: SPLIT_LINE,
+    },
+    series: [
+      {
+        type: "bar",
+        data: revenueData.map((d) => ({
+          value: d.value,
+          itemStyle: { color: grad(d.colors[0], d.colors[1]), borderRadius: [10, 10, 0, 0] },
+        })),
+        barWidth: "38%",
+      },
+    ],
+  };
 
-  /* ── Bar: Total Bookings by Status ───────────────────────── */
-  const bookingsStatusData = [
-    { name: 'Pending', count: pending },
-    { name: 'Completed', count: completed },
-    { name: 'Cancelled', count: cancelled },
-    { name: 'In Progress', count: inProgress },
+  /* ── Bar: outcome counts (shared builder) ────────────────── */
+  const countBarOption = (rows) => ({
+    tooltip: {
+      ...DARK_TOOLTIP,
+      trigger: "axis",
+      axisPointer: { type: "shadow", shadowStyle: { color: "rgba(255,255,255,0.03)" } },
+      valueFormatter: (v) => fmtIN(v),
+    },
+    grid: { left: 8, right: 16, top: 12, bottom: 0, containLabel: true },
+    xAxis: { type: "category", data: rows.map((d) => d.name), axisLabel: AXIS_LABEL, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: { type: "value", axisLabel: AXIS_LABEL, splitLine: SPLIT_LINE, minInterval: 1 },
+    series: [
+      {
+        type: "bar",
+        data: rows.map((d) => ({
+          value: d.value,
+          itemStyle: { color: grad(d.from, d.to), borderRadius: [8, 8, 0, 0] },
+        })),
+        barWidth: "34%",
+      },
+    ],
+  });
+  const paint = (name, value) =>
+    name === "Pending"
+      ? { name, value, from: "#fbbf24", to: "#f59e0b" }
+      : name === "Completed"
+        ? { name, value, from: "#34d399", to: "#10b981" }
+        : { name, value, from: "#f87171", to: "#ef4444" };
+
+  const bookingsStatusRows = [
+    paint("Pending", pending),
+    paint("Completed", completed),
+    paint("Cancelled", cancelled),
+    { name: "In Progress", value: inProgress, from: "#818cf8", to: "#6366f1" },
   ];
-  const hasBookingsStatusData = bookingsStatusData.some((d) => d.count > 0);
+  const hasBookingsStatusData = bookingsStatusRows.some((d) => d.value > 0);
 
-  /* ── Bar: One-Way Bookings by Status ─────────────────────── */
-  const oneWayData = [
-    { name: 'Pending', count: Number(stats.oneWayPending || 0) },
-    { name: 'Completed', count: Number(stats.oneWayCompleted || 0) },
-    { name: 'Cancelled', count: Number(stats.oneWayCancelled || 0) },
+  const oneWayRows = [
+    paint("Pending", Number(stats.oneWayPending || 0)),
+    paint("Completed", Number(stats.oneWayCompleted || 0)),
+    paint("Cancelled", Number(stats.oneWayCancelled || 0)),
   ];
-  const hasOneWayData = oneWayData.some((d) => d.count > 0);
+  const hasOneWayData = oneWayRows.some((d) => d.value > 0);
 
-  /* ── Bar: Round-Trip Bookings by Status ──────────────────── */
-  const roundTripData = [
-    { name: 'Pending', count: Number(stats.roundTripPending || 0) },
-    { name: 'Completed', count: Number(stats.roundTripCompleted || 0) },
-    { name: 'Cancelled', count: Number(stats.roundTripCancelled || 0) },
+  const roundTripRows = [
+    paint("Pending", Number(stats.roundTripPending || 0)),
+    paint("Completed", Number(stats.roundTripCompleted || 0)),
+    paint("Cancelled", Number(stats.roundTripCancelled || 0)),
   ];
-  const hasRoundTripData = roundTripData.some((d) => d.count > 0);
+  const hasRoundTripData = roundTripRows.some((d) => d.value > 0);
 
-  /* ── Bar: Weekly One-Way vs Round-Trip (last 7 days) ─────── */
+  /* ── Line: Weekly One-Way vs Round-Trip ──────────────────── */
   const weeklyData = stats.weeklyData || [];
   const hasWeeklyData = weeklyData.some((d) => d.oneWay > 0 || d.roundTrip > 0);
+  const weeklyOption = {
+    tooltip: { ...DARK_TOOLTIP, trigger: "axis", valueFormatter: (v) => fmtIN(v) },
+    legend: { ...LEGEND, top: 0 },
+    grid: { left: 8, right: 16, top: 36, bottom: 0, containLabel: true },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: weeklyData.map((d) => d.day),
+      axisLabel: AXIS_LABEL,
+      axisLine: { show: false },
+      axisTick: { show: false },
+    },
+    yAxis: { type: "value", axisLabel: AXIS_LABEL, splitLine: SPLIT_LINE, minInterval: 1 },
+    series: [
+      {
+        name: "One-Way",
+        type: "line",
+        smooth: true,
+        symbol: "circle",
+        symbolSize: 7,
+        data: weeklyData.map((d) => d.oneWay),
+        lineStyle: { width: 3, color: "#818cf8" },
+        itemStyle: { color: "#818cf8", borderColor: "#0f172a", borderWidth: 2 },
+        areaStyle: { color: grad("rgba(129,140,248,0.35)", "rgba(129,140,248,0)") },
+      },
+      {
+        name: "Round-Trip",
+        type: "line",
+        smooth: true,
+        symbol: "circle",
+        symbolSize: 7,
+        data: weeklyData.map((d) => d.roundTrip),
+        lineStyle: { width: 3, color: "#34d399" },
+        itemStyle: { color: "#34d399", borderColor: "#0f172a", borderWidth: 2 },
+        areaStyle: { color: grad("rgba(52,211,153,0.35)", "rgba(52,211,153,0)") },
+      },
+    ],
+  };
 
   return (
     <div className="space-y-4 sm:space-y-6 min-w-0">
-      {/* Row 1 — Pie + Revenue */}
+      {/* Row 1 — Donut + Revenue */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <ChartCard title="Bookings by Status" subtitle="Live distribution from all bookings" accentColor="amber">
-          <ResponsiveContainer width="100%" height={280}>
-            {hasStatusData ? (
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  innerRadius={55}
-                  dataKey="value"
-                  nameKey="name"
-                  stroke="#1e293b"
-                  strokeWidth={2}
-                  label={({ name, percent }) => (percent > 0.05 ? `${name}: ${(percent * 100).toFixed(0)}%` : '')}
-                  labelLine={false}
-                >
-                  {statusData.map((entry, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} stroke="#1e293b" strokeWidth={1} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ fontSize: 12 }} iconSize={10} />
-              </PieChart>
-            ) : (
-              <EmptyChart message="No booking data yet" />
-            )}
-          </ResponsiveContainer>
+          {hasStatusData ? <EChart option={statusOption} height={280} /> : <EmptyChart message="No booking data yet" />}
         </ChartCard>
 
         <ChartCard title="Revenue by Trip Type" subtitle="Completed booking revenue split" accentColor="emerald">
-          <ResponsiveContainer width="100%" height={280}>
-            {hasRevenueData ? (
-              <BarChart data={revenueData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={64}>
-                <defs>
-                  <linearGradient id="gradOneWay" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#818cf8" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.8} />
-                  </linearGradient>
-                  <linearGradient id="gradRoundTrip" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.8} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                <Bar dataKey="revenue" name="Revenue" radius={[10, 10, 0, 0]}>
-                  {revenueData.map((entry, index) => (
-                    <Cell key={index} fill={index === 0 ? 'url(#gradOneWay)' : 'url(#gradRoundTrip)'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            ) : (
-              <EmptyChart message="No revenue data yet" />
-            )}
-          </ResponsiveContainer>
+          {hasRevenueData ? <EChart option={revenueOption} height={280} /> : <EmptyChart message="No revenue data yet" />}
         </ChartCard>
       </div>
 
-      {/* Row 2 — Total Bookings + One-Way */}
+      {/* Row 2 — Weekly line + Status bar */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <ChartCard title="Total Bookings" subtitle="All bookings by current status" accentColor="blue">
-          <ResponsiveContainer width="100%" height={260}>
-            {hasBookingsStatusData ? (
-              <BarChart data={bookingsStatusData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={48}>
-                <defs>
-                  <linearGradient id="gradPending" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.85} />
-                  </linearGradient>
-                  <linearGradient id="gradCompleted" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.85} />
-                  </linearGradient>
-                  <linearGradient id="gradCancelled" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f87171" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#ef4444" stopOpacity={0.85} />
-                  </linearGradient>
-                  <linearGradient id="gradInProgress" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#818cf8" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.85} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                <Bar dataKey="count" name="Bookings" radius={[8, 8, 0, 0]}>
-                  {bookingsStatusData.map((entry, index) => (
-                    <Cell key={index} fill={['url(#gradPending)', 'url(#gradCompleted)', 'url(#gradCancelled)', 'url(#gradInProgress)'][index]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            ) : (
-              <EmptyChart message="No booking data yet" />
-            )}
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <ChartCard title="One-Way Bookings" subtitle="Point-to-point trip breakdown" accentColor="indigo">
-          <ResponsiveContainer width="100%" height={260}>
-            {hasOneWayData ? (
-              <BarChart data={oneWayData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={52}>
-                <defs>
-                  <linearGradient id="gradOWPending" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.85} />
-                  </linearGradient>
-                  <linearGradient id="gradOWCompleted" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.85} />
-                  </linearGradient>
-                  <linearGradient id="gradOWCancelled" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f87171" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#ef4444" stopOpacity={0.85} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                <Bar dataKey="count" name="One-Way" radius={[8, 8, 0, 0]}>
-                  {oneWayData.map((entry, index) => (
-                    <Cell key={index} fill={['url(#gradOWPending)', 'url(#gradOWCompleted)', 'url(#gradOWCancelled)'][index]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            ) : (
-              <EmptyChart message="No one-way booking data yet" />
-            )}
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
-
-      {/* Row 3 — Round-Trip + Weekly */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <ChartCard title="Round-Trip Bookings" subtitle="Multi-day round-trip breakdown" accentColor="emerald">
-          <ResponsiveContainer width="100%" height={260}>
-            {hasRoundTripData ? (
-              <BarChart data={roundTripData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={52}>
-                <defs>
-                  <linearGradient id="gradRTPending" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#fbbf24" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.85} />
-                  </linearGradient>
-                  <linearGradient id="gradRTCompleted" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.85} />
-                  </linearGradient>
-                  <linearGradient id="gradRTCancelled" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f87171" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#ef4444" stopOpacity={0.85} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                <Bar dataKey="count" name="Round-Trip" radius={[8, 8, 0, 0]}>
-                  {roundTripData.map((entry, index) => (
-                    <Cell key={index} fill={['url(#gradRTPending)', 'url(#gradRTCompleted)', 'url(#gradRTCancelled)'][index]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            ) : (
-              <EmptyChart message="No round-trip booking data yet" />
-            )}
-          </ResponsiveContainer>
-        </ChartCard>
-
         <ChartCard title="Weekly Bookings" subtitle="One-Way vs Round-Trip (last 7 days)" accentColor="purple">
-          <ResponsiveContainer width="100%" height={260}>
-            {hasWeeklyData ? (
-              <BarChart data={weeklyData} margin={{ top: 8, right: 16, left: -12, bottom: 0 }} barSize={32}>
-                <defs>
-                  <linearGradient id="gradWeeklyOW" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#818cf8" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.85} />
-                  </linearGradient>
-                  <linearGradient id="gradWeeklyRT" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#34d399" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.85} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                <Legend wrapperStyle={{ fontSize: 12 }} iconSize={10} />
-                <Bar dataKey="oneWay" name="One-Way" fill="url(#gradWeeklyOW)" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="roundTrip" name="Round-Trip" fill="url(#gradWeeklyRT)" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            ) : (
-              <EmptyChart message="No weekly booking data yet" />
-            )}
-          </ResponsiveContainer>
+          {hasWeeklyData ? <EChart option={weeklyOption} height={280} /> : <EmptyChart message="No weekly booking data yet" />}
+        </ChartCard>
+
+        <ChartCard title="Total Bookings" subtitle="All bookings by current status" accentColor="blue">
+          {hasBookingsStatusData ? <EChart option={countBarOption(bookingsStatusRows)} height={280} /> : <EmptyChart message="No booking data yet" />}
+        </ChartCard>
+      </div>
+
+      {/* Row 3 — One-Way + Round-Trip bars */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <ChartCard title="One-Way Bookings" subtitle="Point-to-point trip breakdown" accentColor="indigo">
+          {hasOneWayData ? <EChart option={countBarOption(oneWayRows)} height={260} /> : <EmptyChart message="No one-way booking data yet" />}
+        </ChartCard>
+
+        <ChartCard title="Round-Trip Bookings" subtitle="Multi-day round-trip breakdown" accentColor="emerald">
+          {hasRoundTripData ? <EChart option={countBarOption(roundTripRows)} height={260} /> : <EmptyChart message="No round-trip booking data yet" />}
         </ChartCard>
       </div>
 

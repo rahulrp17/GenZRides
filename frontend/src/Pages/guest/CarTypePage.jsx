@@ -200,7 +200,7 @@ const CarTypePage = () => {
                             </span>
                           ) : fare ? (
                             <p className="text-xl font-bold text-green-400">
-                              ₹{fare.estimatedFare.toLocaleString()}
+                              ₹{fare.estimatedFare.toLocaleString('en-IN')}
                               <span className="text-xs font-normal text-gray-500 ml-2">{fare.distance?.toFixed(1)} km · {formatTripDuration(fare.duration)}</span>
                             </p>
                           ) : (

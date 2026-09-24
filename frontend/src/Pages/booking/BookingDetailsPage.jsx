@@ -18,30 +18,12 @@ import ErrorState from '../../components/shared/ErrorState';
 import Modal from '../../components/shared/Modal';
 import CancelReasonDialog from '../../components/shared/CancelReasonDialog';
 import RideTimeline from '../../components/shared/RideTimeline';
+import { BookingStatusBadge } from '../../utils/bookingStatus';
+import { fareTotal } from '../../utils/bookingStatusMeta';
 
 const STATUS_ORDER = ['Accepted', 'On The Way', 'Arrived', 'Started', 'Reached', 'Completed'];
 
-const STATUS_LABELS = {
-  Pending: 'Pending',
-  Accepted: 'Driver Accepted',
-  'On The Way': 'On the Way',
-  Arrived: 'Arrived at Pickup',
-  Started: 'Ride Started',
-  Reached: 'Reached Destination',
-  Completed: 'Completed',
-  Cancelled: 'Cancelled',
-};
 
-const STATUS_COLORS = {
-  Pending: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
-  Accepted: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
-  'On The Way': 'bg-purple-500/20 text-purple-400 border border-purple-500/30',
-  Arrived: 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30',
-  Started: 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30',
-  Reached: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
-  Completed: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
-  Cancelled: 'bg-red-500/20 text-red-400 border border-red-500/30',
-};
 
 const formatDateTime = (dateStr) => {
   if (!dateStr) return 'N/A';
@@ -235,9 +217,7 @@ const BookingDetailsPage = () => {
                 {copied ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
                 <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
               </button>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_COLORS[booking.bookingStatus] || 'bg-white/10 text-gray-300'}`}>
-                {STATUS_LABELS[booking.bookingStatus] || booking.bookingStatus}
-              </span>
+              <BookingStatusBadge status={booking.bookingStatus} />
             </div>
           </div>
         </div>
@@ -298,8 +278,9 @@ const BookingDetailsPage = () => {
               <p className="text-sm font-medium text-white mt-0.5">{formatTripDuration(booking.duration)}</p>
             </div>
             <div className="bg-white/5 rounded-xl p-3">
-              <p className="text-xs text-gray-400 flex items-center gap-1"><CreditCard size={12} /> Fare</p>
-              <p className="text-sm font-bold text-emerald-400 mt-0.5">₹{booking.finalFare || booking.estimatedFare || 'N/A'}</p>
+              <p className="text-xs text-gray-400 flex items-center gap-1"><CreditCard size={12} /> Total Fare</p>
+              <p className="text-sm font-bold text-emerald-400 mt-0.5">₹{fareTotal(booking).toLocaleString('en-IN')}</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">Approx ₹{(booking.estimatedFare ?? 0).toLocaleString('en-IN')}</p>
             </div>
             <div className="bg-white/5 rounded-xl p-3">
               <p className="text-xs text-gray-400 flex items-center gap-1"><CircleDot size={12} /> Trip Type</p>

@@ -492,6 +492,18 @@ export const acceptBooking = async (
     );
   }
 
+  // A driver who rejected a request can never accept it afterwards —
+  // the ride stays open for other drivers only.
+  if (
+    booking.rejectedDrivers?.some(
+      (id) => id.toString() === driver._id.toString()
+    )
+  ) {
+    throw new Error(
+      "You have already rejected this request."
+    );
+  }
+
   // Vehicle-type guard: a driver may only accept bookings for their own
   // cab type (SUV bookings → SUV drivers only, Sedan → Sedan, etc.).
   // This also blocks direct accepts on bookings created without dispatch.

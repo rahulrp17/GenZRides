@@ -9,7 +9,7 @@ import {
   Car, MapPin, Navigation, Phone, Clock, CheckCircle,
   Play, Radio, Wifi, WifiOff,
   User, IndianRupee, CreditCard, CircleDot, X, Flag,
-  Banknote,
+  Banknote, Loader2,
 } from 'lucide-react';
 import { driverAPI, bookingAPI, mapsAPI } from '../../services/endpoints';
 import { CardSkeleton } from '../../components/shared/Skeleton';
@@ -20,16 +20,17 @@ import CancelReasonDialog from '../../components/shared/CancelReasonDialog';
 import RideTimeline from '../../components/shared/RideTimeline';
 import { useRideTime } from '../../components/shared/RideTimer';
 import { useSocket } from '../../Context/SocketContext';
+import { displayStatus } from '../../utils/bookingStatusMeta';
 
 const GOOGLE_MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
 const STATUS_FLOW = [
-  { key: 'Accepted', label: 'Accepted', sublabel: 'Ride assigned', icon: CheckCircle, color: 'emerald', ring: 'ring-emerald-300', bg: 'bg-emerald-500', text: 'text-emerald-400', light: 'bg-emerald-50', tsKey: 'acceptedAt' },
-  { key: 'On The Way', label: 'On The Way', sublabel: 'Heading to pickup', icon: Navigation, color: 'blue', ring: 'ring-blue-300', bg: 'bg-blue-500', text: 'text-blue-600', light: 'bg-blue-50', tsKey: 'onTheWayAt' },
-  { key: 'Arrived', label: 'Arrived', sublabel: 'At pickup location', icon: MapPin, color: 'purple', ring: 'ring-purple-300', bg: 'bg-purple-500', text: 'text-purple-600', light: 'bg-purple-50', tsKey: 'arrivedAt' },
+  { key: 'Accepted', label: 'Driver Assigned', sublabel: 'Ride assigned', icon: CheckCircle, color: 'emerald', ring: 'ring-emerald-300', bg: 'bg-emerald-500', text: 'text-emerald-400', light: 'bg-emerald-50', tsKey: 'acceptedAt' },
+  { key: 'On The Way', label: 'Driver On The Way', sublabel: 'Heading to pickup', icon: Navigation, color: 'blue', ring: 'ring-blue-300', bg: 'bg-blue-500', text: 'text-blue-600', light: 'bg-blue-50', tsKey: 'onTheWayAt' },
+  { key: 'Arrived', label: 'Driver Arrived', sublabel: 'At pickup location', icon: MapPin, color: 'purple', ring: 'ring-purple-300', bg: 'bg-purple-500', text: 'text-purple-600', light: 'bg-purple-50', tsKey: 'arrivedAt' },
   { key: 'Started', label: 'Ride Started', sublabel: 'Trip in progress', icon: Play, color: 'indigo', ring: 'ring-indigo-300', bg: 'bg-indigo-500', text: 'text-indigo-400', light: 'bg-indigo-50', tsKey: 'startedAt' },
   { key: 'Reached', label: 'Reached Destination', sublabel: 'Trip ended, verify payment', icon: Flag, color: 'amber', ring: 'ring-amber-300', bg: 'bg-amber-500', text: 'text-amber-400', light: 'bg-amber-50', tsKey: 'reachedAt' },
-  { key: 'Completed', label: 'Completed', sublabel: 'Trip finished', icon: CheckCircle, color: 'emerald', ring: 'ring-emerald-300', bg: 'bg-emerald-600', text: 'text-emerald-400', light: 'bg-emerald-50', tsKey: 'completedAt' },
+  { key: 'Completed', label: 'Ride Completed', sublabel: 'Trip finished', icon: CheckCircle, color: 'emerald', ring: 'ring-emerald-300', bg: 'bg-emerald-600', text: 'text-emerald-400', light: 'bg-emerald-50', tsKey: 'completedAt' },
 ];
 
 
@@ -170,15 +171,25 @@ const CurrentRide = () => {
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to update status'),
   });
 
+  // Cash collected from the customer. Empty until the driver submits the
+  // amount they actually received; editable afterwards in case of a typo.
+  const [cashInput, setCashInput] = useState('');
+  const [editingPayment, setEditingPayment] = useState(false);
+
   const paymentMutation = useMutation({
-    mutationFn: async ({ id, paymentStatus }) =>
-      (await bookingAPI.updatePayment(id, { paymentStatus })).data,
-    onSuccess: (_data, variables) => {
-      toast.success(`Payment marked as ${variables.paymentStatus.toLowerCase()}`);
+    mutationFn: async ({ id, amount }) =>
+      (await bookingAPI.updatePayment(id, { amount })).data,
+    onSuccess: (data) => {
+      const collected = data?.data?.booking?.collectedAmount;
+      toast.success(
+        collected ? `Payment of ₹${Number(collected).toLocaleString("en-IN")} recorded.` : 'Payment recorded.'
+      );
+      setCashInput('');
+      setEditingPayment(false);
       queryClient.invalidateQueries({ queryKey: ['currentRide'] });
       queryClient.invalidateQueries({ queryKey: ['driverDashboard'] });
     },
-    onError: (err) => toast.error(err.response?.data?.message || 'Failed to update payment'),
+    onError: (err) => toast.error(err.response?.data?.message || 'Failed to record payment'),
   });
 
   const cancelMutation = useMutation({
@@ -515,14 +526,7 @@ const CurrentRide = () => {
                 <div>
                   <p className="text-sm opacity-80">#{booking._id?.slice(-8).toUpperCase()}</p>
                   <h2 className="text-lg font-bold mt-0.5">
-                    {booking.bookingStatus === 'Accepted' ? 'Pickup Customer' :
-                     booking.bookingStatus === 'On The Way' ? 'Heading to Pickup' :
-                     booking.bookingStatus === 'Arrived' ? 'Ready to Start' :
-                     booking.bookingStatus === 'Started' ? 'Ride In Progress' :
-                     booking.bookingStatus === 'Reached' ? 'Destination Reached' :
-                     booking.bookingStatus === 'Completed' ? 'Ride Completed' :
-                     booking.bookingStatus === 'Cancelled' ? 'Ride Cancelled' :
-                     booking.bookingStatus}
+                    {displayStatus(booking.bookingStatus)}
                   </h2>
                 </div>
                 <div className={`w-11 h-11 rounded-full flex items-center justify-center ${
@@ -584,7 +588,7 @@ const CurrentRide = () => {
                   <IndianRupee size={12} className="text-slate-200/60" />
                   <p className="text-xs text-slate-200/70">Fare</p>
                 </div>
-                <p className="text-lg font-bold text-indigo-400">₹{booking.estimatedFare || 0}</p>
+                <p className="text-lg font-bold text-indigo-400">₹{Number(booking.estimatedFare || 0).toLocaleString("en-IN")}</p>
               </div>
               <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-4 shadow-sm border border-white/10">
                 <div className="flex items-center gap-2 mb-1">
@@ -644,32 +648,61 @@ const CurrentRide = () => {
                 {booking.bookingStatus === 'Reached' && (
                   <>
                     <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Payment Verification</p>
-                      <p className="text-sm font-medium text-white mb-3">
-                        Current: <span className={booking.paymentStatus === 'Paid' ? 'text-emerald-400' : booking.paymentStatus === 'Unpaid' ? 'text-red-400' : 'text-amber-400'}>{booking.paymentStatus || 'Pending'}</span>
-                      </p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          onClick={() => paymentMutation.mutate({ id: booking._id, paymentStatus: 'Paid' })}
-                          disabled={paymentMutation.isPending || booking.paymentStatus === 'Paid'}
-                          className="flex items-center justify-center gap-2 py-2.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-semibold hover:bg-emerald-500/30 transition disabled:opacity-50"
-                        >
-                          <Banknote size={16} /> Paid
-                        </button>
-                        <button
-                          onClick={() => paymentMutation.mutate({ id: booking._id, paymentStatus: 'Unpaid' })}
-                          disabled={paymentMutation.isPending || booking.paymentStatus === 'Unpaid'}
-                          className="flex items-center justify-center gap-2 py-2.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl text-sm font-semibold hover:bg-red-500/30 transition disabled:opacity-50"
-                        >
-                          <X size={16} /> Unpaid
-                        </button>
-                      </div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Cash Collection</p>
+                      {booking.paymentStatus === 'Paid' && booking.collectedAmount > 0 && !editingPayment ? (
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm font-medium text-white">
+                            Collected: <span className="text-emerald-400 font-bold tabular-nums">₹{Number(booking.collectedAmount ?? 0).toLocaleString("en-IN")}</span>
+                          </p>
+                          <button
+                            onClick={() => {
+                              setCashInput(String(booking.collectedAmount));
+                              setEditingPayment(true);
+                            }}
+                            className="shrink-0 px-4 py-2 bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs font-semibold hover:bg-white/10 transition"
+                          >
+                            Update
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-sm font-medium text-white mb-3">
+                            Enter the cash the customer handed over{booking.paymentMethod === 'Cash' ? '' : ' (confirm the online fare)'}.
+                          </p>
+                          <div className="flex gap-2">
+                            <div className="relative flex-1 min-w-0">
+                              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">₹</span>
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                value={cashInput}
+                                onChange={(e) => setCashInput(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                                placeholder={booking.estimatedFare ? `${booking.estimatedFare}` : 'Amount'}
+                                aria-label="Cash received from customer"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3.5 py-2.5 text-white font-semibold tabular-nums placeholder:text-gray-600 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/50 transition"
+                              />
+                            </div>
+                            <button
+                              onClick={() => paymentMutation.mutate({ id: booking._id, amount: Number(cashInput) })}
+                              disabled={paymentMutation.isPending || !Number(cashInput) || Number(cashInput) <= 0}
+                              className="shrink-0 inline-flex items-center justify-center gap-1.5 px-5 py-2.5 min-h-[44px] bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-sm font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all disabled:opacity-50"
+                            >
+                              {paymentMutation.isPending ? (
+                                <Loader2 size={16} className="animate-spin" />
+                              ) : (
+                                <Banknote size={16} />
+                              )}
+                              Submit
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                     <button
                       onClick={() => handleAction('complete', booking._id)}
-                      disabled={statusMutation.isPending || paymentMutation.isPending || !['Paid', 'Unpaid'].includes(booking.paymentStatus)}
+                      disabled={statusMutation.isPending || paymentMutation.isPending || booking.paymentStatus !== 'Paid'}
                       className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all disabled:opacity-50"
-                      title={['Paid', 'Unpaid'].includes(booking.paymentStatus) ? 'Mark this ride as completed' : 'Verify payment first'}
+                      title={booking.paymentStatus === 'Paid' ? 'Mark this ride as completed' : 'Submit the collected cash first'}
                     >
                       <CheckCircle size={18} /> Complete Ride
                     </button>

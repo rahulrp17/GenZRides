@@ -10,18 +10,8 @@ import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import Modal from '../../components/shared/Modal';
 import CancelReasonDialog from '../../components/shared/CancelReasonDialog';
+import { BookingStatusBadge } from '../../utils/bookingStatus';
 import { motion as Motion } from 'framer-motion';
-
-const STATUS_COLORS = {
-  Pending: 'bg-amber-500/10 text-amber-400',
-  Accepted: 'bg-blue-500/10 text-blue-400',
-  'On The Way': 'bg-purple-500/10 text-purple-400',
-  Arrived: 'bg-cyan-500/10 text-cyan-400',
-  Started: 'bg-indigo-500/10 text-indigo-400',
-  Reached: 'bg-amber-500/10 text-amber-400',
-  Completed: 'bg-emerald-500/10 text-emerald-400',
-  Cancelled: 'bg-red-500/10 text-red-400',
-};
 
 const RideHistory = () => {
   const [page, setPage] = useState(1);
@@ -105,8 +95,6 @@ const RideHistory = () => {
 
   if (isError) return <ErrorState message={error?.message || 'Failed to load ride history'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['rideHistory'] })} />;
 
-  const statusColors = STATUS_COLORS;
-
   return (
     <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -173,12 +161,10 @@ const RideHistory = () => {
                       {new Date(b.pickupDateTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[b.bookingStatus] || 'bg-white/10 text-gray-400'}`}>
-                        {b.bookingStatus}
-                      </span>
+                      <BookingStatusBadge status={b.bookingStatus} size="sm" />
                     </td>
                     <td className="px-6 py-4 text-sm font-semibold text-white">
-                      {b.finalFare > 0 ? `₹${b.finalFare}` : `₹${b.estimatedFare}`}
+                      {b.finalFare > 0 ? `₹${Number(b.finalFare).toLocaleString('en-IN')}` : `₹${Number(b.estimatedFare ?? 0).toLocaleString('en-IN')}`}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
@@ -220,11 +206,9 @@ const RideHistory = () => {
             {bookings.map((b) => (
               <div key={b._id} className="bg-white/5 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/10">
                 <div className="flex items-start justify-between mb-2">
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[b.bookingStatus] || ''}`}>
-                    {b.bookingStatus}
-                  </span>
+                  <BookingStatusBadge status={b.bookingStatus} size="sm" />
                   <span className="text-sm font-bold text-white">
-                    {b.finalFare > 0 ? `₹${b.finalFare}` : `₹${b.estimatedFare}`}
+                    {b.finalFare > 0 ? `₹${Number(b.finalFare).toLocaleString('en-IN')}` : `₹${Number(b.estimatedFare ?? 0).toLocaleString('en-IN')}`}
                   </span>
                 </div>
                 <div className="space-y-1.5 mb-3">
@@ -270,9 +254,7 @@ const RideHistory = () => {
         {selectedBooking && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[selectedBooking.bookingStatus]}`}>
-                {selectedBooking.bookingStatus}
-              </span>
+              <BookingStatusBadge status={selectedBooking.bookingStatus} />
               <span className="text-xl font-bold text-white">
                 ₹{selectedBooking.finalFare || selectedBooking.estimatedFare}
               </span>

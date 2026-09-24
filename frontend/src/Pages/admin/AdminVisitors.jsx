@@ -24,7 +24,11 @@ import { formatDateTime } from "./bookingUtils";
 
 const PAGE_LIMIT = 10;
 
-const VISITOR_STATUSES = ["Pending", "Confirmed", "Expired", "Cancelled"];
+// The page lists ONLY incomplete holds: the guest tapped "Book Now" but
+// took no further action inside the 10-minute window, so the existing
+// backend sweep marked the hold Expired. Pending (in-window) and
+// Confirmed holds are never shown here.
+const LIST_STATUS = "Expired";
 
 const VISITOR_STYLES = {
   Pending: "bg-amber-500/15 text-amber-300 border-amber-400/30",
@@ -53,7 +57,6 @@ const AdminVisitors = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
-  const [statusFilter, setStatusFilter] = useState("");
   const [view, setView] = useState(() => {
     try {
       return localStorage.getItem("adminVisitorsView") || "cards";
@@ -72,10 +75,9 @@ const AdminVisitors = () => {
   const [selected, setSelected] = useState(null);
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ["adminVisitors", page, statusFilter, debouncedSearch],
+    queryKey: ["adminVisitors", page, debouncedSearch],
     queryFn: async () => {
-      const params = { page, limit: PAGE_LIMIT };
-      if (statusFilter) params.status = statusFilter;
+      const params = { page, limit: PAGE_LIMIT, status: LIST_STATUS };
       if (debouncedSearch) params.search = debouncedSearch;
       const { data } = await adminAPI.getVisitors(params);
       return data;
@@ -183,17 +185,12 @@ const AdminVisitors = () => {
     >
       <QueueHero
         icon={Users}
-        eyebrow="Live holds · 10-minute confirm window"
+        eyebrow="Incomplete holds · expired after 10 minutes"
         title="Visitors"
-        subtitle="Temporary trip holds from “Book Now” — pending, confirmed, or expired. No booking exists until a hold is confirmed."
+        subtitle="Abandoned trip holds only — guests who tapped “Book Now” but took no further action within 10 minutes. Holds appear here only after they expire."
         stats={[
-          { label: "Total holds", value: data?.total ?? 0 },
+          { label: "Incomplete", value: data?.total ?? 0, accent: "text-amber-300" },
           { label: "Page", value: `${data?.page ?? 1}/${data?.totalPages ?? 1}` },
-          {
-            label: "Pending",
-            value: visitors.filter((v) => v.status === "Pending").length,
-            accent: "text-amber-300",
-          },
         ]}
         loading={isLoading}
         refreshing={isFetching}
@@ -216,48 +213,26 @@ const AdminVisitors = () => {
         loading={isLoading}
       />
 
-      <div className="flex gap-1.5 bg-white/5 border border-white/10 rounded-2xl p-1.5 overflow-x-auto min-w-0" role="tablist" aria-label="Filter by hold status">
-        {["", ...VISITOR_STATUSES].map((s) => (
-          <button
-            key={s || "all"}
-            role="tab"
-            aria-selected={statusFilter === s}
-            onClick={() => {
-              setStatusFilter(s);
-              setPage(1);
-            }}
-            className={`flex-1 whitespace-nowrap px-3.5 py-2 min-h-[40px] rounded-xl text-xs font-semibold transition-all ${
-              statusFilter === s
-                ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-[0_0_18px_rgba(34,197,94,0.35)]"
-                : "text-gray-400 hover:text-white hover:bg-white/5"
-            }`}
-          >
-            {s || "All holds"}
-          </button>
-        ))}
-      </div>
-
       {isLoading ? (
         <TableSkeleton rows={5} cols={5} />
       ) : visitors.length === 0 ? (
         <EmptyState
           icon={Calendar}
-          title="No visitor holds"
+          title="No incomplete visitor holds"
           description={
-            debouncedSearch || statusFilter
-              ? "Nothing matches the current filters."
-              : "New “Book Now” holds appear here live."
+            debouncedSearch
+              ? "Nothing matches the current search."
+              : "Abandoned “Book Now” holds appear here live, once their 10-minute window expires."
           }
           action={
-            debouncedSearch || statusFilter ? (
+            debouncedSearch ? (
               <button
                 onClick={() => {
                   setSearch("");
-                  setStatusFilter("");
                 }}
                 className="px-5 py-2.5 min-h-[44px] rounded-2xl bg-white/5 border border-white/15 text-sm font-semibold text-white hover:bg-white/10 transition"
               >
-                Clear filters
+                Clear search
               </button>
             ) : undefined
           }
@@ -345,7 +320,7 @@ const AdminVisitors = () => {
               ))}
             </div>
           ) : (
-            <GlassTable columns={columns} rows={visitors} rowKey={(v) => v._id} />
+            <GlassTable columns={columns} rows={visitors} rowKey={(v) => v._id} density="compact" />
           )}
           <Pagination
             page={data?.page || 1}
