@@ -18,9 +18,15 @@ const navItems = [
     icon: Calendar,
     children: [
       { path: "/admin/bookings", label: "Customer Bookings" },
-      { path: "/admin/booking-requests", label: "Customer Requests", countKey: "pendingCustomerRequests" },
       { path: "/admin/instant-bookings", label: "Instant Customer" },
-      { path: "/admin/instant-bookings/requests", label: "Instant Requests", countKey: "pendingInstantRequests" },
+    ],
+  },
+  {
+    label: "Booking Requests",
+    icon: Bell,
+    children: [
+      { path: "/admin/instant-bookings/requests", label: "Instant Bookings Request", countKey: "pendingInstantRequests" },
+      { path: "/admin/booking-requests", label: "Customer Booking Request", countKey: "pendingCustomerRequests" },
     ],
   },
   { path: "/admin/visitors", label: "Visitors", icon: Users, countKey: "incompleteVisitors" },

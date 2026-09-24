@@ -1,16 +1,16 @@
 # Graph Report - frontend  (2026-09-24)
 
 ## Corpus Check
-- 168 files · ~2,648,103 words
+- 168 files · ~2,648,260 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 793 nodes · 2264 edges · 49 communities (39 shown, 10 thin omitted)
+- 793 nodes · 2264 edges · 48 communities (38 shown, 10 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 7 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3dbdd1f5`
+- Built from commit: `4363e62e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -45,7 +45,6 @@
 - TariffChart.jsx
 - NotFound.jsx
 - DriverBookingFeed
-- InfoDetail.jsx
 - LoadingPage.jsx
 - StickyMobileCTA.jsx
 - vercel.json
@@ -74,17 +73,17 @@
   src/Pages/admin/AdminDashboard.jsx → src/Context/SocketContext.jsx
 - `About()` --calls--> `breadcrumbJsonLd()`  [EXTRACTED]
   src/Pages/AboutUs/About.jsx → src/utils/StructuredData.js
-- `InfoDetail()` --calls--> `breadcrumbJsonLd()`  [EXTRACTED]
-  src/Pages/InfoDetail/InfoDetail.jsx → src/utils/StructuredData.js
+- `AirportDetail()` --calls--> `breadcrumbJsonLd()`  [EXTRACTED]
+  src/Pages/AirportDetail/AirportDetail.jsx → src/utils/StructuredData.js
+- `AirportTransfers()` --calls--> `breadcrumbJsonLd()`  [EXTRACTED]
+  src/Pages/AirportTransfers/AirportTransfers.jsx → src/utils/StructuredData.js
 - `PopularRoutes()` --calls--> `breadcrumbJsonLd()`  [EXTRACTED]
   src/Pages/PopularRoutes/PopularRoutes.jsx → src/utils/StructuredData.js
-- `AdminProfile()` --calls--> `useAuth()`  [EXTRACTED]
-  src/Pages/admin/AdminProfile.jsx → src/hooks/useAuth.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (49 total, 10 thin omitted)
+## Communities (48 total, 10 thin omitted)
 
 ### Community 0 - "AdminInstantBookings.jsx"
 Cohesion: 0.07
@@ -139,16 +138,16 @@ Cohesion: 0.08
 Nodes (27): CarTypePage, ConfirmPage, Footer(), Hero(), ROUTE_TICKER, ROUTE_TICKER, CarTypePage(), imageFor() (+19 more)
 
 ### Community 23 - "Vehicles.jsx"
-Cohesion: 0.40
-Nodes (4): AttachVehicle(), cardVariants, imageForVehicle(), vehicles
+Cohesion: 0.33
+Nodes (5): AttachVehicle(), cardVariants, imageForVehicle(), vehicles, localBusinessJsonLd
 
 ### Community 24 - "Login.jsx"
 Cohesion: 0.20
 Nodes (5): AUTH_SLIDES, AuthSplit(), getAuthErrorMessage(), Login(), DriverLogin()
 
 ### Community 26 - "index.js"
-Cohesion: 0.14
-Nodes (20): PageHero(), AirportDetail(), AIRPORTS, CODE_TO_CITY, PERKS, AIRPORTS, AirportTransfers(), PERKS (+12 more)
+Cohesion: 0.15
+Nodes (17): PageHero(), ContactUs(), FAQS, GuestBookingPage(), faqJsonLd, FAQS, Info(), SECTIONS (+9 more)
 
 ### Community 27 - "CurrentRideCustomer.jsx"
 Cohesion: 0.13
@@ -175,20 +174,16 @@ Cohesion: 0.27
 Nodes (7): getOrigin(), normalizePath(), SEO(), upsertJsonLd(), upsertLink(), upsertMeta(), passwordRules
 
 ### Community 33 - "Reveal.jsx"
-Cohesion: 0.18
-Nodes (14): AIRPORTS, AirportTransfers(), cardHover, GlowBlobs(), Reveal(), SectionHeading(), PopularRoutes(), ROUTES (+6 more)
+Cohesion: 0.15
+Nodes (18): AIRPORTS, AirportTransfers(), cardHover, GlowBlobs(), Reveal(), SectionHeading(), PopularRoutes(), ROUTES (+10 more)
 
 ### Community 34 - "TariffChart.jsx"
-Cohesion: 0.40
-Nodes (5): imageForVehicle(), notes, PACKAGES, TariffChart(), tariffData
+Cohesion: 0.22
+Nodes (8): imageFor(), VehicleShowcase(), imageForVehicle(), notes, PACKAGES, TariffChart(), tariffData, vehicleAPI
 
 ### Community 36 - "DriverBookingFeed"
 Cohesion: 0.20
 Nodes (4): DriverCustomerRequests, DriverInstantBookings, DriverMyBookings, DriverBookingFeed()
-
-### Community 37 - "InfoDetail.jsx"
-Cohesion: 0.33
-Nodes (5): FAQS, InfoDetail(), ORDER, TITLES, TOPICS
 
 ### Community 42 - "DriverProfilePage.jsx"
 Cohesion: 0.14
@@ -222,7 +217,7 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.025) - this node is a cross-community bridge._
 - **Why does `useSocket()` connect `useSocket` to `AdminInstantBookings.jsx`, `BookingDetailsPage.jsx`, `DriverBookingFeed`, `DriverDashboard.jsx`, `BookRide.jsx`, `CurrentRideCustomer.jsx`?**
   _High betweenness centrality (0.024) - this node is a cross-community bridge._
-- **Why does `SEO()` connect `SEO.jsx` to `BookingDetailsPage.jsx`, `Home.jsx`, `NotFound.jsx`, `Reveal.jsx`, `InfoDetail.jsx`, `TariffChart.jsx`, `PopularRoutes.jsx`, `DriverRegister.jsx`, `useSocket`, `ConfirmPage.jsx`, `Vehicles.jsx`, `Login.jsx`, `index.js`, `DriverContinue.jsx`, `StructuredData.js`?**
+- **Why does `SEO()` connect `SEO.jsx` to `Reveal.jsx`, `BookingDetailsPage.jsx`, `Home.jsx`, `NotFound.jsx`, `TariffChart.jsx`, `PopularRoutes.jsx`, `DriverRegister.jsx`, `useSocket`, `ConfirmPage.jsx`, `Vehicles.jsx`, `Login.jsx`, `index.js`, `DriverContinue.jsx`, `StructuredData.js`?**
   _High betweenness centrality (0.016) - this node is a cross-community bridge._
 - **What connects `name`, `private`, `version` to the rest of the system?**
   _167 weakly-connected nodes found - possible documentation gaps or missing edges._

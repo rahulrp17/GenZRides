@@ -1478,7 +1478,7 @@
       "file_type": "code",
       "norm_label": "adminlayout()",
       "source_file": "src/layouts/AdminLayout.jsx",
-      "source_location": "L36"
+      "source_location": "L42"
     },
     {
       "id": "src_layouts_customerlayout_customerlayout",
@@ -2006,7 +2006,7 @@
       "file_type": "code",
       "norm_label": "guestbookingform()",
       "source_file": "src/Pages/guest/GuestBookingForm.jsx",
-      "source_location": "L433"
+      "source_location": "L436"
     },
     {
       "id": "src_pages_guest_guestbookingform_pad",
@@ -2309,30 +2309,6 @@
       "source_location": "L8"
     },
     {
-      "id": "src_pages_airportdetail_airportdetail_airportdetail",
-      "label": "AirportDetail()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "index.js",
-      "file_type": "code",
-      "norm_label": "airportdetail()",
-      "source_file": "src/Pages/AirportDetail/AirportDetail.jsx",
-      "source_location": "L73"
-    },
-    {
-      "id": "src_pages_airporttransfers_airporttransfers_airporttransfers",
-      "label": "AirportTransfers()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "index.js",
-      "file_type": "code",
-      "norm_label": "airporttransfers()",
-      "source_file": "src/Pages/AirportTransfers/AirportTransfers.jsx",
-      "source_location": "L57"
-    },
-    {
       "id": "src_pages_contact_us_contactus_contactus",
       "label": "ContactUs()",
       "_callable": true,
@@ -2367,6 +2343,18 @@
       "norm_label": "info()",
       "source_file": "src/Pages/Info/Info.jsx",
       "source_location": "L103"
+    },
+    {
+      "id": "src_pages_infodetail_infodetail_infodetail",
+      "label": "InfoDetail()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "index.js",
+      "file_type": "code",
+      "norm_label": "infodetail()",
+      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
+      "source_location": "L114"
     },
     {
       "id": "src_pages_services_services_services",
@@ -2909,40 +2897,28 @@
       "source_location": "L33"
     },
     {
-      "id": "src_component_landing_vehicleshowcase_imagefor",
-      "label": "imageFor()",
+      "id": "src_pages_airportdetail_airportdetail_airportdetail",
+      "label": "AirportDetail()",
       "_callable": true,
       "_origin": "ast",
       "community": 33,
       "community_name": "Reveal.jsx",
       "file_type": "code",
-      "norm_label": "imagefor()",
-      "source_file": "src/Component/Landing/VehicleShowcase.jsx",
-      "source_location": "L22"
+      "norm_label": "airportdetail()",
+      "source_file": "src/Pages/AirportDetail/AirportDetail.jsx",
+      "source_location": "L73"
     },
     {
-      "id": "src_component_landing_vehicleshowcase_vehicleshowcase",
-      "label": "VehicleShowcase()",
+      "id": "src_pages_airporttransfers_airporttransfers_airporttransfers",
+      "label": "AirportTransfers()",
       "_callable": true,
       "_origin": "ast",
       "community": 33,
       "community_name": "Reveal.jsx",
       "file_type": "code",
-      "norm_label": "vehicleshowcase()",
-      "source_file": "src/Component/Landing/VehicleShowcase.jsx",
-      "source_location": "L30"
-    },
-    {
-      "id": "src_component_landing_vehicleshowcase_vehicleskeleton",
-      "label": "VehicleSkeleton()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 33,
-      "community_name": "Reveal.jsx",
-      "file_type": "code",
-      "norm_label": "vehicleskeleton()",
-      "source_file": "src/Component/Landing/VehicleShowcase.jsx",
-      "source_location": "L11"
+      "norm_label": "airporttransfers()",
+      "source_file": "src/Pages/AirportTransfers/AirportTransfers.jsx",
+      "source_location": "L57"
     },
     {
       "id": "src_pages_routedetail_routedetail_routedetail",
@@ -2955,6 +2931,42 @@
       "norm_label": "routedetail()",
       "source_file": "src/Pages/RouteDetail/RouteDetail.jsx",
       "source_location": "L315"
+    },
+    {
+      "id": "src_component_landing_vehicleshowcase_imagefor",
+      "label": "imageFor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "TariffChart.jsx",
+      "file_type": "code",
+      "norm_label": "imagefor()",
+      "source_file": "src/Component/Landing/VehicleShowcase.jsx",
+      "source_location": "L22"
+    },
+    {
+      "id": "src_component_landing_vehicleshowcase_vehicleshowcase",
+      "label": "VehicleShowcase()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "TariffChart.jsx",
+      "file_type": "code",
+      "norm_label": "vehicleshowcase()",
+      "source_file": "src/Component/Landing/VehicleShowcase.jsx",
+      "source_location": "L30"
+    },
+    {
+      "id": "src_component_landing_vehicleshowcase_vehicleskeleton",
+      "label": "VehicleSkeleton()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "TariffChart.jsx",
+      "file_type": "code",
+      "norm_label": "vehicleskeleton()",
+      "source_file": "src/Component/Landing/VehicleShowcase.jsx",
+      "source_location": "L11"
     },
     {
       "id": "src_pages_tariff_chart_tariffchart_imageforvehicle",
@@ -3002,7 +3014,7 @@
       "file_type": "code",
       "norm_label": "driverbookingfeed()",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L39"
+      "source_location": "L50"
     },
     {
       "id": "src_pages_driver_drivercustomerrequests_drivercustomerrequests",
@@ -3039,18 +3051,6 @@
       "norm_label": "drivermybookings()",
       "source_file": "src/Pages/driver/DriverMyBookings.jsx",
       "source_location": "L5"
-    },
-    {
-      "id": "src_pages_infodetail_infodetail_infodetail",
-      "label": "InfoDetail()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 37,
-      "community_name": "InfoDetail.jsx",
-      "file_type": "code",
-      "norm_label": "infodetail()",
-      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
-      "source_location": "L114"
     },
     {
       "id": "src_components_shared_loadingpage_carorbit",
@@ -3326,7 +3326,7 @@
       "file_type": "code",
       "norm_label": "bookride()",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L194"
+      "source_location": "L197"
     },
     {
       "id": "src_pages_customer_bookride_datetimefield",
@@ -4407,7 +4407,7 @@
       "file_type": "code",
       "norm_label": "pay_tabs",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L23"
+      "source_location": "L34"
     },
     {
       "id": "src_pages_driver_driverbookingfeed_sorts",
@@ -4418,7 +4418,7 @@
       "file_type": "code",
       "norm_label": "sorts",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L29"
+      "source_location": "L40"
     },
     {
       "id": "src_pages_driver_driverhistory",
@@ -5601,6 +5601,17 @@
       "source_location": "L27"
     },
     {
+      "id": "src_utils_structureddata_localbusinessjsonld",
+      "label": "localBusinessJsonLd",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "Vehicles.jsx",
+      "file_type": "code",
+      "norm_label": "localbusinessjsonld",
+      "source_file": "src/utils/StructuredData.js",
+      "source_location": "L60"
+    },
+    {
       "id": "src_component_auth_authsplit",
       "label": "AuthSplit.jsx",
       "_origin": "ast",
@@ -5689,83 +5700,6 @@
       "source_location": "L1"
     },
     {
-      "id": "src_pages_airportdetail_airportdetail",
-      "label": "AirportDetail.jsx",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "index.js",
-      "file_type": "code",
-      "norm_label": "airportdetail.jsx",
-      "source_file": "src/Pages/AirportDetail/AirportDetail.jsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_pages_airportdetail_airportdetail_airports",
-      "label": "AIRPORTS",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "index.js",
-      "file_type": "code",
-      "norm_label": "airports",
-      "source_file": "src/Pages/AirportDetail/AirportDetail.jsx",
-      "source_location": "L21"
-    },
-    {
-      "id": "src_pages_airportdetail_airportdetail_code_to_city",
-      "label": "CODE_TO_CITY",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "index.js",
-      "file_type": "code",
-      "norm_label": "code_to_city",
-      "source_file": "src/Pages/AirportDetail/AirportDetail.jsx",
-      "source_location": "L71"
-    },
-    {
-      "id": "src_pages_airportdetail_airportdetail_perks",
-      "label": "PERKS",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "index.js",
-      "file_type": "code",
-      "norm_label": "perks",
-      "source_file": "src/Pages/AirportDetail/AirportDetail.jsx",
-      "source_location": "L64"
-    },
-    {
-      "id": "src_pages_airporttransfers_airporttransfers",
-      "label": "AirportTransfers/AirportTransfers.jsx",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "index.js",
-      "file_type": "code",
-      "norm_label": "airporttransfers/airporttransfers.jsx",
-      "source_file": "src/Pages/AirportTransfers/AirportTransfers.jsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_pages_airporttransfers_airporttransfers_airports",
-      "label": "AIRPORTS",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "index.js",
-      "file_type": "code",
-      "norm_label": "airports",
-      "source_file": "src/Pages/AirportTransfers/AirportTransfers.jsx",
-      "source_location": "L12"
-    },
-    {
-      "id": "src_pages_airporttransfers_airporttransfers_perks",
-      "label": "PERKS",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "index.js",
-      "file_type": "code",
-      "norm_label": "perks",
-      "source_file": "src/Pages/AirportTransfers/AirportTransfers.jsx",
-      "source_location": "L50"
-    },
-    {
       "id": "src_pages_contact_us_contactus",
       "label": "ContactUs.jsx",
       "_origin": "ast",
@@ -5843,6 +5777,61 @@
       "source_location": "L20"
     },
     {
+      "id": "src_pages_infodetail_infodetail",
+      "label": "InfoDetail.jsx",
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "index.js",
+      "file_type": "code",
+      "norm_label": "infodetail.jsx",
+      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_pages_infodetail_infodetail_faqs",
+      "label": "FAQS",
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "index.js",
+      "file_type": "code",
+      "norm_label": "faqs",
+      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
+      "source_location": "L78"
+    },
+    {
+      "id": "src_pages_infodetail_infodetail_order",
+      "label": "ORDER",
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "index.js",
+      "file_type": "code",
+      "norm_label": "order",
+      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
+      "source_location": "L105"
+    },
+    {
+      "id": "src_pages_infodetail_infodetail_titles",
+      "label": "TITLES",
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "index.js",
+      "file_type": "code",
+      "norm_label": "titles",
+      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
+      "source_location": "L106"
+    },
+    {
+      "id": "src_pages_infodetail_infodetail_topics",
+      "label": "TOPICS",
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "index.js",
+      "file_type": "code",
+      "norm_label": "topics",
+      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
+      "source_location": "L22"
+    },
+    {
       "id": "src_pages_services_services",
       "label": "Services.jsx",
       "_origin": "ast",
@@ -5863,17 +5852,6 @@
       "norm_label": "fleet_strip",
       "source_file": "src/Pages/Services/Services.jsx",
       "source_location": "L118"
-    },
-    {
-      "id": "src_utils_structureddata_localbusinessjsonld",
-      "label": "localBusinessJsonLd",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "index.js",
-      "file_type": "code",
-      "norm_label": "localbusinessjsonld",
-      "source_file": "src/utils/StructuredData.js",
-      "source_location": "L60"
     },
     {
       "id": "src_app_currentride",
@@ -6855,15 +6833,81 @@
       "source_location": "L35"
     },
     {
-      "id": "src_component_landing_vehicleshowcase",
-      "label": "VehicleShowcase.jsx",
+      "id": "src_pages_airportdetail_airportdetail",
+      "label": "AirportDetail.jsx",
       "_origin": "ast",
       "community": 33,
       "community_name": "Reveal.jsx",
       "file_type": "code",
-      "norm_label": "vehicleshowcase.jsx",
-      "source_file": "src/Component/Landing/VehicleShowcase.jsx",
+      "norm_label": "airportdetail.jsx",
+      "source_file": "src/Pages/AirportDetail/AirportDetail.jsx",
       "source_location": "L1"
+    },
+    {
+      "id": "src_pages_airportdetail_airportdetail_airports",
+      "label": "AIRPORTS",
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "Reveal.jsx",
+      "file_type": "code",
+      "norm_label": "airports",
+      "source_file": "src/Pages/AirportDetail/AirportDetail.jsx",
+      "source_location": "L21"
+    },
+    {
+      "id": "src_pages_airportdetail_airportdetail_code_to_city",
+      "label": "CODE_TO_CITY",
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "Reveal.jsx",
+      "file_type": "code",
+      "norm_label": "code_to_city",
+      "source_file": "src/Pages/AirportDetail/AirportDetail.jsx",
+      "source_location": "L71"
+    },
+    {
+      "id": "src_pages_airportdetail_airportdetail_perks",
+      "label": "PERKS",
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "Reveal.jsx",
+      "file_type": "code",
+      "norm_label": "perks",
+      "source_file": "src/Pages/AirportDetail/AirportDetail.jsx",
+      "source_location": "L64"
+    },
+    {
+      "id": "src_pages_airporttransfers_airporttransfers",
+      "label": "AirportTransfers/AirportTransfers.jsx",
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "Reveal.jsx",
+      "file_type": "code",
+      "norm_label": "airporttransfers/airporttransfers.jsx",
+      "source_file": "src/Pages/AirportTransfers/AirportTransfers.jsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_pages_airporttransfers_airporttransfers_airports",
+      "label": "AIRPORTS",
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "Reveal.jsx",
+      "file_type": "code",
+      "norm_label": "airports",
+      "source_file": "src/Pages/AirportTransfers/AirportTransfers.jsx",
+      "source_location": "L12"
+    },
+    {
+      "id": "src_pages_airporttransfers_airporttransfers_perks",
+      "label": "PERKS",
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "Reveal.jsx",
+      "file_type": "code",
+      "norm_label": "perks",
+      "source_file": "src/Pages/AirportTransfers/AirportTransfers.jsx",
+      "source_location": "L50"
     },
     {
       "id": "src_pages_routedetail_routedetail",
@@ -6888,15 +6932,15 @@
       "source_location": "L40"
     },
     {
-      "id": "src_services_endpoints_vehicleapi",
-      "label": "vehicleAPI",
+      "id": "src_component_landing_vehicleshowcase",
+      "label": "VehicleShowcase.jsx",
       "_origin": "ast",
-      "community": 33,
-      "community_name": "Reveal.jsx",
+      "community": 34,
+      "community_name": "TariffChart.jsx",
       "file_type": "code",
-      "norm_label": "vehicleapi",
-      "source_file": "src/services/endpoints.js",
-      "source_location": "L236"
+      "norm_label": "vehicleshowcase.jsx",
+      "source_file": "src/Component/Landing/VehicleShowcase.jsx",
+      "source_location": "L1"
     },
     {
       "id": "src_pages_tariff_chart_tariffchart",
@@ -6941,6 +6985,17 @@
       "norm_label": "tariffdata",
       "source_file": "src/Pages/Tariff_Chart/TariffChart.jsx",
       "source_location": "L31"
+    },
+    {
+      "id": "src_services_endpoints_vehicleapi",
+      "label": "vehicleAPI",
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "TariffChart.jsx",
+      "file_type": "code",
+      "norm_label": "vehicleapi",
+      "source_file": "src/services/endpoints.js",
+      "source_location": "L236"
     },
     {
       "id": "src_app_notfound",
@@ -7029,61 +7084,6 @@
       "norm_label": "drivermybookings.jsx",
       "source_file": "src/Pages/driver/DriverMyBookings.jsx",
       "source_location": "L1"
-    },
-    {
-      "id": "src_pages_infodetail_infodetail",
-      "label": "InfoDetail.jsx",
-      "_origin": "ast",
-      "community": 37,
-      "community_name": "InfoDetail.jsx",
-      "file_type": "code",
-      "norm_label": "infodetail.jsx",
-      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_pages_infodetail_infodetail_faqs",
-      "label": "FAQS",
-      "_origin": "ast",
-      "community": 37,
-      "community_name": "InfoDetail.jsx",
-      "file_type": "code",
-      "norm_label": "faqs",
-      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
-      "source_location": "L78"
-    },
-    {
-      "id": "src_pages_infodetail_infodetail_order",
-      "label": "ORDER",
-      "_origin": "ast",
-      "community": 37,
-      "community_name": "InfoDetail.jsx",
-      "file_type": "code",
-      "norm_label": "order",
-      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
-      "source_location": "L105"
-    },
-    {
-      "id": "src_pages_infodetail_infodetail_titles",
-      "label": "TITLES",
-      "_origin": "ast",
-      "community": 37,
-      "community_name": "InfoDetail.jsx",
-      "file_type": "code",
-      "norm_label": "titles",
-      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
-      "source_location": "L106"
-    },
-    {
-      "id": "src_pages_infodetail_infodetail_topics",
-      "label": "TOPICS",
-      "_origin": "ast",
-      "community": 37,
-      "community_name": "InfoDetail.jsx",
-      "file_type": "code",
-      "norm_label": "topics",
-      "source_file": "src/Pages/InfoDetail/InfoDetail.jsx",
-      "source_location": "L22"
     },
     {
       "id": "src_components_shared_loadingpage",
@@ -9845,7 +9845,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/layouts/AdminLayout.jsx",
-      "source_location": "L37",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -9857,7 +9857,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/layouts/AdminLayout.jsx",
-      "source_location": "L44",
+      "source_location": "L50",
       "weight": 1.0
     },
     {
@@ -9869,7 +9869,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/layouts/AdminLayout.jsx",
-      "source_location": "L45",
+      "source_location": "L51",
       "weight": 1.0
     },
     {
@@ -10601,7 +10601,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L1067",
+      "source_location": "L1070",
       "weight": 1.0
     },
     {
@@ -10613,7 +10613,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L1104",
+      "source_location": "L1107",
       "weight": 1.0
     },
     {
@@ -10625,7 +10625,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L1110",
+      "source_location": "L1113",
       "weight": 1.0
     },
     {
@@ -10637,7 +10637,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L197",
+      "source_location": "L200",
       "weight": 1.0
     },
     {
@@ -10649,7 +10649,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L198",
+      "source_location": "L201",
       "weight": 1.0
     },
     {
@@ -10661,7 +10661,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L217",
+      "source_location": "L220",
       "weight": 1.0
     },
     {
@@ -10673,7 +10673,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L237",
+      "source_location": "L240",
       "weight": 1.0
     },
     {
@@ -10685,7 +10685,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L238",
+      "source_location": "L241",
       "weight": 1.0
     },
     {
@@ -10697,7 +10697,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L327",
+      "source_location": "L330",
       "weight": 1.0
     },
     {
@@ -10709,7 +10709,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L340",
+      "source_location": "L343",
       "weight": 1.0
     },
     {
@@ -10721,7 +10721,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L531",
+      "source_location": "L534",
       "weight": 1.0
     },
     {
@@ -10733,7 +10733,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L755",
+      "source_location": "L758",
       "weight": 1.0
     },
     {
@@ -10745,7 +10745,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L989",
+      "source_location": "L992",
       "weight": 1.0
     },
     {
@@ -10757,7 +10757,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L123",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -11081,7 +11081,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L439",
+      "source_location": "L544",
       "weight": 1.0
     },
     {
@@ -11093,7 +11093,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L55",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -11105,7 +11105,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L61",
+      "source_location": "L72",
       "weight": 1.0
     },
     {
@@ -11345,7 +11345,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/guest/GuestBookingForm.jsx",
-      "source_location": "L360",
+      "source_location": "L363",
       "weight": 1.0
     },
     {
@@ -11369,7 +11369,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/guest/GuestBookingForm.jsx",
-      "source_location": "L440",
+      "source_location": "L443",
       "weight": 1.0
     },
     {
@@ -11381,7 +11381,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/guest/GuestBookingForm.jsx",
-      "source_location": "L465",
+      "source_location": "L468",
       "weight": 1.0
     },
     {
@@ -11393,7 +11393,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/guest/GuestBookingForm.jsx",
-      "source_location": "L466",
+      "source_location": "L469",
       "weight": 1.0
     },
     {
@@ -11405,7 +11405,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/guest/GuestBookingForm.jsx",
-      "source_location": "L500",
+      "source_location": "L503",
       "weight": 1.0
     },
     {
@@ -11417,7 +11417,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/guest/GuestBookingForm.jsx",
-      "source_location": "L607",
+      "source_location": "L610",
       "weight": 1.0
     },
     {
@@ -11429,7 +11429,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/Pages/guest/GuestBookingForm.jsx",
-      "source_location": "L608",
+      "source_location": "L611",
       "weight": 1.0
     },
     {
@@ -19073,7 +19073,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L10",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -19085,7 +19085,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L10",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -19097,7 +19097,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L11",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -19109,7 +19109,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L12",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -19121,7 +19121,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L13",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -19133,7 +19133,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L14",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -19145,7 +19145,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L15",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -19157,7 +19157,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L16",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -19169,7 +19169,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L17",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -19181,7 +19181,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L18",
+      "source_location": "L29",
       "weight": 1.0
     },
     {
@@ -19193,7 +19193,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L19",
+      "source_location": "L30",
       "weight": 1.0
     },
     {
@@ -19205,7 +19205,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L20",
+      "source_location": "L31",
       "weight": 1.0
     },
     {
@@ -26189,7 +26189,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L10",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -26201,7 +26201,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L11",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -26213,7 +26213,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L12",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -26225,7 +26225,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L13",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -26237,7 +26237,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L14",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -26249,7 +26249,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L15",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -26261,7 +26261,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L16",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -26273,7 +26273,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L17",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -26285,7 +26285,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L18",
+      "source_location": "L29",
       "weight": 1.0
     },
     {
@@ -26297,7 +26297,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L19",
+      "source_location": "L30",
       "weight": 1.0
     },
     {
@@ -26309,7 +26309,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L20",
+      "source_location": "L31",
       "weight": 1.0
     },
     {
@@ -31434,7 +31434,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/layouts/AdminLayout.jsx",
-      "source_location": "L36",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -32292,7 +32292,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/Pages/customer/BookRide.jsx",
-      "source_location": "L194",
+      "source_location": "L197",
       "weight": 1.0
     },
     {
@@ -32765,7 +32765,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L23",
+      "source_location": "L34",
       "weight": 1.0
     },
     {
@@ -32776,7 +32776,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L29",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -32787,7 +32787,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/Pages/driver/DriverBookingFeed.jsx",
-      "source_location": "L39",
+      "source_location": "L50",
       "weight": 1.0
     },
     {
@@ -33161,7 +33161,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/Pages/guest/GuestBookingForm.jsx",
-      "source_location": "L433",
+      "source_location": "L436",
       "weight": 1.0
     },
     {
@@ -35495,5 +35495,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3dbdd1f5fca13b202c3aaac010f0854baa8d88e0"
+  "built_at_commit": "4363e62edc25ed8114e19ad27481dc16a5e498f7"
 }

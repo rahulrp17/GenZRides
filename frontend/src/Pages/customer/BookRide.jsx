@@ -110,7 +110,10 @@ const mantineInputStyles = {
 function DateTimeField({ id, label, value, minDate, minTime, onChange }) {
   const [dateVal, setDateVal] = useState(null);
   const [timeVal, setTimeVal] = useState("");
-  const valueRef = useRef(value);
+  // Starts unset (not a copy of `value`) so the first run always hydrates
+  // the pickers from the initial value — otherwise a prefilled date/time
+  // never appears.
+  const valueRef = useRef(null);
 
   useEffect(() => {
     if (valueRef.current === value) return;
