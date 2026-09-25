@@ -813,7 +813,7 @@ const GuestBookingForm = () => {
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
                 <div>
-                  <h3 className="text-white font-semibold flex items-center gap-2">
+                  <h3 className="text-white font-semibold mt-4 flex items-center gap-2">
                     <MapPinned
                       size={18}
                       className={

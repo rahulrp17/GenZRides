@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSocket } from "../../Context/SocketContext";
 import { adminAPI, vehicleAPI } from "../../services/endpoints";
@@ -95,6 +95,92 @@ export const useIncompleteVisitorCount = () => {
   }, [socket, queryClient]);
 
   return query;
+};
+
+// "New arrivals" badges: each queue badge shows liveTotal − seenTotal,
+// so visiting a page clears its badge (same for request queues and the
+// visitors feed). Seen markers live in localStorage per queue key.
+const seenKey = (key) => `seenBadge:${key}`;
+
+export const getSeen = (key) => {
+  try {
+    return Number(localStorage.getItem(seenKey(key)) || 0);
+  } catch {
+    return 0;
+  }
+};
+
+export const markSeen = (key, total) => {
+  try {
+    localStorage.setItem(seenKey(key), String(Number(total) || 0));
+  } catch {
+    // private mode — badge simply won't clear
+  }
+};
+
+// Call inside a queue page with its live total; marks everything seen,
+// including arrivals that stream in while the page is open.
+export const useMarkSeen = (key, total) => {
+  useEffect(() => {
+    if (typeof total === "number") markSeen(key, total);
+  }, [key, total]);
+};
+
+const displayDelta = (live, key) => Math.max(0, Number(live || 0) - getSeen(key));
+
+// Merged sidebar badge counts (deltas, not totals).
+export const useBadgeCounts = () => {
+  const { data: counts } = useAdminCounts();
+  const { data: incompleteVisitors } = useIncompleteVisitorCount();
+  return {
+    pendingCustomerRequests: displayDelta(counts?.pendingCustomerRequests, "pendingCustomerRequests"),
+    pendingInstantRequests: displayDelta(counts?.pendingInstantRequests, "pendingInstantRequests"),
+    incompleteVisitors: displayDelta(incompleteVisitors, "incompleteVisitors"),
+  };
+};
+
+// Tracks ids that arrive AFTER the first load so the UI can flash them
+// for a few seconds. Returns isFresh(id); entries auto-expire.
+export const useFreshIds = (ids, ttlMs = 3000) => {
+  const list = Array.isArray(ids) ? ids : [];
+  const key = list.join("|");
+  const knownRef = useRef(null);
+  const [fresh, setFresh] = useState(() => new Set());
+  const timersRef = useRef([]);
+
+  useEffect(() => {
+    if (knownRef.current === null) {
+      // First load seeds the baseline — nothing flashes on entry.
+      knownRef.current = new Set(list);
+      return;
+    }
+    const added = list.filter((id) => id && !knownRef.current.has(id));
+    if (added.length === 0) return;
+    added.forEach((id) => knownRef.current.add(id));
+    setFresh((prev) => {
+      const next = new Set(prev);
+      added.forEach((id) => next.add(id));
+      return next;
+    });
+    const t = setTimeout(() => {
+      setFresh((prev) => {
+        const next = new Set(prev);
+        added.forEach((id) => next.delete(id));
+        return next;
+      });
+    }, ttlMs);
+    timersRef.current.push(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+  useEffect(
+    () => () => {
+      timersRef.current.forEach(clearTimeout);
+    },
+    []
+  );
+
+  return (id) => fresh.has(id);
 };
 
 export const useVehicles = () => {

@@ -954,13 +954,14 @@ const BookRide = () => {
             {/* Notes */}
             <div>
               <label className="flex items-center gap-2 text-xs font-medium text-gray-400 mb-1.5">
-                <StickyNote size={14} /> Notes (optional)
+                <StickyNote size={14} /> Notes
               </label>
               <textarea
                 rows={2}
                 value={notes}
+                required
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Any special instructions..."
+                placeholder="Exact Pickup Address,Flight number, luggage, pet, extra stop…"
                 className="w-full px-3 py-2.5 bg-white/5 border border-white/10 text-white placeholder-gray-500 rounded-xl text-base focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none transition resize-none touch-manipulation [color-scheme:dark]"
               />
             </div>
@@ -1090,7 +1091,7 @@ const BookRide = () => {
           <div className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-[13px]">
             <div className="flex items-center justify-between gap-3 pb-2 border-b border-dashed border-white/15">
               <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-gray-400 font-semibold">
-                <Receipt size={13} className="text-emerald-400" /> Trip invoice
+                <Receipt size={13} className="text-emerald-400" /> PAYMENT SUMMARY
               </span>
               <span className="text-[11px] text-gray-500 tabular-nums">
                 {fareEstimate?.distance?.toFixed(1)} km · {formatTripDuration(fareEstimate?.duration || 0)}
@@ -1110,7 +1111,7 @@ const BookRide = () => {
                 <span className="text-gray-300">
                   Distance fare
                   {fareEstimate?.fareBreakdown?.chargeableDistance > 0 && fareEstimate?.perKm != null && (
-                    <span className="block text-[11px] text-gray-500 font-normal">{fareEstimate.fareBreakdown.chargeableDistance} km × {perKmLabel(fareEstimate.perKm)}</span>
+                    <span className="block text-[11px] text-gray-500 font-normal">{(fareEstimate.fareBreakdown.chargeableDistance).toFixed(1)} km × {perKmLabel(fareEstimate.perKm)}</span>
                   )}
                 </span>
                 <span className="text-white font-medium tabular-nums shrink-0">{formatCurrency(fareEstimate?.fareBreakdown?.distanceFare)}</span>

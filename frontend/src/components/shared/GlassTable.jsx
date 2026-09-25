@@ -7,8 +7,9 @@ import React from "react";
  *
  * columns: [{ header, cell(row) => node, thClassName?, tdClassName? }]
  * density: "comfortable" (default) or "compact" for denser queues.
+ * rowClassName: optional (row) => string for per-row flashes/highlights.
  */
-const GlassTable = ({ columns, rows, rowKey, minWidth = "820px", density = "comfortable" }) => {
+const GlassTable = ({ columns, rows, rowKey, minWidth = "820px", density = "comfortable", rowClassName = null }) => {
   const compact = density === "compact";
   return (
   <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
@@ -32,7 +33,7 @@ const GlassTable = ({ columns, rows, rowKey, minWidth = "820px", density = "comf
           {rows.map((row, i) => (
             <tr
               key={rowKey(row, i)}
-              className="border-b border-white/5 last:border-0 hover:bg-white/[0.04] transition-colors"
+              className={`border-b border-white/5 last:border-0 hover:bg-white/[0.04] transition-colors ${rowClassName ? rowClassName(row) : ""}`}
             >
               {columns.map((c) => (
                 <td

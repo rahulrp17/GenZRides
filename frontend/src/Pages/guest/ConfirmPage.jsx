@@ -396,7 +396,7 @@ const ConfirmPage = () => {
               <div className="border-t border-white/10 mt-6 pt-5 text-sm">
                 <div className="flex items-center justify-between gap-3 pb-2 border-b border-dashed border-white/15">
                   <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-gray-400 font-semibold">
-                    <Receipt size={13} className="text-emerald-400" /> Trip invoice
+                    <Receipt size={13} className="text-emerald-400" /> PAYMENT SUMMARY
                   </span>
                   <span className="text-[11px] text-gray-500 tabular-nums">
                     {fare.distance?.toFixed(1)} km · {formatTripDuration(fare.duration)}
@@ -434,7 +434,7 @@ const ConfirmPage = () => {
                       <span>
                         Distance fare
                         {fare.fareBreakdown.chargeableDistance > 0 && perKm != null && (
-                          <span className="block text-[11px] text-gray-500 font-normal">{fare.fareBreakdown.chargeableDistance} km × {perKmLabel(perKm)}</span>
+                          <span className="block text-[11px] text-gray-500 font-normal">({(totalKm ?? 0).toFixed(1)} km - {fare.fareBreakdown.baseKm} km) x {perKm} Km </span>
                         )}
                       </span>
                       <span className="text-white tabular-nums shrink-0">{formatCurrency(fare.fareBreakdown.distanceFare)}</span>
@@ -525,9 +525,9 @@ const ConfirmPage = () => {
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 transition resize-none" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-300 mb-1.5 flex items-center gap-1.5"><StickyNote size={14} className="text-green-400" /> Booking Note <span className="text-gray-500 font-normal">(optional)</span></label>
-                  <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 500))} rows={2}
-                    placeholder="Flight number, luggage, pet, extra stop…"
+                  <label className="text-sm font-medium text-gray-300 mb-1.5 flex items-center gap-1.5"><StickyNote size={14} className="text-green-400" /> Booking Note <span className="text-gray-500 font-normal"></span></label>
+                  <textarea value={note} onChange={(e) => setNote(e.target.value.slice(0, 500))} rows={2} required
+                    placeholder="Exact Picup Address,Flight number, luggage, pet, extra stop…"
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 transition resize-none" />
                 </div>
                 <Motion.button
@@ -601,7 +601,7 @@ const ConfirmPage = () => {
           {/* Guest details — compact contact strip */}
           <div className="bg-white/5 border border-white/10 rounded-xl divide-y divide-white/10">
             {[
-              ["Guest", name.trim() || "—"],
+              ["Customer", name.trim() || "—"],
               ["Email", email.trim() || "—"],
               ["Phone", phone.trim() || "—"],
             ].map(([label, value]) => (
@@ -654,7 +654,7 @@ const ConfirmPage = () => {
           <div className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-[13px]">
             <div className="flex items-center justify-between gap-3 pb-2 border-b border-dashed border-white/15">
               <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-gray-400 font-semibold">
-                <Receipt size={13} className="text-emerald-400" /> Trip invoice
+                <Receipt size={13} className="text-emerald-400" /> PAYMENT SUMMARY
               </span>
               <span className="text-[11px] text-gray-500 tabular-nums">
                 {fare.distance?.toFixed(1)} km · {formatTripDuration(fare.duration)}
@@ -674,7 +674,7 @@ const ConfirmPage = () => {
                 <span className="text-gray-300">
                   Distance fare
                   {fare.fareBreakdown?.chargeableDistance > 0 && perKm != null && (
-                    <span className="block text-[11px] text-gray-500 font-normal">{fare.fareBreakdown.chargeableDistance} km × {perKmLabel(perKm)}</span>
+                    <span className="block text-[11px] text-gray-500 font-normal">({(totalKm ?? 0).toFixed(1)} km - {fare.fareBreakdown.baseKm} km) x {perKmLabel}{perKm} Km </span>
                   )}
                 </span>
                 <span className="text-white font-medium tabular-nums shrink-0">{formatCurrency(fare.fareBreakdown?.distanceFare)}</span>
@@ -727,7 +727,7 @@ const ConfirmPage = () => {
 
           {/* Notes — single line */}
           <p className="text-[11px] leading-5 bg-red-700 border border-white/10 text-200 rounded-md px-2.5 py-1.5 text-gray-400">
-            <span className="text-black font-bold">Note:</span> <span className="text-white">Pay cash to the driver. Tolls &amp; permits at actuals.{""} {draft.tripType === "One Way" && " Waiting ₹2.5/min after 30 min free."}</span> 
+            <span className="text-black font-bold">Note:</span> <span className="text-white">Pay cash to the driver for Tolls &amp; permits at actuals.{""} {draft.tripType === "One Way" && " Waiting charge ₹2.5/min  will apply when driver waiting at pick up point after 30 min ."}</span> 
             
             <br />
             {note.trim() && <span className="text-black font-bold">Customer note:</span>}{note.trim() && <span className="text-white"> {note.trim()}</span>}

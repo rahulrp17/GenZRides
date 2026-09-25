@@ -46,13 +46,15 @@ const rowCls = ({ isActive }, compact) =>
       : "border border-transparent text-gray-400 hover:border-white/10 hover:bg-white/5 hover:text-white"
   }`;
 
-// Best-match wins: an exact path beats a prefix. Without this,
-// "/admin/instant-bookings/requests" would also highlight the
-// "/admin/instant-bookings" sibling (prefix match), while detail pages
-// like "/admin/bookings/:id" still highlight their parent entry.
-const activeChildPath = (pathname, kids) => {
+// Best-match wins globally: an exact path anywhere beats every prefix.
+// Without this, "/admin/instant-bookings/requests" would ALSO highlight
+// the "/admin/instant-bookings" child of the *other* dropdown (prefix
+// match). Detail pages like "/admin/bookings/:id" (no exact entry
+// anywhere) still highlight their parent entry via the prefix fallback.
+const activeChildPath = (pathname, kids, allowPrefix) => {
   const exact = kids.find((c) => pathname === c.path);
   if (exact) return exact.path;
+  if (!allowPrefix) return null;
   return kids.find((c) => pathname.startsWith(`${c.path}/`))?.path || null;
 };
 
@@ -78,10 +80,10 @@ const NavItem = ({ item, compact, badgeCounts, onNavigate }) => (
   </Motion.div>
 );
 
-const NavDropdown = ({ item, compact, badgeCounts, onNavigate }) => {
+const NavDropdown = ({ item, compact, badgeCounts, onNavigate, allowPrefix }) => {
   const location = useLocation();
   const kids = item.children || [];
-  const activePath = activeChildPath(location.pathname, kids);
+  const activePath = activeChildPath(location.pathname, kids, allowPrefix);
   const active = activePath !== null;
   const isActiveChild = (c) => c.path === activePath;
   const childTotal = kids.reduce(
@@ -232,6 +234,10 @@ const NavDropdown = ({ item, compact, badgeCounts, onNavigate }) => {
 
 const SidebarNav = ({ items, expanded, badgeCounts = {}, onNavigate }) => {
   const compact = !expanded;
+  const { pathname } = useLocation();
+  // If ANY child path matches exactly, no group may claim via prefix.
+  const allChildPaths = items.flatMap((it) => (it.children || []).map((c) => c.path));
+  const allowPrefix = !allChildPaths.includes(pathname);
   return (
     <nav
       className={`flex-1 space-y-1 min-w-0 ${
@@ -246,6 +252,7 @@ const SidebarNav = ({ items, expanded, badgeCounts = {}, onNavigate }) => {
             compact={compact}
             badgeCounts={badgeCounts}
             onNavigate={onNavigate}
+            allowPrefix={allowPrefix}
           />
         ) : (
           <NavItem

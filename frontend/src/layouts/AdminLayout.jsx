@@ -7,7 +7,7 @@ import SEO from "../components/SEO";
 import PushListener from "../components/PushListener";
 import AutoPushSync from "../components/AutoPushSync";
 import SidebarNav from "../components/shared/SidebarNav";
-import { useAdminCounts, useIncompleteVisitorCount } from "../Pages/admin/bookingUtils";
+import { useBadgeCounts } from "../Pages/admin/bookingUtils";
 import { motion as Motion } from "framer-motion";
 
 const navItems = [
@@ -46,13 +46,9 @@ const AdminLayout = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  // Live badge counts (real backend data, socket-invalidated).
-  const { data: queueCounts } = useAdminCounts();
-  const { data: incompleteVisitors } = useIncompleteVisitorCount();
-  const badgeCounts = {
-    ...(queueCounts || {}),
-    incompleteVisitors: incompleteVisitors || 0,
-  };
+  // Live "new arrivals" badge counts (real backend totals minus what
+  // the admin already saw — visiting a page clears its badge).
+  const badgeCounts = useBadgeCounts();
   useEffect(() => {
     if (!dropdownOpen) return;
     const onOutside = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false); };

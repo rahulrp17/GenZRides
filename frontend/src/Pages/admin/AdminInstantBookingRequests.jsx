@@ -38,6 +38,8 @@ import {
   formatDateTime,
   customerName,
   customerPhone,
+  useMarkSeen,
+  useFreshIds,
 } from "./bookingUtils";
 
 const REJECT_REASONS = [
@@ -154,6 +156,11 @@ const AdminInstantBookingRequests = () => {
   });
 
   const bookings = data?.bookings || [];
+  // Visiting clears the "new requests" badge; arrivals after the first
+  // load flash for 3s so the admin spots them instantly.
+  useMarkSeen("pendingInstantRequests", data?.total ?? bookings.length);
+  const isFresh = useFreshIds(bookings.map((b) => b._id));
+  const freshRow = (b) => (isFresh(b._id) ? "bg-emerald-500/10 animate-pulse" : "");
   const totalValue = bookings.reduce(
     (s, b) => s + (Number(b.estimatedFare) || 0),
     0,
@@ -344,14 +351,14 @@ const AdminInstantBookingRequests = () => {
       ) : view === "cards" ? (
         <div className="grid gap-3 sm:gap-4 w-full max-w-full">
           {bookings.map((b, i) => (
-            <QueueCard key={b._id} index={i}>
+            <QueueCard key={b._id} index={i} highlight={isFresh(b._id)}>
               <BookingRouteSide b={b} showApproval />
               <BookingFareRail b={b}>{rowActions(b, true)}</BookingFareRail>
             </QueueCard>
           ))}
         </div>
       ) : (
-        <GlassTable columns={requestColumns} rows={bookings} rowKey={(b) => b._id} density="compact" />
+        <GlassTable columns={requestColumns} rows={bookings} rowKey={(b) => b._id} density="compact" rowClassName={freshRow} />
       )}
 
       <BookingDetailModal

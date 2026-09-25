@@ -428,3 +428,47 @@ describe("Admin queues (instant feeds, visitors, counts, scope)", () => {
     ).not.toContain(res.body.booking._id.toString());
   });
 });
+
+describe("Admin visitor deletion", () => {
+  it("deletes an abandoned hold so it leaves the visitors feed", async () => {
+    const visit = await request(app)
+      .post("/api/bookings/guest/visit")
+      .send({ ...trip(), ...guest("9812345678") });
+    expect(visit.status).toBe(201);
+    const visitorId = visit.body.visitor._id;
+
+    const listed = await authAdmin(request(app).get("/api/admin/visitors"));
+    expect(
+      listed.body.visitors.map((v) => v._id.toString())
+    ).toContain(visitorId.toString());
+
+    const del = await authAdmin(
+      request(app).delete(`/api/admin/visitors/${visitorId}`)
+    );
+    expect(del.status).toBe(200);
+    expect(del.body.success).toBe(true);
+
+    const after = await authAdmin(request(app).get("/api/admin/visitors"));
+    expect(
+      after.body.visitors.map((v) => v._id.toString())
+    ).not.toContain(visitorId.toString());
+    expect(await Visitor.findById(visitorId).lean()).toBeNull();
+  });
+
+  it("returns 404 for an unknown visitor and 403 without admin auth", async () => {
+    const missing = await authAdmin(
+      request(app).delete(
+        `/api/admin/visitors/${new mongoose.Types.ObjectId().toString()}`
+      )
+    );
+    expect(missing.status).toBe(404);
+
+    const visit = await request(app)
+      .post("/api/bookings/guest/visit")
+      .send({ ...trip(), ...guest("9812345679") });
+    const noAuth = await request(app).delete(
+      `/api/admin/visitors/${visit.body.visitor._id}`
+    );
+    expect(noAuth.status).toBe(401);
+  });
+});

@@ -156,6 +156,7 @@ export const adminAPI = {
   rejectInstantBooking: (id, data) => api.patch(`/admin/instant-bookings/${id}/reject`, data),
   // Visitor holds + live sidebar counts
   getVisitors: (params) => api.get('/admin/visitors', { params }),
+  deleteVisitor: (id) => api.delete(`/admin/visitors/${id}`),
   getCounts: () => api.get('/admin/counts'),
   getWithdrawals: () => api.get('/admin/withdrawals'),
   approveWithdrawal: (id) => api.patch(`/admin/withdrawals/${id}/approve`),

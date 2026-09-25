@@ -245,7 +245,7 @@ const VehicleSelector = ({
               
               <div className="flex items-center justify-between gap-3 pb-2 pt-3 border-b border-dashed border-white/15">
                 <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-gray-400 font-semibold">
-                  <Receipt size={13} className="text-emerald-400" /> Trip invoice
+                  <Receipt size={13} className="text-emerald-400" /> PAYMENT SUMMARY
                 </span>
                 <span className="text-[11px] text-gray-500 tabular-nums">
                   {fareEstimate.distance?.toFixed(1)} km · {formatTripDuration(fareEstimate.duration)}
@@ -284,7 +284,7 @@ const VehicleSelector = ({
                   <span className="text-gray-300">
                     Distance fare
                     {fareBreakdown.chargeableDistance > 0 && fareEstimate.perKm != null && (
-                      <span className="block text-[11px] text-gray-500 font-normal">{fareBreakdown.chargeableDistance} km × {perKmLabel(fareEstimate.perKm)}</span>
+                      <span className="block text-[11px] text-gray-500 font-normal">{(fareBreakdown.chargeableDistance).toFixed(1)} km × {perKmLabel(fareEstimate.perKm)}</span>
                     )}
                   </span>
                   <span className="text-gray-200 font-medium tabular-nums shrink-0">{formatCurrency(fareBreakdown.distanceFare)}</span>

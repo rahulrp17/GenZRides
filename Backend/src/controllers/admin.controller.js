@@ -935,6 +935,32 @@ export const getVisitors = async (req, res) => {
 };
 
 /**
+ * DELETE VISITOR (remove an abandoned hold from the page)
+ */
+export const deleteVisitor = async (req, res) => {
+  try {
+    const result = await adminService.deleteVisitor(req.params.id);
+
+    try {
+      const io = getIO();
+      io.to("admins").emit("visitor-updated", { visitorId: req.params.id });
+    } catch (_) {}
+    emitToAdmins("admin-counts-updated", null);
+
+    res.status(200).json({
+      success: true,
+      message: "Visitor deleted.",
+      ...result,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/**
  * GET LIVE SIDEBAR COUNTS (pending queues for badges)
  */
 export const getAdminCounts = async (req, res) => {

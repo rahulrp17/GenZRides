@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Users, Eye, MapPin, Clock, User, Phone, Mail, Calendar } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { Users, Eye, MapPin, Clock, User, Phone, Mail, Calendar, Trash2 } from "lucide-react";
 import { motion as Motion } from "framer-motion";
 import { adminAPI } from "../../services/endpoints";
 import { useSocket } from "../../Context/SocketContext";
@@ -12,6 +13,7 @@ import EmptyState from "../../components/shared/EmptyState";
 import GlassTable from "../../components/shared/GlassTable";
 import Pagination from "../../components/shared/Pagination";
 import Modal from "../../components/shared/Modal";
+import ConfirmDialog from "../../components/shared/ConfirmDialog";
 import {
   QueueHero,
   QueueToolbar,
@@ -20,7 +22,7 @@ import {
   RailDetailsBtn,
   TripTypeBadge,
 } from "./bookingShared";
-import { formatDateTime } from "./bookingUtils";
+import { formatDateTime, useMarkSeen } from "./bookingUtils";
 
 const PAGE_LIMIT = 10;
 
@@ -73,6 +75,7 @@ const AdminVisitors = () => {
     }
   };
   const [selected, setSelected] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ["adminVisitors", page, debouncedSearch],
@@ -102,6 +105,24 @@ const AdminVisitors = () => {
   }, [socket, queryClient]);
 
   const visitors = data?.visitors || [];
+
+  // Visiting clears the "new incomplete holds" badge.
+  useMarkSeen("incompleteVisitors", data?.total ?? visitors.length);
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => adminAPI.deleteVisitor(id),
+    onSuccess: (_data, id) => {
+      toast.success("Visitor deleted");
+      queryClient.invalidateQueries({ queryKey: ["adminVisitors"] });
+      queryClient.invalidateQueries({ queryKey: ["incompleteVisitorCount"] });
+      queryClient.invalidateQueries({ queryKey: ["adminCounts"] });
+      setDeleteTarget(null);
+      setSelected((prev) => (prev && prev._id === id ? null : prev));
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to delete visitor");
+    },
+  });
 
   if (isError) {
     return (
@@ -165,14 +186,25 @@ const AdminVisitors = () => {
       header: "",
       tdClassName: "text-right",
       cell: (v) => (
-        <button
-          onClick={() => setSelected(v)}
-          title="Details"
-          aria-label="View details"
-          className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs hover:bg-white/10 transition"
-        >
-          <Eye size={14} />
-        </button>
+        <span className="inline-flex items-center justify-end gap-1.5">
+          <button
+            onClick={() => setSelected(v)}
+            title="Details"
+            aria-label="View details"
+            className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-white/5 border border-white/10 text-gray-300 rounded-xl text-xs hover:bg-white/10 transition"
+          >
+            <Eye size={14} />
+          </button>
+          <button
+            onClick={() => setDeleteTarget(v)}
+            disabled={deleteMutation.isPending}
+            title="Delete hold"
+            aria-label="Delete hold"
+            className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-red-500/15 border border-red-500/25 text-red-300 rounded-xl text-xs hover:bg-red-500/25 transition disabled:opacity-50"
+          >
+            <Trash2 size={14} />
+          </button>
+        </span>
       ),
     },
   ];
@@ -307,6 +339,15 @@ const AdminVisitors = () => {
                   </div>
                   <BookingFareRail b={{ estimatedFare: null }}>
                     <RailDetailsBtn onClick={() => setSelected(v)} />
+                    <button
+                      onClick={() => setDeleteTarget(v)}
+                      disabled={deleteMutation.isPending}
+                      title="Delete hold"
+                      aria-label="Delete hold"
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full rounded-2xl text-xs font-semibold transition-all bg-red-500/15 border border-red-500/25 text-red-300 hover:bg-red-500/25 disabled:opacity-50"
+                    >
+                      <Trash2 size={14} /> Delete
+                    </button>
                     {v.bookingId && (
                       <button
                         onClick={() => navigate(`/admin/bookings/${v.bookingId}`)}
@@ -398,9 +439,26 @@ const AdminVisitors = () => {
                 <MapPin size={16} /> Open Booking
               </button>
             )}
+            <button
+              onClick={() => setDeleteTarget(selected)}
+              disabled={deleteMutation.isPending}
+              className="w-full py-2.5 min-h-[44px] bg-red-500/15 border border-red-500/25 text-red-300 text-sm font-semibold rounded-2xl flex items-center justify-center gap-2 hover:bg-red-500/25 transition-all disabled:opacity-50"
+            >
+              <Trash2 size={16} /> Delete Hold
+            </button>
           </div>
         )}
       </Modal>
+
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        onClose={() => !deleteMutation.isPending && setDeleteTarget(null)}
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget._id)}
+        title="Delete Hold"
+        message={`Permanently remove hold ${deleteTarget?.reference || ""}? This cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+      />
     </Motion.div>
   );
 };

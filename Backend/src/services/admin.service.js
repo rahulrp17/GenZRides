@@ -1462,6 +1462,16 @@ export const getVisitors = async (
   };
 };
 
+export const deleteVisitor = async (visitorId) => {
+  const visitor = await Visitor.findByIdAndDelete(visitorId);
+
+  if (!visitor) {
+    throw new Error("Visitor not found.");
+  }
+
+  return { deletedId: visitor._id };
+};
+
 export const getAdminCounts = async () => {
   const [pendingCustomerRequests, pendingInstantRequests] =
     await Promise.all([

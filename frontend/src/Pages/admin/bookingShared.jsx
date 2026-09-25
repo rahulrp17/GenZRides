@@ -458,13 +458,18 @@ export const BookingDetailModal = ({ booking: b, onClose, footer }) => {
   );
 };
 
-// Card shell shared by all booking queues.
-export const QueueCard = ({ index, children }) => (
+// Card shell shared by all booking queues. `highlight` flashes a newly
+// arrived booking for a few seconds (ring + glow + pulse).
+export const QueueCard = ({ index, children, highlight = false }) => (
   <Motion.article
     initial={{ opacity: 0, y: 14 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: Math.min(index * 0.05, 0.3), duration: 0.32 }}
-    className="group relative overflow-hidden bg-white/5 backdrop-blur-lg rounded-3xl border border-white/10 hover:border-green-400/40 hover:shadow-[0_8px_40px_-12px_rgba(0,255,128,0.3)] transition-all duration-300 min-w-0"
+    className={`group relative overflow-hidden bg-white/5 backdrop-blur-lg rounded-3xl border transition-all duration-300 min-w-0 ${
+      highlight
+        ? "border-emerald-400/70 shadow-[0_0_35px_rgba(34,197,94,0.45)] animate-pulse"
+        : "border-white/10 hover:border-green-400/40 hover:shadow-[0_8px_40px_-12px_rgba(0,255,128,0.3)]"
+    }`}
   >
     <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-green-400/50 to-transparent" />
     <span

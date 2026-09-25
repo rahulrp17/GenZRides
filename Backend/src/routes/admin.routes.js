@@ -36,6 +36,7 @@ import {
   rejectInstantBooking,
   approveBooking,
   getVisitors,
+  deleteVisitor,
   getAdminCounts,
   assignDriver,
   cancelBooking,
@@ -108,6 +109,7 @@ router.patch("/instant-bookings/:id/reject", validateParams(idParamSchema), vali
 
 // Visitors (temporary guest holds)
 router.get("/visitors", validateQuery(paginationQuerySchema), getVisitors);
+router.delete("/visitors/:id", validateParams(idParamSchema), deleteVisitor);
 
 // Live sidebar counts (pending queues for badges)
 router.get("/counts", getAdminCounts);
