@@ -7,6 +7,8 @@ import WhatsappLog from "../src/models/WhatsappLog.js";
 import {
   notifyAdminOfBooking,
   normalizeRecipient,
+  buildBookingTemplateParams,
+  PREMIUM_BOOKING_TEMPLATE,
 } from "../src/services/whatsapp.service.js";
 
 let mongoServer;
@@ -18,7 +20,7 @@ const setWaEnv = () => {
   process.env.WHATSAPP_TOKEN = "test-token";
   process.env.WHATSAPP_PHONE_NUMBER_ID = "123456789012345";
   process.env.WHATSAPP_BUSINESS_NUMBER = ADMIN_TEST_NUMBER;
-  process.env.WHATSAPP_TEMPLATE_NAME = "new_booking_alert";
+  process.env.WHATSAPP_TEMPLATE_NAME = "premium_booking_invoice";
   process.env.WHATSAPP_TEMPLATE_LANG = "en";
 };
 
@@ -96,7 +98,14 @@ describe("Admin booking WhatsApp alert", () => {
     expect(result.via).toBe("template");
     expect(captured).toHaveLength(1);
     expect(captured[0].to).toBe(ADMIN_TEST_NUMBER);
-    expect(captured[0].template.name).toBe("new_booking_alert");
+    expect(captured[0].template.name).toBe("premium_booking_invoice");
+    // Invoice param order: ref, name, phone, pickup, drop, when, vehicle, fare
+    const params = captured[0].template.components[0].parameters.map((p) => p.text);
+    expect(params).toHaveLength(8);
+    expect(params[0]).toMatch(/^[0-9A-F]{8}$/);
+    expect(params[1]).toBe("WA Customer");
+    expect(params[2]).toBe("9876543298");
+    expect(params[7]).toBe("450");
 
     const log = await WhatsappLog.findOne({ booking: booking._id }).lean();
     expect(log?.status).toBe("sent");
@@ -105,6 +114,48 @@ describe("Admin booking WhatsApp alert", () => {
     const dup = await notifyAdminOfBooking(populated, fakeSender);
     expect(dup).toMatchObject({ sent: false, skipped: "duplicate" });
     expect(captured).toHaveLength(1);
+  });
+
+  it("keeps template params in invoice order (ref..fare)", async () => {
+    const populated = await Booking.findById(booking._id)
+      .populate("customer", "name phone")
+      .populate("vehicleType");
+    const params = await buildBookingTemplateParams(populated);
+    expect(params).toHaveLength(8);
+    expect(params[0]).toMatch(/^[0-9A-F]{8}$/);
+    expect(params.slice(1)).toEqual([
+      "WA Customer",
+      "9876543298",
+      "Pickup Plaza",
+      "Drop Towers",
+      expect.stringContaining("One Way"),
+      "Sedan",
+      "450",
+    ]);
+    expect(PREMIUM_BOOKING_TEMPLATE.name).toBe("premium_booking_invoice");
+  });
+
+  it("falls back to the invoice-style text alert when the template send fails", async () => {
+    const texts = [];
+    let calls = 0;
+    const flakySender = async (payload) => {
+      calls += 1;
+      if (payload.type === "template") throw new Error("template missing");
+      texts.push(payload.text.body);
+      return { sent: true, messageId: "test-msg-text" };
+    };
+    const populated = await Booking.findById(booking._id)
+      .populate("customer", "name phone")
+      .populate("vehicleType");
+
+    const result = await notifyAdminOfBooking(populated, flakySender);
+
+    expect(calls).toBe(2);
+    expect(result).toMatchObject({ sent: true, via: "text" });
+    expect(texts).toHaveLength(1);
+    expect(texts[0]).toContain("🧾 *New Booking Received* ✅");
+    expect(texts[0]).toContain("💰 *Est. Fare:* ₹450 (Cash)");
+    expect(texts[0]).toContain("📍 *Pickup:* Pickup Plaza");
   });
 
   it("records the structured Meta error when the send fails", async () => {

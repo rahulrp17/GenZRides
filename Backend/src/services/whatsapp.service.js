@@ -9,7 +9,7 @@ const getConfig = () => ({
   token: process.env.WHATSAPP_TOKEN || "",
   phoneNumberId: (process.env.WHATSAPP_PHONE_NUMBER_ID || "").trim(),
   businessNumber: (process.env.WHATSAPP_BUSINESS_NUMBER || "").trim(),
-  templateName: (process.env.WHATSAPP_TEMPLATE_NAME || "new_booking_alert").trim(),
+  templateName: (process.env.WHATSAPP_TEMPLATE_NAME || "premium_booking_invoice").trim(),
   templateLang: (process.env.WHATSAPP_TEMPLATE_LANG || "en").trim(),
 });
 
@@ -176,20 +176,59 @@ const getBookingAlertFields = async (booking) => {
 const buildBookingAlert = async (booking) => {
   const f = await getBookingAlertFields(booking);
 
+  // Invoice-style alert (mirrors the approved `premium_booking_invoice`
+  // template below). WhatsApp renders *bold* in both template and text
+  // messages, so the fallback looks identical to the template.
   const lines = [
-    "New cab booking received",
-    `Ref: ${f.ref}`,
-    `Name: ${f.name}`,
-    `Phone: ${f.phone}`,
-    `Pickup: ${f.pickup}`,
-    `Drop: ${f.drop}`,
-    `When: ${f.when}`,
-    `Vehicle: ${f.vehicle}`,
-    `Fare: Rs.${f.fare}`,
-    `Status: ${f.status}`,
+    "🧾 *New Booking Alert*🚨 ✅",
+    "________________________________",
+    `🔖 *Booking ID:* #${f.ref}`,
+    `👤 *Name:* ${f.name}`,
+    `📞 *Phone:* ${f.phone}`,
+    "_______________________",
+    `📍 *Pickup:* ${f.pickup}`,
+    `🏁 *Drop:* ${f.drop}`,
+    `🗓️ *When:* ${f.when}`,
+    "_______________________",
+    `🚗 *Vehicle:* ${f.vehicle}`,
+    `💰 *Est. Fare:* ₹${f.fare} (Cash)`,
+    `⏳ *Status:* ${f.status}`,
+    "________________________________",
+    "_Pay Cash to driver for Tolls & permits at actuals. Please assign a driver._",
   ];
 
   return lines.join("\n");
+};
+
+// Premium invoice template — create EXACTLY this in the Meta dashboard
+// (WhatsApp Manager → Message Templates → Create, category UTILITY,
+// language EN) with name `premium_booking_invoice`, then set
+// WHATSAPP_TEMPLATE_NAME to match. Parameter order {{1}}..{{8}} must stay
+// in sync with buildBookingTemplateParams below.
+//
+// HEADER (static text): 🚕 New Ride Booked!
+// BODY:
+// 🧾 *New Booking Received* ✅
+//
+// 🔖 *Booking ID:* #{{1}}
+// 👤 *Name:* {{2}}
+// 📞 *Phone:* {{3}}
+//
+// 📍 *Pickup:* {{4}}
+// 🏁 *Drop:* {{5}}
+// 🗓️ *When:* {{6}}
+//
+// 🚗 *Vehicle:* {{7}}
+// 💰 *Est. Fare:* ₹{{8}} (Cash)
+//
+// _Tolls & permits at actuals. Please assign a driver._
+// FOOTER (static text): GenZRides • Instant Booking Alert
+export const PREMIUM_BOOKING_TEMPLATE = {
+  name: "premium_booking_invoice",
+  category: "UTILITY",
+  language: "en",
+  header: "🚕 New Ride Booked!",
+  footer: "GenZRides • Instant Booking Alert",
 };
 
 // Must match the approved template body parameter order exactly:
