@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 const createReviewSchema = z.object({
   rating: z.number().int().min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
+  driverRating: z.number().int().min(1, 'Driver rating must be at least 1').max(5, 'Driver rating must be at most 5').optional(),
   review: z.string().max(500, 'Review must be at most 500 characters').optional(),
 });
 

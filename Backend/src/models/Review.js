@@ -47,6 +47,15 @@ const reviewSchema = new mongoose.Schema(
       max: 5,
     },
 
+    // Driver-specific score (overall trip score stays in `rating`).
+    // Optional so reviews written before this field existed stay valid.
+    driverRating: {
+      type: Number,
+      default: null,
+      min: 1,
+      max: 5,
+    },
+
     /* ==========================================
        REVIEW
     ========================================== */

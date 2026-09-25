@@ -115,6 +115,10 @@ const CurrentRideCustomer = () => {
   const mapRef = useRef(null);
   const hasInteractedRef = useRef(false);
   const initialFitDoneRef = useRef(false);
+  // Completion redirect guards — only navigate when the ride completes
+  // *while* the customer watches (not on a fresh visit to an old receipt).
+  const seenStatusRef = useRef({ id: null, status: null });
+  const redirectedRef = useRef(null);
 
   // Review state
   const [reviewRating, setReviewRating] = useState(0);
@@ -359,6 +363,27 @@ const CurrentRideCustomer = () => {
       document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [socket, booking?._id, queryClient]);
+
+  // Ride completed while watching → hand off to My Bookings, where the
+  // review dialog opens for that trip. A fresh visit to an already
+  // completed receipt stays put (invoice + details remain visible).
+  useEffect(() => {
+    if (!booking?._id) return;
+    if (seenStatusRef.current.id !== booking._id) {
+      seenStatusRef.current = { id: booking._id, status: booking.bookingStatus };
+      return;
+    }
+    if (
+      booking.bookingStatus === 'Completed' &&
+      seenStatusRef.current.status !== 'Completed' &&
+      redirectedRef.current !== booking._id
+    ) {
+      redirectedRef.current = booking._id;
+      seenStatusRef.current.status = 'Completed';
+      toast.success('Ride completed! Taking you to My Bookings…');
+      navigate('/customer/bookings', { state: { justCompletedId: booking._id } });
+    }
+  }, [booking?._id, booking?.bookingStatus, navigate]);
 
   // Reset live status when active booking changes
   useEffect(() => {

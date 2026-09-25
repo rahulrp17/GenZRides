@@ -11,7 +11,7 @@ export const createReview = async (
   customerId,
   data
 ) => {
-  const { rating, review = "" } = data;
+  const { rating, driverRating = null, review = "" } = data;
 
   const booking = await Booking.findById(bookingId);
 
@@ -47,6 +47,7 @@ export const createReview = async (
     customer: customerId,
     driver: booking.driver,
     rating,
+    driverRating,
     review,
   });
 
@@ -59,15 +60,23 @@ export const createReview = async (
 
   /* =====================================
      UPDATE DRIVER AVERAGE RATING + COUNT
-     Both are recomputed from all reviews so the counters self-heal
-     even for drivers rated before counting existed.
+     Scored on the driver-specific rating when the customer gave one,
+     otherwise on the overall rating (reviews written before driverRating
+     existed keep counting exactly as before).
   ===================================== */
 
+  const scoreField = "$driverRating";
   const agg = await Review.aggregate([
     { $match: { driver: booking.driver } },
-    { $group: { _id: null, avg: { $avg: "$rating" }, count: { $sum: 1 } } },
+    {
+      $group: {
+        _id: null,
+        avg: { $avg: { $ifNull: [scoreField, "$rating"] } },
+        count: { $sum: 1 },
+      },
+    },
   ]);
-  const average = agg[0]?.avg || rating;
+  const average = agg[0]?.avg || driverRating || rating;
   const totalRatings = agg[0]?.count || 1;
 
   await DriverProfile.findByIdAndUpdate(

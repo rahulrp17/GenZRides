@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { Calendar, MapPin, Clock, Car, Eye, X, Download, Filter, Copy, Check, RefreshCw, ChevronDown } from 'lucide-react';
+import { Calendar, MapPin, Clock, Car, Eye, X, Download, Filter, Copy, Check, RefreshCw, ChevronDown, Star } from 'lucide-react';
 import { bookingAPI, invoiceAPI } from '../../services/endpoints';
 import { useSocket } from '../../Context/SocketContext';
 import { useCopyBooking } from '../../utils/bookingText';
@@ -10,6 +11,7 @@ import ErrorState from '../../components/shared/ErrorState';
 import EmptyState from '../../components/shared/EmptyState';
 import Pagination from '../../components/shared/Pagination';
 import Modal from '../../components/shared/Modal';
+import ReviewModal from '../../components/customer/ReviewModal';
 import { formatTripDuration } from '../../utils/formatDuration';
 import CancelReasonDialog from '../../components/shared/CancelReasonDialog';
 import { BookingStatusBadge } from '../../utils/bookingStatus';
@@ -20,8 +22,13 @@ const CustomerBookings = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [cancelId, setCancelId] = useState(null);
+  const [reviewBooking, setReviewBooking] = useState(null);
   const { copied, copyBooking } = useCopyBooking();
   const queryClient = useQueryClient();
+  const location = useLocation();
+  const navigate = useNavigate();
+  // Consumed once — auto-opened review after a live completion redirect.
+  const justOpenedRef = React.useRef(null);
 
   const { socket } = useSocket();
   const { data, isLoading, isFetching, isError, error } = useQuery({
@@ -95,6 +102,22 @@ const CustomerBookings = () => {
 
   const bookings = data?.bookings || [];
   const pagination = { total: data?.total, page: data?.page, totalPages: data?.totalPages };
+
+  // Arrived here right after a ride completed (redirected from Current Ride):
+  // celebrate once, then open the review dialog for that booking.
+  useEffect(() => {
+    const justCompletedId = location.state?.justCompletedId;
+    if (!justCompletedId || justOpenedRef.current === justCompletedId || bookings.length === 0) return;
+    const target = bookings.find((b) => String(b._id) === String(justCompletedId));
+    if (!target) return;
+    justOpenedRef.current = justCompletedId;
+    navigate(location.pathname, { replace: true });
+    if (target.bookingStatus === 'Completed' && !target.rating) {
+      toast.success('Ride completed — how was your trip?');
+      setReviewBooking(target);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookings, location.state]);
 
   if (isError) {
     return <ErrorState message={error?.message || 'Failed to load bookings'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['myBookings'] })} />;
@@ -218,6 +241,15 @@ const CustomerBookings = () => {
                             <Download size={14} />
                           </button>
                         )}
+                        {b.bookingStatus === 'Completed' && !b.rating && (
+                          <button
+                            onClick={() => setReviewBooking(b)}
+                            className="p-1 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 rounded-lg transition"
+                            title="Rate this ride"
+                          >
+                            <Star size={14} />
+                          </button>
+                        )}
                         {['Pending', 'Accepted'].includes(b.bookingStatus) && (
                           <button
                             onClick={() => setCancelId(b._id)}
@@ -272,6 +304,11 @@ const CustomerBookings = () => {
                     {b.bookingStatus === 'Completed' && (
                       <button onClick={() => handleDownloadInvoice(b._id)} className="p-1 text-green-400 hover:text-green-300 hover:bg-white/5 rounded-lg transition">
                         <Download size={14} />
+                      </button>
+                    )}
+                    {b.bookingStatus === 'Completed' && !b.rating && (
+                      <button onClick={() => setReviewBooking(b)} className="p-1 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 rounded-lg transition" title="Rate this ride">
+                        <Star size={14} />
                       </button>
                     )}
                     {['Pending', 'Accepted'].includes(b.bookingStatus) && (
@@ -401,6 +438,14 @@ const CustomerBookings = () => {
         message="Please tell us why you are cancelling. The driver will be notified immediately."
         confirmText="Cancel Booking"
         isPending={cancelMutation.isPending}
+      />
+
+      {/* Post-ride review */}
+      <ReviewModal
+        booking={reviewBooking}
+        isOpen={!!reviewBooking}
+        onClose={() => setReviewBooking(null)}
+        onSubmitted={() => setReviewBooking(null)}
       />
     </Motion.div>
   );
