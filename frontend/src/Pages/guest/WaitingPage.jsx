@@ -26,6 +26,7 @@ import { hero2 } from "../../assets/images";
 import { Reveal } from "../../Component/Landing/Reveal";
 import { formatTripDuration } from "../../utils/formatDuration";
 import { BookingStatusBadge } from "../../utils/bookingStatus";
+import { toBookingRef } from "../../utils/bookingText";
 import { guestAPI } from "../../services/endpoints";
 
 const LIVE_POLL_MS = 10_000;
@@ -78,7 +79,10 @@ const WaitingPage = () => {
     // ignore
   }
 
-  const ref = location.state?.ref || storedRef;
+  const rawRef = location.state?.ref || storedRef;
+  // Normalize to the canonical 8-char caps ref — also heals legacy
+  // sessionStorage values that stored the full 24-char ObjectId.
+  const ref = toBookingRef(rawRef) || null;
   const name = location.state?.name || storedName;
   const note = (location.state?.note || location.state?.booking?.note || storedBooking?.note || "").trim();
   const booking = location.state?.booking || storedBooking || null;
@@ -91,7 +95,7 @@ const WaitingPage = () => {
   } catch {
     // ignore — page stays static
   }
-  const lookupRef = ref ? String(ref).slice(-8).toUpperCase() : null;
+  const lookupRef = ref || null;
   const [live, setLive] = useState(null);
   const terminal = ["Completed", "Cancelled"].includes(live?.bookingStatus);
 
@@ -253,7 +257,7 @@ const WaitingPage = () => {
            {statusBanner && (
             <Reveal
               delay={0.04}
-              className={`mt-5 md:mt-6 bg-white/5 backdrop-blur-lg rounded-[30px] border p-5 sm:p-6 text-left ${BANNER_TONES[statusBanner.tone]}`}
+              className={`mt-5 hidden md:mt-6 bg-white/5 backdrop-blur-lg rounded-[30px] border p-5 sm:p-6 text-left ${BANNER_TONES[statusBanner.tone]}`}
             >
               <div className="flex items-start gap-3">
                 <span
@@ -291,7 +295,7 @@ const WaitingPage = () => {
                   <span className="inline-flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-full px-3.5 py-1.5 text-xs sm:text-sm">
                     <CheckCircle2 size={14} className="text-green-400 shrink-0" />
                     <span className="text-gray-300">
-                      Ref: <span className="font-mono font-semibold text-white">#{String(ref).slice(-8).toUpperCase()}</span>
+                      Ref: <span className="font-mono font-semibold text-white">#{ref}</span>
                     </span>
                   </span>
                 )}
@@ -301,14 +305,14 @@ const WaitingPage = () => {
               <div className="relative pl-6 sm:pl-7 mt-6 space-y-5">
                 <span aria-hidden className="absolute left-[10px] sm:left-[14px] top-2 bottom-2 w-px bg-gradient-to-b from-green-400/70 via-white/15 to-red-400/70" />
                 <div className="relative">
-                  <span aria-hidden className="absolute left-[-22px] sm:left-[-26px] top-1.5 w-[9px] h-[9px] rounded-full bg-green-400 ring-4 ring-green-400/20" />
+                  <span aria-hidden className="absolute left-[-18px] sm:left-[-18px] top-1.5 w-[9px] h-[9px] rounded-full bg-green-400 ring-4 ring-green-400/20" />
                   <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold flex items-center gap-1.5">
                     <MapPin size={12} className="text-green-400" /> Pickup
                   </p>
                   <p className="text-sm sm:text-base font-medium text-white break-words">{booking.pickupAddress}</p>
                 </div>
                 <div className="relative">
-                  <span aria-hidden className="absolute left-[-22px] sm:left-[-26px] top-1.5 w-[9px] h-[9px] rounded-full bg-red-400 ring-4 ring-red-400/20" />
+                  <span aria-hidden className="absolute left-[-18px] sm:left-[-18px] top-1.5 w-[9px] h-[9px] rounded-full bg-red-400 ring-4 ring-red-400/20" />
                   <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold flex items-center gap-1.5">
                     <Navigation size={12} className="text-red-400" /> Drop
                   </p>
@@ -384,7 +388,7 @@ const WaitingPage = () => {
           <Reveal delay={0.14} className="mt-5 md:mt-6 bg-white/5 backdrop-blur-lg rounded-[30px] border border-white/10 p-6 sm:p-8 text-center">
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               {ref && (
-                <Link to="/booking/my-booking">
+                <Link to="/booking/my-booking" state={{ ref, phone: storedPhone }}>
                   <Motion.button
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}

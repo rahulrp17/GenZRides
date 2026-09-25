@@ -1,9 +1,17 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
+/**
+ * Role-aware route guard.
+ * - Guests (no user) → /login (with `from` so login can redirect back).
+ * - Signed-in user with wrong role → /unauthorized (401 page, with
+ *   `requiredRole` + `from` so the 401 page can explain + link home).
+ */
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
+  const from = `${location.pathname}${location.search}`;
 
   if (loading) {
     return (
@@ -13,12 +21,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" state={{ from }} replace />;
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    if (user.role === 'driver') return <Navigate to="/driver" replace />;
-    if (user.role === 'admin') return <Navigate to="/admin" replace />;
-    return <Navigate to="/customer" replace />;
+    const requiredRole = allowedRoles.length === 1 ? allowedRoles[0] : null;
+    return <Navigate to="/unauthorized" state={{ requiredRole, from }} replace />;
   }
 
   return children;

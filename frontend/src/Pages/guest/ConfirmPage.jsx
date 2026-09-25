@@ -13,6 +13,7 @@ import PageHero from "../../Component/Landing/PageHero";
 import { bookingAPI, guestAPI, vehicleAPI } from "../../services/endpoints";
 import { hero8 } from "../../assets/images";
 import { loadDraft, saveDraft, clearDraft } from "./guestDraft";
+import { toBookingRef } from "../../utils/bookingText";
 import { Reveal } from "../../Component/Landing/Reveal";
 
 const formatCurrency = (n) =>
@@ -272,8 +273,11 @@ const ConfirmPage = () => {
       // details — and survives a refresh (the guest has no account to fetch
       // the booking from).
       const bookingInfo = createdResponse?.booking || createdResponse?.data || null;
+      // Canonical tracking ref (last 8 of the _id, uppercase) — this is what
+      // the track-ride form, Waiting page and backend lookup all key on.
+      const shortRef = toBookingRef(bookingRef);
       const summary = {
-        ref: bookingRef,
+        ref: shortRef,
         pickupAddress: pickupAddress.trim(),
         dropAddress: draft.drop.address,
         pickupDateTime: new Date(draft.pickupDateTime).toISOString(),
@@ -300,7 +304,7 @@ const ConfirmPage = () => {
       // lookup form on this device.
       if (!token) {
         try {
-          localStorage.setItem("guestBookingRef", String(bookingRef || ""));
+          localStorage.setItem("guestBookingRef", shortRef);
           localStorage.setItem("guestBookingPhone", cleanPhone);
           localStorage.setItem("guestBookingName", cleanName);
         } catch {
@@ -309,7 +313,7 @@ const ConfirmPage = () => {
       }
 
       clearDraft();
-      navigate("/booking/waiting", { state: { ref: bookingRef, name: cleanName, note: note.trim(), booking: summary } });
+      navigate("/booking/waiting", { state: { ref: shortRef, name: cleanName, note: note.trim(), booking: summary } });
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || "Booking failed. Please try again.");
       // Expired hold — drop it so "Book Now" reserves a fresh one.

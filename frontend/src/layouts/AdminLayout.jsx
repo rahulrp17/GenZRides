@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { NavLink, Outlet, Navigate, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import {  Home,  Users,  Car,  Calendar,  Wallet,  Star,  Bell,  LogOut,  Menu,  ChevronDown,  Settings,  LayoutPanelLeft,  User,  PanelLeftClose,  PanelLeftOpen,} from "lucide-react";
 import useAuth from "../hooks/useAuth";
@@ -42,6 +42,8 @@ const navItems = [
 const AdminLayout = () => {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = `${location.pathname}${location.search}`;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -72,9 +74,10 @@ const AdminLayout = () => {
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.role === "driver") return <Navigate to="/driver" replace />;
-  if (user.role === "customer") return <Navigate to="/customer" replace />;
+  if (!user) return <Navigate to="/login" state={{ from }} replace />;
+  // Role-aware guard: signed-in non-admins see the 401 page, not a silent redirect.
+  if (user.role !== "admin")
+    return <Navigate to="/unauthorized" state={{ requiredRole: "admin", from }} replace />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-900 flex">

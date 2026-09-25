@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, Outlet, Navigate, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import {
   Home, Car, Clock, Wallet, Star, Bell, User,
@@ -41,6 +41,8 @@ const DriverLayout = () => {
   const { user, loading, logout } = useAuth();
   const { socket } = useSocket();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = `${location.pathname}${location.search}`;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -122,9 +124,10 @@ const DriverLayout = () => {
     );
   }
 
-  if (!user) return <Navigate to="/driver/login" replace />;
-  if (user.role === 'admin') return <Navigate to="/admin" replace />;
-  if (user.role === 'customer') return <Navigate to="/customer" replace />;
+  if (!user) return <Navigate to="/driver/login" state={{ from }} replace />;
+  // Role-aware guard: signed-in non-drivers see the 401 page, not a silent redirect.
+  if (user.role !== 'driver')
+    return <Navigate to="/unauthorized" state={{ requiredRole: 'driver', from }} replace />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-900 flex">

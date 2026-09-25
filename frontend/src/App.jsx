@@ -82,6 +82,7 @@ const DriverRegister = lazy(() => import("./Pages/driver-auth/DriverRegister"));
 const DriverLogin = lazy(() => import("./Pages/driver-auth/DriverLogin"));
 const DriverContinue = lazy(() => import("./Pages/driver-auth/DriverContinue"));
 const NotFound = lazy(() => import("./Pages/NotFound"));
+const Unauthorized = lazy(() => import("./Pages/Unauthorized"));
 const ForgotPassword = lazy(() => import("./Pages/Auth/ForgotPassword"));
 const ResetPassword = lazy(() => import("./Pages/Auth/ResetPassword"));
 const OtpVerification = lazy(() => import("./Pages/Auth/OtpVerification"));
@@ -175,6 +176,8 @@ function App() {
         <Route path="/driver/continue" element={<><Navbar /><DriverContinue /></>} />
         <Route path="/driver/register" element={<DriverRegister />} />
         <Route path="/driver/login" element={<DriverLogin />} />
+        {/* 401 — role-aware: wrong role lands here, guests are sent to login by guards */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* Admin dashboard */}
         <Route path="/admin" element={<AdminLayout />}>

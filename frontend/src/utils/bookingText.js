@@ -54,6 +54,16 @@ export const formatBookingDetails = (booking) => {
   return lines.join("\n");
 };
 
+// Canonical guest tracking reference: last 8 of the Mongo _id, uppercase.
+// Accepts a full ObjectId, a short ref (any case, optional leading #),
+// or anything stored previously — always returns the 8-char form (or "").
+export const toBookingRef = (id) =>
+  String(id || "")
+    .trim()
+    .replace(/^#/, "")
+    .slice(-8)
+    .toUpperCase();
+
 // Clipboard write with legacy fallback (non-secure contexts / old browsers).
 export const copyTextToClipboard = async (text) => {
   if (!text) throw new Error("Nothing to copy.");

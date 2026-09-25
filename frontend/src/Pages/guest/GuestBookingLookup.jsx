@@ -33,6 +33,7 @@ import { hero2 } from "../../assets/images";
 import { Reveal } from "../../Component/Landing/Reveal";
 import { formatTripDuration } from "../../utils/formatDuration";
 import { BookingStatusBadge } from "../../utils/bookingStatus";
+import { toBookingRef } from "../../utils/bookingText";
 
 const fmtWhen = (iso) =>
   iso
@@ -77,8 +78,10 @@ const readLs = (key) => {
 const GuestBookingLookup = () => {
   const location = useLocation();
   const navState = location.state || {};
-  const [ref, setRef] = useState(navState.ref || readLs("guestBookingRef"));
-  const [phone, setPhone] = useState(navState.phone || readLs("guestBookingPhone"));
+  // Normalize to the canonical 8-char caps ref — heals legacy localStorage
+  // values that stored the full 24-char ObjectId, and any pasted input.
+  const [ref, setRef] = useState(toBookingRef(navState.ref || readLs("guestBookingRef")));
+  const [phone, setPhone] = useState((navState.phone || readLs("guestBookingPhone") || "").replace(/\D/g, "").slice(0, 10));
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(false);
   const [lookedUp, setLookedUp] = useState(false);
@@ -94,7 +97,7 @@ const GuestBookingLookup = () => {
 
   const handleLookup = async (e) => {
     e?.preventDefault();
-    const cleanRef = ref.trim().replace(/^#/, "");
+    const cleanRef = toBookingRef(ref);
     const cleanPhone = phone.trim();
     if (cleanRef.length < 6) return toast.error("Enter the booking reference from your confirmation.");
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) return toast.error("Enter the 10-digit mobile number you booked with.");
@@ -165,7 +168,7 @@ const GuestBookingLookup = () => {
                 <label className="text-sm font-medium text-gray-300 mb-1.5 flex items-center gap-1.5"><CheckCircle2 size={14} className="text-green-400" /> BookingID</label>
                 <input
                   value={ref}
-                  onChange={(e) => setRef(e.target.value.slice(0, 24))}
+                  onChange={(e) => setRef(toBookingRef(e.target.value))}
                   placeholder="e.g. 0D81F495 (from #ref)"
                   className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 transition font-mono"
                 />
@@ -230,7 +233,7 @@ const GuestBookingLookup = () => {
 
               {booking.approvalStatus === "Pending Approval" && status !== "Cancelled" && (
                 <div className="mt-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl px-4 py-2.5 text-[13px] text-amber-200">
-                  Waiting for admin approval — this usually takes a few minutes. Your driver is assigned right after.
+                  Waiting for Booking Confirmation — this usually takes a few minutes. Your driver is assigned right after.
                 </div>
               )}
               {booking.approvalStatus === "Rejected" && (

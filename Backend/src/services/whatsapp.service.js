@@ -41,6 +41,12 @@ const sanitizeMetaError = (err) => {
   };
 };
 
+// One-line structured form for WhatsappLog so a failed booking alert can
+// be diagnosed from the DB alone (code/subcode pinpoint template,
+// permission, and dev-mode/test-number blocks — the plain message does not).
+const formatMetaError = (safe) =>
+  `Meta error http=${safe.httpStatus ?? "?"} code=${safe.code ?? "?"} subcode=${safe.subcode ?? "?"} type=${safe.type || "?"}: ${safe.message}`;
+
 // Injectable transport (default: Meta Cloud API). Tests inject a fake
 // sender which receives the full Meta payload and returns
 // { sent, messageId } or throws.
@@ -298,6 +304,9 @@ export const notifyAdminOfBooking = async (booking, sender = null) => {
         `[whatsapp] booking ${ref}: template send failed, falling back to text:`,
         JSON.stringify(safe)
       );
+      // Common cause: unverified test sender number / app in dev mode, or
+      // the template name/language not matching an approved template.
+      // (Meta dashboard → WhatsApp → API Setup / Message Templates.)
     }
 
     // Path 2: free-form text fallback (delivers inside an open 24h window).
@@ -315,7 +324,7 @@ export const notifyAdminOfBooking = async (booking, sender = null) => {
         `[whatsapp] booking ${ref}: Meta API error`,
         JSON.stringify(safe)
       );
-      await recordWhatsappFailure(booking._id, to || "invalid", safe.message);
+      await recordWhatsappFailure(booking._id, to || "invalid", formatMetaError(safe));
       return { sent: false, skipped: "send-failed", detail: safe };
     }
 
