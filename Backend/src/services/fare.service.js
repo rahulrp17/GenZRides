@@ -144,7 +144,7 @@ export const calculateFare = async ({
     : travelledDistance;
 
   const chargeableDistance = Math.max(0, totalRunningKm - baseKm);
-  const distanceFare = chargeableDistance * perKm;
+  const distanceFare = Math.round(chargeableDistance * perKm);
 
   /* ===========================
      DRIVER BATA

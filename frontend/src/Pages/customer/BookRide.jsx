@@ -1111,7 +1111,7 @@ const BookRide = () => {
                 <span className="text-gray-300">
                   Distance fare
                   {fareEstimate?.fareBreakdown?.chargeableDistance > 0 && fareEstimate?.perKm != null && (
-                    <span className="block text-[11px] text-gray-500 font-normal">{(fareEstimate.fareBreakdown.chargeableDistance).toFixed(1)} km × {perKmLabel(fareEstimate.perKm)}</span>
+                    <span className="block text-[11px] text-gray-500 font-normal">{(fareEstimate.fareBreakdown.chargeableDistance).toFixed(1)} km × ₹{perKmLabel(fareEstimate.perKm)}/perKm</span>
                   )}
                 </span>
                 <span className="text-white font-medium tabular-nums shrink-0">{formatCurrency(fareEstimate?.fareBreakdown?.distanceFare)}</span>

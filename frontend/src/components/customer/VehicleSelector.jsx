@@ -284,7 +284,7 @@ const VehicleSelector = ({
                   <span className="text-gray-300">
                     Distance fare
                     {fareBreakdown.chargeableDistance > 0 && fareEstimate.perKm != null && (
-                      <span className="block text-[11px] text-gray-500 font-normal">{(fareBreakdown.chargeableDistance).toFixed(1)} km × {perKmLabel(fareEstimate.perKm)}</span>
+                      <span className="block text-[11px] text-gray-500 font-normal">{(fareBreakdown.chargeableDistance).toFixed(1)} km × ₹{perKmLabel(fareEstimate.perKm)}/perKm</span>
                     )}
                   </span>
                   <span className="text-gray-200 font-medium tabular-nums shrink-0">{formatCurrency(fareBreakdown.distanceFare)}</span>

@@ -438,7 +438,7 @@ const ConfirmPage = () => {
                       <span>
                         Distance fare
                         {fare.fareBreakdown.chargeableDistance > 0 && perKm != null && (
-                          <span className="block text-[11px] text-gray-500 font-normal">({(totalKm ?? 0).toFixed(1)} km - {fare.fareBreakdown.baseKm} km) x {perKm} Km </span>
+                          <span className="block text-[11px] text-gray-500 font-normal">({(totalKm ?? 0).toFixed(1)} km - {fare.fareBreakdown.baseKm} km) x ₹{perKm}/perKm </span>
                         )}
                       </span>
                       <span className="text-white tabular-nums shrink-0">{formatCurrency(fare.fareBreakdown.distanceFare)}</span>
@@ -494,7 +494,7 @@ const ConfirmPage = () => {
                 <div className="flex justify-between items-center gap-3 pt-2.5">
                   <span className="font-semibold text-white">
                     Amount payable
-                    <span className="block text-[11px] text-gray-500 font-normal">pay cash to the driver</span>
+                    <span className="block text-[11px] text-gray-500 font-normal">pay cash to the driver for</span>
                   </span>
                   <span className="font-display text-2xl font-bold text-green-400 tabular-nums">{formatCurrency(fare.estimatedFare)}</span>
                 </div>
@@ -678,7 +678,7 @@ const ConfirmPage = () => {
                 <span className="text-gray-300">
                   Distance fare
                   {fare.fareBreakdown?.chargeableDistance > 0 && perKm != null && (
-                    <span className="block text-[11px] text-gray-500 font-normal">({(totalKm ?? 0).toFixed(1)} km - {fare.fareBreakdown.baseKm} km) x {perKmLabel}{perKm} Km </span>
+                    <span className="block text-[11px] text-gray-500 font-normal">({(totalKm ?? 0).toFixed(1)} km - {fare.fareBreakdown.baseKm} km) x ₹{perKmLabel}{perKm}/perKm </span>
                   )}
                 </span>
                 <span className="text-white font-medium tabular-nums shrink-0">{formatCurrency(fare.fareBreakdown?.distanceFare)}</span>
