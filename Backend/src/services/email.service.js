@@ -611,6 +611,257 @@ export const notifyAdminOfBookingEmail = async (
   }
 };
 
+/* ===========================================================
+   CUSTOMER BOOKING-CONFIRMED EMAIL (driver assigned)
+   Fires exactly once per assignment: both assignment paths are
+   atomic (driver:null guard — only one accept/assign can win), so
+   no dedupe ledger is needed. NEVER throws: the assignment must
+   succeed even if email fails. Placeholder guest-domain addresses
+   are never used as recipients.
+========================================================== */
+
+const PLACEHOLDER_DOMAIN = "@guest.letsgocab.local";
+
+const resolveCustomerRecipient = (booking) => {
+  const snapshot = String(booking?.guestEmail || "").trim().toLowerCase();
+  if (snapshot && !snapshot.includes(PLACEHOLDER_DOMAIN)) {
+    return { email: snapshot, name: booking?.guestName || booking?.customer?.name };
+  }
+  const email = String(booking?.customer?.email || "").trim().toLowerCase();
+  if (email && !email.includes(PLACEHOLDER_DOMAIN)) {
+    return { email, name: booking?.customer?.name };
+  }
+  return null;
+};
+
+export const buildAssignmentEmailView = (booking) => {
+  const driver = booking?.driver || {};
+  const driverUser = driver.user || {};
+  const ref = booking?._id?.toString().slice(-8).toUpperCase() || "UNKNOWN";
+  const vehicleBits = [driver.vehicleBrand, driver.vehicleModel, driver.vehicleColor]
+    .filter(Boolean)
+    .join(" ");
+  return {
+    ref,
+    customerName: booking?.guestName || booking?.customer?.name || "Rider",
+    pickupAddress: booking?.pickup?.address || "N/A",
+    dropAddress: booking?.drop?.address || "N/A",
+    when: formatDateTime(booking?.pickupDateTime),
+    tripType: booking?.tripType || "One Way",
+    vehicleName: booking?.vehicleType?.name || driver?.vehicleType?.name || "Cab",
+    driverName: driverUser.name || "Your driver",
+    driverPhone: driverUser.phone || "",
+    vehicleLine: [vehicleBits, driver.vehicleNumber].filter(Boolean).join(" · "),
+    totalFare: booking?.finalFare > 0 ? booking.finalFare : booking?.estimatedFare || 0,
+    paymentMethod: booking?.paymentMethod || "Cash",
+  };
+};
+
+export const buildAssignmentEmailHtml = (view) => {
+  const v = Object.fromEntries(
+    Object.entries(view).map(([k, val]) => [k, escapeHtml(val)])
+  );
+  const driverCall = v.driverPhone
+    ? `<a href="tel:${v.driverPhone}" style="display:inline-block;background:#10b981;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 28px;border-radius:999px;margin:8px 0 0;">Call ${v.driverName}</a>`
+    : ``;
+  const payNote =
+    view.paymentMethod === "Cash"
+      ? `Please pay <strong>₹${Number(view.totalFare || 0).toLocaleString("en-IN")}</strong> in cash to your driver. Tolls &amp; permits at actuals.`
+      : `Paid online. Please show booking reference <strong>#${v.ref}</strong> to your driver.`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Driver assigned — GenZRides booking #${v.ref}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#050807;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#050807;padding:24px 12px;">
+<tr><td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#0a0f0d;border:1px solid rgba(255,255,255,0.1);border-radius:20px;overflow:hidden;">
+<tr><td style="background:linear-gradient(135deg,#059669,#10b981);padding:22px 28px;text-align:center;">
+<p style="margin:0;color:#ffffff;font-size:20px;font-weight:800;letter-spacing:0.5px;">GenZRides</p>
+<p style="margin:4px 0 0;color:rgba(255,255,255,0.85);font-size:12px;letter-spacing:2px;">DRIVER ASSIGNED ✓</p>
+</td></tr>
+<tr><td style="padding:24px 28px 8px;">
+<p style="margin:0;color:#ffffff;font-size:16px;">Hi ${v.customerName},</p>
+<p style="margin:8px 0 0;color:#9ca3af;font-size:13px;line-height:1.6;">Your cab is confirmed! <strong style="color:#34d399;">${v.driverName}</strong> will pick you up in a <strong style="color:#ffffff;">${v.vehicleName}</strong>. Keep booking reference <strong style="color:#ffffff;">#${v.ref}</strong> handy.</p>
+</td></tr>
+<tr><td style="padding:12px 28px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;">
+<tr><td style="padding:14px 16px;">
+<p style="margin:0 0 10px;color:#6b7280;font-size:10px;letter-spacing:1.5px;font-weight:700;">YOUR TRIP</p>
+<p style="margin:0;color:#34d399;font-size:11px;font-weight:700;">▲ PICKUP · ${v.when}</p>
+<p style="margin:2px 0 8px 14px;color:#ffffff;font-size:13px;">${v.pickupAddress}</p>
+<p style="margin:0;color:#f87171;font-size:11px;font-weight:700;">▼ DROP</p>
+<p style="margin:2px 0 0 14px;color:#ffffff;font-size:13px;">${v.dropAddress}</p>
+<p style="margin:10px 0 0;color:#9ca3af;font-size:12px;">${v.tripType} · ${v.vehicleName}</p>
+</td></tr>
+</table>
+</td></tr>
+<tr><td style="padding:12px 28px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:14px;">
+<tr><td style="padding:14px 16px;text-align:center;">
+<p style="margin:0 0 4px;color:#6b7280;font-size:10px;letter-spacing:1.5px;font-weight:700;">YOUR DRIVER</p>
+<p style="margin:0;color:#ffffff;font-size:16px;font-weight:800;">${v.driverName}</p>
+${v.vehicleLine ? `<p style="margin:4px 0 0;color:#9ca3af;font-size:12px;">${v.vehicleLine}</p>` : ``}
+${v.driverPhone ? `<p style="margin:4px 0 0;color:#9ca3af;font-size:12px;">${v.driverPhone}</p>` : ``}
+${driverCall}
+</td></tr>
+</table>
+</td></tr>
+<tr><td style="padding:12px 28px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td style="color:#9ca3af;font-size:13px;">Total fare</td>
+<td align="right" style="color:#34d399;font-size:20px;font-weight:800;">₹${Number(view.totalFare || 0).toLocaleString("en-IN")}</td>
+</tr>
+<tr><td colspan="2" style="color:#6b7280;font-size:12px;padding-top:4px;">${payNote}</td></tr>
+</table>
+</td></tr>
+<tr><td style="padding:20px 28px 24px;text-align:center;">
+<p style="margin:0;color:#4b5563;font-size:11px;line-height:1.6;">Need help? Reply to this email or call support.<br/>GenZRides · Safe rides across Tamil Nadu</p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+};
+
+export const buildAssignmentEmailText = (view) => {
+  const lines = [
+    `GenZRides — Driver Assigned ✓ (Booking #${view.ref})`,
+    ``,
+    `Hi ${view.customerName}, your cab is confirmed!`,
+    `${view.driverName} will pick you up in a ${view.vehicleName}.`,
+    ``,
+    `TRIP`,
+    `Pickup (${view.when}): ${view.pickupAddress}`,
+    `Drop: ${view.dropAddress}`,
+    `${view.tripType} · ${view.vehicleName}`,
+    ``,
+    `DRIVER`,
+    `${view.driverName}${view.driverPhone ? ` · ${view.driverPhone}` : ""}`,
+    view.vehicleLine || "",
+    ``,
+    `Total fare: ₹${Number(view.totalFare || 0).toLocaleString("en-IN")} (${view.paymentMethod})`,
+    view.paymentMethod === "Cash"
+      ? `Please pay in cash to your driver. Tolls & permits at actuals.`
+      : `Paid online. Please show booking reference #${view.ref} to your driver.`,
+    ``,
+    `Need help? Reply to this email. GenZRides.`,
+  ];
+  return lines.filter((l) => l !== null).join("\n");
+};
+
+export const notifyCustomerOfAssignment = async (bookingId, transportFactory = null) => {
+  const ref = String(bookingId || "").slice(-8).toUpperCase() || "unknown";
+
+  try {
+    if (!bookingId) {
+      return { sent: false, skipped: "no-booking" };
+    }
+
+    // Fresh, fully-populated snapshot — never trusts the caller's shape.
+    const { default: Booking } = await import("../models/Booking.js");
+    const booking = await Booking.findById(bookingId)
+      .populate("customer", "name phone email")
+      .populate("vehicleType", "name")
+      .populate({
+        path: "driver",
+        select: "user vehicleBrand vehicleModel vehicleColor vehicleNumber",
+        populate: { path: "user", select: "name phone" },
+      })
+      .lean();
+
+    if (!booking) {
+      return { sent: false, skipped: "booking-not-found" };
+    }
+
+    if (!booking.driver) {
+      return { sent: false, skipped: "no-driver" };
+    }
+
+    const to = resolveCustomerRecipient(booking);
+    if (!to) {
+      console.warn(
+        `[email] booking ${ref}: customer confirmation skipped, no usable recipient (placeholder or missing email).`
+      );
+      return { sent: false, skipped: "no-recipient" };
+    }
+
+    const config = getConfig();
+    const missing = [
+      !config.host && "SMTP_HOST",
+      !config.user && "SMTP_USER",
+      !config.pass && "SMTP_PASS",
+    ].filter(Boolean);
+
+    if (missing.length > 0) {
+      console.warn(
+        `[email] booking ${ref}: customer confirmation skipped, missing env: ${missing.join(", ")} (set SMTP_HOST/USER/PASS on production)`
+      );
+      return { sent: false, skipped: "email-not-configured" };
+    }
+
+    const view = buildAssignmentEmailView(booking);
+    const html = buildAssignmentEmailHtml(view);
+    const text = buildAssignmentEmailText(view);
+    const subject = `Driver assigned — GenZRides booking #${view.ref}`;
+
+    // Prefer HTTPS API when configured, SMTP fallback — same as admin flow.
+    let info = null;
+    let apiUsed = null;
+    try {
+      const apiInfo = await sendViaHttpApi(config, {
+        from: config.from,
+        to: to.email,
+        subject,
+        text,
+        html,
+      });
+      if (apiInfo) {
+        info = apiInfo;
+        apiUsed = process.env.RESEND_API_KEY ? "resend" : "brevo";
+      }
+    } catch (apiErr) {
+      console.error(`[email] booking ${ref}: customer confirmation HTTP API failed:`, apiErr?.message || apiErr);
+    }
+
+    if (!info) {
+      const factory = transportFactory || defaultTransportFactory;
+      const transporter = await factory(config);
+      try {
+        info = await transporter.sendMail({
+          from: config.from,
+          to: to.email,
+          subject,
+          text,
+          html,
+        });
+      } catch (err) {
+        console.error(
+          `[email] booking ${ref}: customer confirmation send failed to ${maskEmail(to.email)}:`,
+          err?.message || err
+        );
+        return { sent: false, skipped: "send-failed" };
+      }
+    }
+
+    console.log(
+      `[email] booking ${ref}: customer confirmation sent via ${apiUsed || `smtp:${config.host}:${config.port}`} to ${maskEmail(to.email)} (id=${info?.messageId || "n/a"})`
+    );
+    return { sent: true, messageId: info?.messageId || null };
+  } catch (err) {
+    console.error(
+      `[email] booking ${ref}: customer confirmation unexpected error:`,
+      err?.message || err
+    );
+    return { sent: false, skipped: "error" };
+  }
+};
+
 // Re-send helper for admin retry (e.g. after fixing SMTP config). Only
 // useful when the previous attempt was `failed`/`no-recipients`/not-sent.
 export const resendAdminBookingEmail = async (bookingId, transportFactory = null) => {

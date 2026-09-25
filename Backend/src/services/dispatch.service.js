@@ -3,6 +3,7 @@ import DriverProfile from "../models/DriverProfile.js";
 
 import { notifyUser } from "./notification.service.js";
 import { sendRideRequest } from "./notification.service.js";
+import { notifyCustomerOfAssignment } from "./email.service.js";
 
 /* ===========================================================
    FIND ELIGIBLE DRIVERS (NO DISTANCE FILTER)
@@ -609,6 +610,13 @@ export const acceptBooking = async (
   driver.isAvailable = false;
 
   await driver.save();
+
+  /* ==========================================
+      CUSTOMER CONFIRMATION EMAIL (fire-and-forget —
+      a mail failure must never break the accept)
+  ========================================== */
+
+  notifyCustomerOfAssignment(booking._id).catch(() => {});
 
   /* ==========================================
       CUSTOMER NOTIFICATION

@@ -10,6 +10,7 @@ import WithdrawalRequest from "../models/WithdrawalRequest.js";
 import Review from "../models/Review.js";
 import { creditWallet } from "./wallet.service.js";
 import { notifyUser } from "./notification.service.js";
+import { notifyCustomerOfAssignment } from "./email.service.js";
 import { updateDriverStats } from "./driverStatus.service.js";
 import { withCache, invalidateCache } from "../config/redis.js";
 
@@ -1007,6 +1008,9 @@ export const assignDriver = async (bookingId, driverId) => {
   driver.currentRide = booking._id;
   driver.isAvailable = false;
   await driver.save();
+
+  // Fire-and-forget customer confirmation email (never blocks assignment).
+  notifyCustomerOfAssignment(booking._id).catch(() => {});
 
   return booking;
 };
