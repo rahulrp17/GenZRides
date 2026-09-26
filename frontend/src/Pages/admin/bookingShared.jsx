@@ -32,6 +32,7 @@ import {
   formatDateTime,
   customerName,
   customerPhone,
+  customerEmail,
 } from "./bookingUtils";
 
 export const TripTypeBadge = ({ type }) => {
@@ -88,46 +89,46 @@ export const QueueHero = ({
   refreshing,
   onRefresh,
 }) => (
-  <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-green-500/15 via-white/5 to-transparent p-4 sm:p-5">
+  <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-green-500/15 via-white/5 to-transparent p-3">
     <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 bg-green-500/15 blur-[100px]" />
     <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-green-400/60 to-transparent" />
-    <div className="relative flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between min-w-0">
+    <div className="relative flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between min-w-0">
       <div className="min-w-0">
-        <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-green-300">
-          {Icon && <Icon size={12} />} {eyebrow}
+        <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-green-300">
+          {Icon && <Icon size={11} />} {eyebrow}
           <span className="relative flex w-1.5 h-1.5 ml-1">
             <span className="absolute inline-flex w-full h-full rounded-full bg-green-400 opacity-60 animate-ping" />
             <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-green-400" />
           </span>
         </p>
-        <h1 className="font-display text-lg sm:text-xl font-bold text-white tracking-tight mt-1">
+        <h1 className="font-display text-[15px] sm:text-base font-bold text-white tracking-tight mt-0.5">
           {title}
         </h1>
-        <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5">{subtitle}</p>
+        <p className="text-[11px] text-gray-400 mt-0.5 truncate">{subtitle}</p>
       </div>
-      <div className="grid grid-cols-3 gap-2 lg:min-w-[360px]">
+      <div className="grid grid-cols-3 gap-1.5 lg:min-w-[340px]">
         {stats.map((s) => (
           <div
             key={s.label}
-            className="bg-black/30 border border-white/10 rounded-2xl px-3 py-2 text-center min-w-0"
+            className="bg-black/30 border border-white/10 rounded-xl px-2 py-1 text-center min-w-0"
           >
             <p
-              className={`text-base sm:text-lg font-bold leading-none truncate ${
+              className={`text-[13px] sm:text-sm font-bold leading-none truncate ${
                 s.accent || "text-white"
               }`}
             >
               {loading ? "–" : s.value}
             </p>
-            <p className="text-[10px] text-gray-400 mt-1 truncate">{s.label}</p>
+            <p className="text-[9px] text-gray-400 mt-0.5 truncate">{s.label}</p>
           </div>
         ))}
       </div>
     </div>
-    <div className="relative mt-3 flex flex-col sm:flex-row gap-2 sm:items-center">
+    <div className="relative mt-2 flex flex-col sm:flex-row gap-2 sm:items-center">
       <button
         onClick={onRefresh}
         disabled={refreshing}
-        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-2xl px-5 py-2.5 min-h-[44px] text-sm hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60"
+        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl px-4 py-1.5 min-h-[38px] text-[13px] hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60"
       >
         <RefreshCw size={15} className={refreshing ? "animate-spin" : ""} />
         {refreshing ? "Refreshing…" : "Refresh now"}
@@ -214,25 +215,25 @@ export const DriverCell = ({ b }) => (
 
 // Left (route) side of a queue card: badges, timeline, chips.
 export const BookingRouteSide = ({ b, showApproval }) => (
-  <div className="p-3.5 sm:p-4 min-w-0">
-    <div className="flex flex-wrap items-center gap-1.5 mb-2.5 min-w-0">
+  <div className="p-3 min-w-0">
+    <div className="flex flex-wrap items-center gap-1 mb-2 min-w-0">
       <TripTypeBadge type={b.tripType} />
       {showApproval && <ApprovalBadge value={b.approvalStatus} />}
-      <span className="font-mono text-[14px] bg-green-400/15 border border-green-400/25 rounded-full px-2 py-0.5 text-green-500">
+      <span className="font-mono text-xs bg-green-400/15 border border-green-400/25 rounded-full px-2 py-0.5 text-green-500">
         #{b._id?.slice(-6).toUpperCase()}
       </span>
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] text-gray-500">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] text-gray-500">
         <Clock size={11} /> {formatDateTime(b.pickupDateTime)}
       </span>
       <span
-        className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] text-gray-500"
+        className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] text-gray-500"
         title={`Booked ${formatDateTime(b.createdAt)}`}
       >
         <Calendar size={11} /> Booked {formatDateTime(b.createdAt)}
       </span>
     </div>
 
-    <div className="relative pl-5 space-y-2.5 min-w-0">
+    <div className="relative pl-5 space-y-2 min-w-0">
       <span
         aria-hidden
         className="absolute left-[5px] top-2 bottom-2 w-px bg-gradient-to-b from-green-400/70 via-white/15 to-red-400/70"
@@ -245,7 +246,7 @@ export const BookingRouteSide = ({ b, showApproval }) => (
         <p className="text-[10px] uppercase tracking-[0.12em] text-gray-500 font-semibold">
           Pickup
         </p>
-        <p className="text-sm font-medium text-white truncate" title={b.pickup?.address}>
+        <p className="text-[13px] font-medium text-white truncate" title={b.pickup?.address}>
           {b.pickup?.address || "N/A"}
         </p>
       </div>
@@ -257,22 +258,22 @@ export const BookingRouteSide = ({ b, showApproval }) => (
         <p className="text-[10px] uppercase tracking-[0.12em] text-gray-500 font-semibold">
           Drop
         </p>
-        <p className="text-sm font-medium text-white truncate" title={b.drop?.address}>
+        <p className="text-[13px] font-medium text-white truncate" title={b.drop?.address}>
           {b.drop?.address || "N/A"}
         </p>
       </div>
     </div>
 
-    <div className="flex flex-wrap gap-1.5 mt-2.5">
+    <div className="flex flex-wrap gap-1 mt-2">
       {(b.vehicleType?.name || b.driver?.vehicleType?.name) && (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300 max-w-full">
+        <span className="inline-flex items-center gap-1.5 px-2 py-[3px] bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300 max-w-full">
           <Car size={12} className="text-violet-400 shrink-0" />
           <span className="truncate">
             {b.vehicleType?.name || b.driver?.vehicleType?.name}
           </span>
         </span>
       )}
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300 max-w-full">
+      <span className="inline-flex items-center gap-1.5 px-2 py-[3px] bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300 max-w-full">
         <User size={12} className="text-emerald-400 shrink-0" />
         <span className="truncate">
           {customerName(b)}
@@ -280,13 +281,13 @@ export const BookingRouteSide = ({ b, showApproval }) => (
         </span>
       </span>
       {b.distance != null && (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
+        <span className="inline-flex items-center gap-1.5 px-2 py-[3px] bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
           <MapPin size={12} className="text-sky-400 shrink-0" />
           {Number(b.distance).toFixed(1)} km
         </span>
       )}
       {b.paymentMethod && (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
+        <span className="inline-flex items-center gap-1.5 px-2 py-[3px] bg-black/25 border border-white/10 rounded-full text-[11px] text-gray-300">
           <Wallet size={12} className="text-amber-400 shrink-0" />
           {b.paymentMethod}
         </span>
@@ -297,41 +298,78 @@ export const BookingRouteSide = ({ b, showApproval }) => (
 
 // Right (fare) rail of a queue card; action buttons go in as children.
 export const BookingFareRail = ({ b, children }) => (
-  <div className="relative flex sm:flex-col items-center sm:items-stretch justify-between gap-2.5 px-4 py-3 sm:p-4 bg-gradient-to-br from-green-500/15 via-green-500/5 to-transparent border-t sm:border-t-0 sm:border-l border-white/10 min-w-0">
+  <div className="relative flex sm:flex-col items-center sm:items-stretch justify-between gap-2 px-3 py-2.5 sm:p-3 bg-gradient-to-br from-green-500/15 via-green-500/5 to-transparent border-t sm:border-t-0 sm:border-l border-white/10 min-w-0">
     {b?.estimatedFare != null && (
       <div className="min-w-0 sm:text-right">
         <p className="text-[10px] uppercase tracking-[0.12em] text-gray-400 font-semibold">
           Est. fare
         </p>
-        <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-300 via-green-200 to-green-400 bg-clip-text text-transparent leading-tight">
+        <p className="text-lg sm:text-xl font-bold bg-gradient-to-r from-green-300 via-green-200 to-green-400 bg-clip-text text-transparent leading-tight">
           ₹{(b.estimatedFare ?? 0).toLocaleString("en-IN")}
         </p>
       </div>
     )}
-    <div className="flex flex-wrap sm:flex-col gap-1.5 shrink-0 sm:shrink">
-      {children}
+    <div className="flex  sm:flex-col gap-1 shrink-0 sm:shrink">
+      {children} 
     </div>
   </div>
 );
 
 const railBtn =
-  "inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full rounded-2xl text-xs font-semibold transition-all disabled:opacity-50";
+  "inline-flex items-center justify-center gap-1 px-0 py-0 min-h-[40px] sm:min-h-[30px] sm:w-full rounded-2xl text-xs font-semibold transition-all disabled:opacity-50";
 
 export const RailDetailsBtn = ({ onClick }) => (
   <button
     onClick={onClick}
     aria-label="View details"
-    className={`${railBtn} bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10`}
+    className={`${railBtn} bg-white/5 px-3 py-1 border border-white/10 text-gray-300 hover:bg-white/10`}
   >
     <Eye size={15} />
-    <span className="sm:inline">Details</span>
+    <span className="hidden sm:inline">Details</span>
+  </button>
+);
+
+const RAIL_TONES = {
+  primary:
+    "bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-[0_0_18px_rgba(34,197,94,0.5)]",
+  emerald:
+    "bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 hover:bg-emerald-500/25",
+  amber:
+    "bg-amber-500/15 border border-amber-500/25 text-amber-300 hover:bg-amber-500/25",
+  red: "bg-red-500/15 border border-red-500/25 text-red-300 hover:bg-red-500/25",
+  ghost: "bg-white/5 border border-white/10 text-gray-200 hover:bg-white/10",
+};
+
+// Card-rail action button: icon-only pill on phones (44px touch target),
+// icon + label full-width from sm up. `title` doubles as tooltip + a11y label.
+export const RailActionBtn = ({
+  onClick,
+  disabled,
+  title,
+  label,
+  icon: Icon,
+  tone = "ghost",
+}) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    title={title || label}
+    aria-label={title || label}
+    className={`inline-flex items-center justify-center gap-1 px-3 sm:px-4 py-1 min-w-[44px] min-h-[40px] sm:min-h-[30px] sm:w-full rounded-2xl text-xs font-semibold transition-all disabled:opacity-50 ${
+      RAIL_TONES[tone] || RAIL_TONES.ghost
+    }`}
+  >
+    {/* `Icon &&` value-reference keeps no-unused-vars happy (this config
+        has no jsx-uses-vars); also guards a missing icon prop. */}
+    {Icon && <Icon size={15} />}
+    <span className="hidden sm:inline text-[14px]">{label}</span>
   </button>
 );
 
 // Detail modal shared by all booking queues; footer actions via prop.
 export const BookingDetailModal = ({ booking: b, onClose, footer }) => {
   const { copied, copyBooking } = useCopyBooking();
-  const contactEmail = b?.customer?.email || b?.guestEmail || "";
+  const contactEmail = customerEmail(b);
   return (
     <Modal
       isOpen={!!b}

@@ -7,6 +7,7 @@ import {
   Calendar,
   Eye,
   MapPin,
+  Navigation,
   User,
   Car,
   CheckCircle,
@@ -36,6 +37,7 @@ import GlassTable from "../../components/shared/GlassTable";
 import useDebounce from "../../hooks/useDebounce";
 import CancelReasonDialog from "../../components/shared/CancelReasonDialog";
 import AssignDriverDialog from "../../components/shared/AssignDriverDialog";
+import { customerEmail } from "./bookingUtils";
 // 
 
 import { useSocket } from "../../Context/SocketContext";
@@ -285,7 +287,7 @@ const AdminCustomerBookings = () => {
       cell: (b) => (
         <div className="min-w-[140px] max-w-[200px]">
           <p className="text-sm font-semibold text-white truncate">{b.customer?.name || "N/A"}</p>
-          <p className="text-[11px] text-gray-500 truncate">{b.customer?.email || b.customer?.phone || ""}</p>
+          <p className="text-[11px] text-gray-500 truncate">{customerEmail(b) || b.customer?.phone || ""}</p>
         </div>
       ),
     },
@@ -346,7 +348,7 @@ const AdminCustomerBookings = () => {
             <Eye size={14} />
           </button>
           <button onClick={() => openBooking(b._id)} title="Track ride" aria-label="Track ride" className="p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 rounded-xl text-xs hover:bg-emerald-500/25 transition">
-            <MapPin size={14} />
+            <Navigation size={14} />
           </button>
           {!b.driver && b.bookingStatus === "Pending" && (
             <>
@@ -664,29 +666,35 @@ const AdminCustomerBookings = () => {
                         Approx ₹{(b.estimatedFare ?? 0).toLocaleString('en-IN')}
                       </p>
                     </div>
-                    <div className="flex sm:flex-col gap-1.5 shrink-0 sm:shrink">
+                    <div className="flex sm:flex-col gap-1 shrink-0 sm:shrink">
                       <button
                         onClick={() => setSelectedBooking(b)}
                         aria-label="View details"
-                        className="inline-flex items-center justify-center gap-1.5 p-2.5 min-w-[44px] min-h-[44px] sm:min-h-[40px] sm:w-full bg-white/5 border border-white/10 text-gray-300 rounded-2xl text-xs font-medium hover:bg-white/10 transition"
+                        className="inline-flex items-center justify-center gap-1 p-0 min-w-[44px] min-h-[40px] sm:min-h-[30px] sm:w-full bg-white/5 border border-white/10 text-gray-300 rounded-2xl text-xs font-medium hover:bg-white/10 transition"
                       >
                         <Eye size={15} />
-                        <span className="hidden sm:inline">Details</span>
+                        <span className="hidden sm:inline text-xs">Details</span>
                       </button>
                       <button
                             onClick={() => openBooking(b._id)}
                             disabled={completeMutation.isPending}
-                            className=" items-center justify-center px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 rounded-2xl text-xs font-semibold hover:bg-emerald-500/25 active:scale-[0.98] transition-all disabled:opacity-50"
+                            title="Track ride"
+                            aria-label="Track ride"
+                            className="inline-flex items-center justify-center gap-1 p-0 min-w-[44px] min-h-[40px] sm:min-h-[30px] sm:w-full sm:px-4 bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 rounded-2xl text-xs font-semibold hover:bg-emerald-500/25 active:scale-[0.98] transition-all disabled:opacity-50"
                           >
-                            Track ride
+                            <Navigation size={15} />
+                            <span className="hidden sm:inline text-xs">Track ride</span>
                           </button>
                       {!b.driver && b.bookingStatus === "Pending" && (
                         <button
                           onClick={() => approveMutation.mutate(b._id)}
                           disabled={approveMutation.isPending}
-                          className="inline-flex items-center justify-center gap-1 px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-xs font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
+                          title="Approve & dispatch to drivers"
+                          aria-label="Approve and dispatch"
+                          className="inline-flex items-center justify-center gap-1 px-0 py-0 min-w-[44px] min-h-[40px] sm:min-h-[30px] sm:w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-xs font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
                         >
-                          Approve
+                          <CheckCircle size={15} />
+                          <span className="hidden sm:inline text-xs">Approve</span>
                         </button>
                       )}
                       {!b.driver && b.bookingStatus === "Pending" && (
@@ -694,7 +702,7 @@ const AdminCustomerBookings = () => {
                           onClick={() =>
                             setAssignDialog({ open: true, bookingId: b._id })
                           }
-                          className="hidden items-center justify-center gap-1 px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-xs font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all"
+                          className="hidden items-center justify-center gap-1 px-0 py-0 min-h-[40px] sm:min-h-[30px] sm:w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl text-xs font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] hover:brightness-110 active:scale-[0.98] transition-all"
                         >
                           Assign
                         </button>
@@ -704,7 +712,7 @@ const AdminCustomerBookings = () => {
                           <button
                             onClick={() => completeMutation.mutate(b._id)}
                             disabled={completeMutation.isPending}
-                            className=" hidden items-center justify-center px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 rounded-2xl text-xs font-semibold hover:bg-emerald-500/25 active:scale-[0.98] transition-all disabled:opacity-50"
+                            className=" hidden items-center justify-center gap-1 px-0 py-0 min-h-[40px] sm:min-h-[30px] sm:w-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 rounded-2xl text-xs font-semibold hover:bg-emerald-500/25 active:scale-[0.98] transition-all disabled:opacity-50"
                           >
                             Complete
                           </button>
@@ -717,7 +725,7 @@ const AdminCustomerBookings = () => {
                                 id: b._id,
                               })
                             }
-                            className="hidden items-center justify-center px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full bg-red-500/15 border border-red-500/25 text-red-300 rounded-2xl text-xs font-semibold hover:bg-red-500/25 active:scale-[0.98] transition-all"
+                            className="hidden items-center justify-center gap-1 px-0 py-0 min-h-[40px] sm:min-h-[30px] sm:w-full bg-red-500/15 border border-red-500/25 text-red-300 rounded-2xl text-xs font-semibold hover:bg-red-500/25 active:scale-[0.98] transition-all"
                           >
                             Cancel
                           </button>
@@ -818,9 +826,9 @@ const AdminCustomerBookings = () => {
                     {selectedBooking.customer.phone}
                   </p>
                 )}
-                {selectedBooking.customer?.email && (
+                {customerEmail(selectedBooking) && (
                   <p className="text-xs text-slate-200/60 mt-0.5 truncate">
-                    {selectedBooking.customer.email}
+                    {customerEmail(selectedBooking)}
                   </p>
                 )}
               </div>

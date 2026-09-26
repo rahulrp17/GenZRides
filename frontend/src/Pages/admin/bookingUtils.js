@@ -19,6 +19,18 @@ export const customerName = (b) =>
 export const customerPhone = (b) =>
   b.customer?.phone || b.guestPhone || "";
 
+// Real contact email for a booking. Guest accounts are phone-keyed with a
+// placeholder address (guest-<phone>@guest.letsgocab.local) so the typed
+// address stays free for later registration — the actual address is
+// snapshotted on the booking itself (booking.guestEmail) and must win.
+// Returns "" when no real address exists (never a placeholder).
+export const customerEmail = (b) => {
+  if (!b) return "";
+  if (b.guestEmail) return b.guestEmail;
+  const e = b.customer?.email || "";
+  return e.includes("@guest.letsgocab.local") ? "" : e;
+};
+
 // Live sidebar badge counts for the two request queues. Refetches on every
 // booking-lifecycle socket event so badges never go stale.
 export const useAdminCounts = () => {
@@ -150,7 +162,10 @@ export const useFreshIds = (ids, ttlMs = 3000) => {
 
   useEffect(() => {
     if (knownRef.current === null) {
-      // First load seeds the baseline — nothing flashes on entry.
+      // First paint is usually the loading skeleton (empty list) — an empty
+      // page is not a baseline. Wait for real data, otherwise every visit
+      // flashes the whole queue as "new" the moment results stream in.
+      if (list.length === 0) return;
       knownRef.current = new Set(list);
       return;
     }

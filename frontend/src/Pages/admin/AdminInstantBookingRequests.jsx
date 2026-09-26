@@ -5,11 +5,12 @@ import { toast } from "react-hot-toast";
 import {
   Calendar,
   Eye,
-  MapPin,
+  Navigation,
   Check,
   Ban,
   XCircle,
   Zap,
+  ShieldCheck,
 } from "lucide-react";
 import { motion as Motion } from "framer-motion";
 import { adminAPI } from "../../services/endpoints";
@@ -28,6 +29,7 @@ import {
   BookingRouteSide,
   BookingFareRail,
   RailDetailsBtn,
+  RailActionBtn,
   BookingDetailModal,
   ApprovalBadge,
   DriverCell,
@@ -189,40 +191,34 @@ const AdminInstantBookingRequests = () => {
               <Eye size={14} />
             </button>
             <button onClick={() => openBooking(b._id)} title="Track" aria-label="Track booking" className={`${btn} bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 hover:bg-emerald-500/25`}>
-              <MapPin size={14} />
+              <Navigation size={14} />
             </button>
           </>
         )}
-        <button
+        <RailActionBtn
           onClick={() => verifyMutation.mutate(b._id)}
           disabled={busy}
           title="Verify & dispatch to drivers"
-          aria-label="Verify booking"
-          className={`${btn} bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-[0_0_18px_rgba(34,197,94,0.5)]`}
-        >
-          <Check size={14} />
-          {rail && "Verify"}
-        </button>
-        <button
+          label="Verify"
+          icon={ShieldCheck}
+          tone="primary"
+        />
+        <RailActionBtn
           onClick={() => setRejectDialog({ open: true, bookingId: b._id })}
           disabled={busy}
           title="Reject (never shown to drivers)"
-          aria-label="Reject booking"
-          className={`${btn} bg-amber-500/15 border border-amber-500/25 text-amber-300 hover:bg-amber-500/25`}
-        >
-          <Ban size={14} />
-          {rail && "Reject"}
-        </button>
-        <button
+          label="Reject"
+          icon={Ban}
+          tone="amber"
+        />
+        <RailActionBtn
           onClick={() => setCancelDialog({ open: true, bookingId: b._id })}
           disabled={busy}
           title="Cancel"
-          aria-label="Cancel booking"
-          className={`${btn} bg-red-500/15 border border-red-500/25 text-red-300 hover:bg-red-500/25`}
-        >
-          <XCircle size={14} />
-          {rail && "Cancel"}
-        </button>
+          label="Cancel"
+          icon={XCircle}
+          tone="red"
+        />
       </>
     );
   };
@@ -392,7 +388,7 @@ const AdminInstantBookingRequests = () => {
                 onClick={() => openBooking(selectedBooking._id)}
                 className="flex-1 py-2.5 min-h-[44px] bg-white/5 border border-white/10 text-white text-sm font-medium rounded-2xl flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
               >
-                <MapPin size={16} /> Track
+                <Navigation size={16} /> Track
               </button>
               <button
                 onClick={() => {
