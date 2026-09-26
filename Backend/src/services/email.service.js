@@ -755,6 +755,209 @@ export const buildAssignmentEmailText = (view) => {
   return lines.filter((l) => l !== null).join("\n");
 };
 
+/* ===========================================================
+   CUSTOMER BOOKING-CONFIRMED EMAIL (admin verified / approved)
+   Sent the moment an admin confirms the booking — before any driver
+   is assigned. The driver-assigned email (above) follows separately
+   once a driver accepts. NEVER throws. Placeholder guest-domain
+   addresses are never used as recipients.
+========================================================== */
+
+export const buildConfirmationEmailView = (booking) => {
+  const ref = booking?._id?.toString().slice(-8).toUpperCase() || "UNKNOWN";
+  return {
+    ref,
+    customerName:
+      booking?.guestName || booking?.customer?.name || "Rider",
+    pickupAddress: booking?.pickup?.address || "N/A",
+    dropAddress: booking?.drop?.address || "N/A",
+    when: formatDateTime(booking?.pickupDateTime),
+    tripType: booking?.tripType || "One Way",
+    vehicleName: booking?.vehicleType?.name || "Cab",
+    totalFare:
+      booking?.finalFare > 0
+        ? booking.finalFare
+        : booking?.estimatedFare || 0,
+    paymentMethod: booking?.paymentMethod || "Cash",
+  };
+};
+
+export const buildConfirmationEmailHtml = (view) => {
+  const v = Object.fromEntries(
+    Object.entries(view).map(([k, val]) => [k, escapeHtml(val)])
+  );
+  const payNote =
+    view.paymentMethod === "Cash"
+      ? `Please pay <strong>₹${Number(view.totalFare || 0).toLocaleString("en-IN")}</strong> in cash to your driver. Tolls &amp; permits at actuals.`
+      : `Paid online. Please show booking reference <strong>#${v.ref}</strong> to your driver.`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Booking confirmed — GenZRides #${v.ref}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#050807;font-family:Arial,Helvetica,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#050807;padding:24px 12px;">
+<tr><td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#0a0f0d;border:1px solid rgba(255,255,255,0.1);border-radius:20px;overflow:hidden;">
+<tr><td style="background:linear-gradient(135deg,#059669,#10b981);padding:22px 28px;text-align:center;">
+<p style="margin:0;color:#ffffff;font-size:20px;font-weight:800;letter-spacing:0.5px;">GenZRides</p>
+<p style="margin:4px 0 0;color:rgba(255,255,255,0.85);font-size:12px;letter-spacing:2px;">BOOKING CONFIRMED ✓</p>
+</td></tr>
+<tr><td style="padding:24px 28px 8px;">
+<p style="margin:0;color:#ffffff;font-size:16px;">Hi ${v.customerName},</p>
+<p style="margin:8px 0 0;color:#9ca3af;font-size:13px;line-height:1.6;">Great news — your booking <strong style="color:#ffffff;">#${v.ref}</strong> is confirmed! We are assigning your driver now and will email you the moment they are on the way.</p>
+</td></tr>
+<tr><td style="padding:12px 28px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;">
+<tr><td style="padding:14px 16px;">
+<p style="margin:0 0 10px;color:#6b7280;font-size:10px;letter-spacing:1.5px;font-weight:700;">YOUR TRIP</p>
+<p style="margin:0;color:#34d399;font-size:11px;font-weight:700;">▲ PICKUP · ${v.when}</p>
+<p style="margin:2px 0 8px 14px;color:#ffffff;font-size:13px;">${v.pickupAddress}</p>
+<p style="margin:0;color:#f87171;font-size:11px;font-weight:700;">▼ DROP</p>
+<p style="margin:2px 0 0 14px;color:#ffffff;font-size:13px;">${v.dropAddress}</p>
+<p style="margin:10px 0 0;color:#9ca3af;font-size:12px;">${v.tripType} · ${v.vehicleName}</p>
+</td></tr>
+</table>
+</td></tr>
+<tr><td style="padding:12px 28px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td style="color:#9ca3af;font-size:13px;">Total fare</td>
+<td align="right" style="color:#34d399;font-size:20px;font-weight:800;">₹${Number(view.totalFare || 0).toLocaleString("en-IN")}</td>
+</tr>
+<tr><td colspan="2" style="color:#6b7280;font-size:12px;padding-top:4px;">${payNote}</td></tr>
+</table>
+</td></tr>
+<tr><td style="padding:20px 28px 24px;text-align:center;">
+<p style="margin:0;color:#4b5563;font-size:11px;line-height:1.6;">Need help? Reply to this email or call support.<br/>GenZRides · Safe rides across Tamil Nadu</p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+};
+
+export const buildConfirmationEmailText = (view) => {
+  const lines = [
+    `GenZRides — Booking Confirmed ✓ (#${view.ref})`,
+    ``,
+    `Hi ${view.customerName}, great news — your booking is confirmed!`,
+    `We are assigning your driver now and will email you the moment they are on the way.`,
+    ``,
+    `TRIP`,
+    `Pickup (${view.when}): ${view.pickupAddress}`,
+    `Drop: ${view.dropAddress}`,
+    `${view.tripType} · ${view.vehicleName}`,
+    ``,
+    `Total fare: ₹${Number(view.totalFare || 0).toLocaleString("en-IN")} (${view.paymentMethod})`,
+    view.paymentMethod === "Cash"
+      ? `Please pay in cash to your driver. Tolls & permits at actuals.`
+      : `Paid online. Please show booking reference #${view.ref} to your driver.`,
+    ``,
+    `Need help? Reply to this email. GenZRides.`,
+  ];
+  return lines.filter((l) => l !== null).join("\n");
+};
+
+export const notifyCustomerOfConfirmation = async (bookingId, transportFactory = null) => {
+  const ref = String(bookingId || "").slice(-8).toUpperCase() || "unknown";
+
+  try {
+    if (!bookingId) {
+      return { sent: false, skipped: "no-booking" };
+    }
+
+    const { default: Booking } = await import("../models/Booking.js");
+    const booking = await Booking.findById(bookingId)
+      .populate("customer", "name phone email")
+      .populate("vehicleType", "name")
+      .lean();
+
+    if (!booking) {
+      return { sent: false, skipped: "booking-not-found" };
+    }
+
+    const to = resolveCustomerRecipient(booking);
+    if (!to) {
+      console.warn(
+        `[email] booking ${ref}: customer confirmation skipped, no usable recipient (placeholder or missing email).`
+      );
+      return { sent: false, skipped: "no-recipient" };
+    }
+
+    const config = getConfig();
+    const missing = [
+      !config.host && "SMTP_HOST",
+      !config.user && "SMTP_USER",
+      !config.pass && "SMTP_PASS",
+    ].filter(Boolean);
+
+    if (missing.length > 0) {
+      console.warn(
+        `[email] booking ${ref}: customer confirmation skipped, missing env: ${missing.join(", ")} (set SMTP_HOST/USER/PASS on production)`
+      );
+      return { sent: false, skipped: "email-not-configured" };
+    }
+
+    const view = buildConfirmationEmailView(booking);
+    const html = buildConfirmationEmailHtml(view);
+    const text = buildConfirmationEmailText(view);
+    const subject = `Booking confirmed — GenZRides #${view.ref}`;
+
+    let info = null;
+    let apiUsed = null;
+    try {
+      const apiInfo = await sendViaHttpApi(config, {
+        from: config.from,
+        to: to.email,
+        subject,
+        text,
+        html,
+      });
+      if (apiInfo) {
+        info = apiInfo;
+        apiUsed = process.env.RESEND_API_KEY ? "resend" : "brevo";
+      }
+    } catch (apiErr) {
+      console.error(`[email] booking ${ref}: customer confirmation HTTP API failed:`, apiErr?.message || apiErr);
+    }
+
+    if (!info) {
+      const factory = transportFactory || defaultTransportFactory;
+      const transporter = await factory(config);
+      try {
+        info = await transporter.sendMail({
+          from: config.from,
+          to: to.email,
+          subject,
+          text,
+          html,
+        });
+      } catch (err) {
+        console.error(
+          `[email] booking ${ref}: customer confirmation send failed to ${maskEmail(to.email)}:`,
+          err?.message || err
+        );
+        return { sent: false, skipped: "send-failed" };
+      }
+    }
+
+    console.log(
+      `[email] booking ${ref}: customer confirmation sent via ${apiUsed || `smtp:${config.host}:${config.port}`} to ${maskEmail(to.email)} (id=${info?.messageId || "n/a"})`
+    );
+    return { sent: true, messageId: info?.messageId || null };
+  } catch (err) {
+    console.error(
+      `[email] booking ${ref}: customer confirmation unexpected error:`,
+      err?.message || err
+    );
+    return { sent: false, skipped: "error" };
+  }
+};
+
 export const notifyCustomerOfAssignment = async (bookingId, transportFactory = null) => {
   const ref = String(bookingId || "").slice(-8).toUpperCase() || "unknown";
 

@@ -10,7 +10,7 @@ import WithdrawalRequest from "../models/WithdrawalRequest.js";
 import Review from "../models/Review.js";
 import { creditWallet } from "./wallet.service.js";
 import { notifyUser } from "./notification.service.js";
-import { notifyCustomerOfAssignment } from "./email.service.js";
+import { notifyCustomerOfAssignment, notifyCustomerOfConfirmation } from "./email.service.js";
 import { updateDriverStats } from "./driverStatus.service.js";
 import { withCache, invalidateCache } from "../config/redis.js";
 
@@ -1313,6 +1313,11 @@ export const verifyInstantBooking = async (bookingId) => {
     booking: updated._id,
   });
 
+  // Fire-and-forget customer confirmation email (never blocks verification).
+  // Sent on every fresh approval — the driver-assigned email follows
+  // separately once a driver accepts.
+  notifyCustomerOfConfirmation(updated._id).catch(() => {});
+
   try {
     await invalidateCache("dashboard:stats");
   } catch {
@@ -1405,6 +1410,9 @@ export const approveBooking = async (bookingId) => {
     type: "Booking",
     booking: booking._id,
   });
+
+  // Fire-and-forget customer confirmation email (never blocks approval).
+  notifyCustomerOfConfirmation(booking._id).catch(() => {});
 
   try {
     await invalidateCache("dashboard:stats");

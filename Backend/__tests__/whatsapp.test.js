@@ -153,7 +153,7 @@ describe("Admin booking WhatsApp alert", () => {
     expect(calls).toBe(2);
     expect(result).toMatchObject({ sent: true, via: "text" });
     expect(texts).toHaveLength(1);
-    expect(texts[0]).toContain("🧾 *New Booking Received* ✅");
+    expect(texts[0]).toContain("🧾 *New Booking Alert*");
     expect(texts[0]).toContain("💰 *Est. Fare:* ₹450 (Cash)");
     expect(texts[0]).toContain("📍 *Pickup:* Pickup Plaza");
   });
