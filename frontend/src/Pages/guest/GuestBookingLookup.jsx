@@ -268,14 +268,14 @@ const GuestBookingLookup = () => {
 
               {/* Route timeline */}
               <div className="relative pl-6 sm:pl-7 mt-6 space-y-5">
-                <span aria-hidden className="absolute left-[10px] sm:left-[14px] top-2 bottom-2 w-px bg-gradient-to-b from-green-400/70 via-white/15 to-red-400/70" />
+                <span aria-hidden className="absolute left-[10px] sm:left-[14px] top-2 bottom-8 w-px bg-gradient-to-b from-green-400/70 via-white/15 to-red-400/70" />
                 <div className="relative">
                   <span aria-hidden className="absolute left-[-18px] sm:left-[-18px] top-1.5 w-[9px] h-[9px] rounded-full bg-green-400 ring-4 ring-green-400/20" />
                   <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold flex items-center gap-1.5"><MapPin size={12} className="text-green-400" /> Pickup</p>
                   <p className="text-sm sm:text-base font-medium text-white break-words">{booking.pickup?.address}</p>
                 </div>
                 <div className="relative">
-                  <span aria-hidden className="absolute left-[-18px] sm:left-[-18px] top-1.5 w-[9px] h-[9px] rounded-full bg-red-400 ring-4 ring-red-400/20" />
+                  <span aria-hidden className="absolute  left-[-18px] sm:left-[-18px] top-1.5 w-[9px] h-[9px] rounded-full bg-red-400 ring-4 ring-red-400/20" />
                   <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold flex items-center gap-1.5"><Navigation size={12} className="text-red-400" /> Drop</p>
                   <p className="text-sm sm:text-base font-medium text-white break-words">{booking.drop?.address}</p>
                 </div>

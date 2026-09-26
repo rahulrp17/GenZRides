@@ -13,8 +13,16 @@ import {
   Loader2,
   Crosshair,
 } from "lucide-react";
-import { mapsAPI } from "../../services/endpoints";
+import { guestAPI } from "../../services/endpoints";
 import { buildPlaceDisplayName } from "../../utils/locationFormat";
+
+// Place search/detail via the public guest endpoints (identical response
+// shapes to the authenticated ones). They work with or without a JWT, so
+// logged-out guests get the same search instead of a 401.
+const placeAPI = {
+  autocomplete: (params) => guestAPI.autocomplete(params),
+  getPlaceDetails: (params) => guestAPI.placeDetails(params),
+};
 
 const SAVED_PLACES_KEY = "rideSavedPlaces";
 const RECENT_SEARCHES_KEY = "rideRecentSearches";
@@ -193,7 +201,7 @@ export default function LocationPicker({
     setSearching(true);
     searchTimerRef.current = setTimeout(async () => {
       try {
-        const { data } = await mapsAPI.autocomplete({ input: value.trim() });
+        const { data } = await placeAPI.autocomplete({ input: value.trim() });
         if (data.success && data.data) {
           setPredictions(data.data);
         }
@@ -219,7 +227,7 @@ export default function LocationPicker({
     setSearching(true);
     searchTimerRef.current = setTimeout(async () => {
       try {
-        const { data } = await mapsAPI.autocomplete({ input: value.trim() });
+        const { data } = await placeAPI.autocomplete({ input: value.trim() });
         if (data.success && data.data) {
           setPredictions(data.data);
         }
@@ -235,7 +243,7 @@ export default function LocationPicker({
     async (prediction) => {
       setSearching(true);
       try {
-        const { data } = await mapsAPI.getPlaceDetails({
+        const { data } = await placeAPI.getPlaceDetails({
           placeId: prediction.placeId,
         });
         if (data.success && data.data) {
@@ -639,7 +647,7 @@ function SavedPlaceButton({
     setEditSearching(true);
     editTimerRef.current = setTimeout(async () => {
       try {
-        const { data } = await mapsAPI.autocomplete({ input: value.trim() });
+        const { data } = await placeAPI.autocomplete({ input: value.trim() });
         if (data.success && data.data) setEditPredictions(data.data);
       } catch { setEditPredictions([]); }
       finally { setEditSearching(false); }
@@ -649,7 +657,7 @@ function SavedPlaceButton({
   const handleEditSelect = useCallback(async (prediction) => {
     setEditSearching(true);
     try {
-      const { data } = await mapsAPI.getPlaceDetails({ placeId: prediction.placeId });
+      const { data } = await placeAPI.getPlaceDetails({ placeId: prediction.placeId });
       if (data.success && data.data) {
         onSave(type, {
           place_id: data.data.placeId,

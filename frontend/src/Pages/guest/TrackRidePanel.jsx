@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   ArrowRight,
 } from "lucide-react";
+import { toBookingRef } from "../../utils/bookingText";
 
 const readLs = (key) => {
   try {
@@ -25,9 +26,10 @@ const readLs = (key) => {
  */
 const TrackRidePanel = () => {
   const navigate = useNavigate();
-  // Never auto-fill the booking reference: the stored value may be the full
-  // booking ID, but this field accepts only its last 8 characters.
-  const [ref, setRef] = useState("");
+  // Pre-fill from this device's last booking (canonical 8-char caps ref).
+  // Stored values from older builds may hold the full booking ID — the
+  // helper normalizes those too. The guest can still overwrite / clear it.
+  const [ref, setRef] = useState(() => toBookingRef(readLs("guestBookingRef")));
   const [phone, setPhone] = useState(readLs("guestBookingPhone"));
 
   const handleTrack = (e) => {

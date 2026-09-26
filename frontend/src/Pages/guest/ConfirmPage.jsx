@@ -678,7 +678,7 @@ const ConfirmPage = () => {
                 <span className="text-gray-300">
                   Distance fare
                   {fare.fareBreakdown?.chargeableDistance > 0 && perKm != null && (
-                    <span className="block text-[11px] text-gray-500 font-normal">({(totalKm ?? 0).toFixed(1)} km - {fare.fareBreakdown.baseKm} km) x ₹{perKmLabel}{perKm}/perKm </span>
+                    <span className="block text-[11px] text-gray-500 font-normal">({(totalKm ?? 0).toFixed(1)} km - {fare.fareBreakdown.baseKm} km) x ₹{perKmLabel(perKm)}/perKm </span>
                   )}
                 </span>
                 <span className="text-white font-medium tabular-nums shrink-0">{formatCurrency(fare.fareBreakdown?.distanceFare)}</span>
