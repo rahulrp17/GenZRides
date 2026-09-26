@@ -180,21 +180,22 @@ const buildBookingAlert = async (booking) => {
   // template below). WhatsApp renders *bold* in both template and text
   // messages, so the fallback looks identical to the template.
   const lines = [
-    "🧾 *New Booking Alert*🚨 ✅",
-    "________________________________",
+    "🧾 *New Booking Alert* 🚨 ✅",
+    "_____________________________________",
     `🔖 *Booking ID:* #${f.ref}`,
     `👤 *Name:* ${f.name}`,
     `📞 *Phone:* ${f.phone}`,
-    "_______________________",
+    "____________________________",
     `📍 *Pickup:* ${f.pickup}`,
     `🏁 *Drop:* ${f.drop}`,
     `🗓️ *When:* ${f.when}`,
-    "_______________________",
+    "____________________________",
     `🚗 *Vehicle:* ${f.vehicle}`,
     `💰 *Est. Fare:* ₹${f.fare} (Cash)`,
     `⏳ *Status:* ${f.status}`,
-    "________________________________",
-    "_Pay Cash to driver for Tolls & permits at actuals. Please assign a driver._",
+    "_____________________________________",
+    "_Note:Tell customer to Pay Cash to your driver for Tolls & permits at actuals._",
+    
   ];
 
   return lines.join("\n");
