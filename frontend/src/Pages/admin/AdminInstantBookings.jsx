@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
   Calendar,
+  Clock,
   Eye,
   Navigation,
   Check,
@@ -12,7 +13,6 @@ import {
   UserPlus,
   Zap,
   CheckCircle,
-  Users,
   IndianRupee,
   ShieldCheck,
 } from "lucide-react";
@@ -269,7 +269,7 @@ const AdminInstantBookings = () => {
 
   const rowActions = (b, rail = false) => {
     const btn = rail
-      ? "inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full rounded-2xl text-xs font-semibold transition-all disabled:opacity-50"
+      ? "inline-flex items-center justify-center gap-1.5 px-0 py-2.5 min-h-[36px] sm:min-h-[36px] min-w-[36px] rounded-xl text-xs font-semibold transition-all disabled:opacity-50"
       : "p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-xl text-xs transition disabled:opacity-50";
     return (
       <>
@@ -292,6 +292,7 @@ const AdminInstantBookings = () => {
             label="Verify"
             icon={ShieldCheck}
             tone="primary"
+            rail={rail}
           />
         )}
         {canAssign(b) && (
@@ -302,6 +303,7 @@ const AdminInstantBookings = () => {
             label="Assign"
             icon={UserPlus}
             tone="ghost"
+            rail={rail}
           />
         )}
         {isPendingApproval(b) ? (
@@ -312,6 +314,7 @@ const AdminInstantBookings = () => {
             label="Reject"
             icon={Ban}
             tone="amber"
+            rail={rail}
           />
         ) : (
           isActive(b) && (
@@ -322,6 +325,7 @@ const AdminInstantBookings = () => {
               label="Cancel"
               icon={XCircle}
               tone="red"
+              rail={rail}
             />
           )
         )}
@@ -344,7 +348,7 @@ const AdminInstantBookings = () => {
     {
       header: "Booking",
       cell: (b) => (
-        <div className="min-w-[130px]">
+        <div className="min-w-[90px]">
           <p className="font-mono text-xs text-gray-400">#{b._id?.slice(-6).toUpperCase()}</p>
           <p className="text-[11px] text-gray-500 mt-0.5 whitespace-nowrap">{formatDateTime(b.createdAt)}</p>
         </div>
@@ -353,7 +357,7 @@ const AdminInstantBookings = () => {
     {
       header: "Guest",
       cell: (b) => (
-        <div className="min-w-[140px] max-w-[200px]">
+        <div className="min-w-[120px] max-w-[200px]">
           <p className="text-sm font-semibold text-white truncate">{customerName(b)}</p>
           <p className="text-[11px] text-gray-500 truncate">{customerPhone(b)}</p>
         </div>
@@ -363,7 +367,7 @@ const AdminInstantBookings = () => {
     {
       header: "Route",
       cell: (b) => (
-        <div className="min-w-[180px] max-w-[260px]">
+        <div className="min-w-[150px] max-w-[160px]">
           <p className="text-xs text-gray-300 truncate" title={b.pickup?.address}>
             <span className="text-green-400 font-bold">↑ </span>{b.pickup?.address || "N/A"}
           </p>
@@ -429,7 +433,7 @@ const AdminInstantBookings = () => {
             Verify pending holds, assign approved rides, complete or cancel — updates live. Accepted revenue counts assigned rides only.
           </p>
         </div>
-        <div className="relative mt-3 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="relative mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           {[
             {
               label: "Total instant",
@@ -438,8 +442,20 @@ const AdminInstantBookings = () => {
               tint: "text-emerald-300",
             },
             {
+              label: "Pending",
+              value: dash.instantPending ?? "–",
+              icon: Clock,
+              tint: "text-amber-300",
+            },
+            {
               label: "Accepted",
               value: dash.instantAccepted ?? "–",
+              icon: CheckCircle,
+              tint: "text-teal-300",
+            },
+            {
+              label: "Completed",
+              value: dash.instantCompleted ?? "–",
               icon: CheckCircle,
               tint: "text-emerald-300",
             },
@@ -450,9 +466,9 @@ const AdminInstantBookings = () => {
               tint: "text-green-300",
             },
             {
-              label: "Drivers online",
-              value: drivers.filter((d) => d.isOnline).length,
-              icon: Users,
+              label: "Total Revenue",
+              value: inr(dash.totalRevenue),
+              icon: IndianRupee,
               tint: "text-sky-300",
             },
           ].map((s) => (

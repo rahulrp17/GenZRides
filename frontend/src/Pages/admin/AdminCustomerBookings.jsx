@@ -276,7 +276,7 @@ const AdminCustomerBookings = () => {
     {
       header: "Booking",
       cell: (b) => (
-        <div className="min-w-[130px]">
+        <div className="min-w-[90px]">
           <p className="font-mono text-xs text-gray-400">#{b._id?.slice(-6).toUpperCase()}</p>
           <p className="text-[11px] text-gray-500 mt-0.5 whitespace-nowrap">{formatBookedOn(b.createdAt)}</p>
         </div>
@@ -396,7 +396,7 @@ const AdminCustomerBookings = () => {
             Every registered-customer ride — track, approve, assign drivers, complete or cancel. Updates live.
           </p>
         </div>
-        <div className="relative mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+        <div className="relative mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           {[
             {
               label: "Total rides",
@@ -409,6 +409,12 @@ const AdminCustomerBookings = () => {
               value: stats.pendingBookings ?? "–",
               icon: Clock,
               tint: "text-amber-300",
+            },
+            {
+              label: "Accepted",
+              value: stats.customerAccepted ?? "–",
+              icon: Car,
+              tint: "text-teal-300",
             },
             {
               label: "Completed",
@@ -426,7 +432,7 @@ const AdminCustomerBookings = () => {
               tint: "text-green-300",
             },
             {
-              label: "Revenue",
+              label: "Total Revenue",
               value:
                 stats.totalRevenue != null
                   ? `₹${Number(stats.totalRevenue).toLocaleString("en-IN")}`

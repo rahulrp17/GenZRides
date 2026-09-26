@@ -341,7 +341,9 @@ const RAIL_TONES = {
 };
 
 // Card-rail action button: icon-only pill on phones (44px touch target),
-// icon + label full-width from sm up. `title` doubles as tooltip + a11y label.
+// icon + label full-width from sm up — but only in card-rail mode
+// (`rail`). In table mode it is always icon-only (tooltip + a11y via
+// `title`/`aria-label`).
 export const RailActionBtn = ({
   onClick,
   disabled,
@@ -349,20 +351,21 @@ export const RailActionBtn = ({
   label,
   icon: Icon,
   tone = "ghost",
+  rail = true,
 }) => (
   <button
     onClick={onClick}
     disabled={disabled}
     title={title || label}
     aria-label={title || label}
-    className={`inline-flex items-center justify-center gap-1 px-3 sm:px-4 py-1 min-w-[44px] min-h-[40px] sm:min-h-[30px] sm:w-full rounded-2xl text-xs font-semibold transition-all disabled:opacity-50 ${
+    className={`inline-flex items-center justify-center gap-1 px-0 py-1 min-w-[36px] min-h-[36px] sm:min-h-[36px] sm:w-full rounded-xl text-xs font-semibold transition-all disabled:opacity-50 ${
       RAIL_TONES[tone] || RAIL_TONES.ghost
     }`}
   >
     {/* `Icon &&` value-reference keeps no-unused-vars happy (this config
         has no jsx-uses-vars); also guards a missing icon prop. */}
     {Icon && <Icon size={15} />}
-    <span className="hidden sm:inline text-[14px]">{label}</span>
+    {rail && <span className="hidden sm:inline">{label}</span>}
   </button>
 );
 

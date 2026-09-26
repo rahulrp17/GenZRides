@@ -37,6 +37,7 @@ import {
 } from "./bookingShared";
 import {
   useVehicles,
+  useApprovedDrivers,
   formatDateTime,
   customerName,
   customerPhone,
@@ -161,6 +162,8 @@ const AdminInstantBookingRequests = () => {
   // Visiting clears the "new requests" badge; arrivals after the first
   // load flash for 3s so the admin spots them instantly.
   useMarkSeen("pendingInstantRequests", data?.total ?? bookings.length);
+  const drivers = useApprovedDrivers();
+  const onlineDrivers = drivers.filter((d) => d.isOnline).length;
   const isFresh = useFreshIds(bookings.map((b) => b._id));
   const freshRow = (b) => (isFresh(b._id) ? "bg-emerald-500/10 animate-pulse" : "");
   const totalValue = bookings.reduce(
@@ -202,6 +205,7 @@ const AdminInstantBookingRequests = () => {
           label="Verify"
           icon={ShieldCheck}
           tone="primary"
+          rail={rail}
         />
         <RailActionBtn
           onClick={() => setRejectDialog({ open: true, bookingId: b._id })}
@@ -210,6 +214,7 @@ const AdminInstantBookingRequests = () => {
           label="Reject"
           icon={Ban}
           tone="amber"
+          rail={rail}
         />
         <RailActionBtn
           onClick={() => setCancelDialog({ open: true, bookingId: b._id })}
@@ -218,6 +223,7 @@ const AdminInstantBookingRequests = () => {
           label="Cancel"
           icon={XCircle}
           tone="red"
+          rail={rail}
         />
       </>
     );
@@ -296,7 +302,7 @@ const AdminInstantBookingRequests = () => {
         stats={[
           { label: "Awaiting verify", value: bookings.length, accent: "text-amber-300" },
           { label: "Queue value", value: `₹${totalValue.toLocaleString("en-IN")}`, accent: "text-green-300" },
-          { label: "Hidden drivers", value: "100%", accent: "text-emerald-300" },
+          { label: "Drivers online", value: onlineDrivers, accent: "text-emerald-300" },
         ]}
         loading={isLoading}
         refreshing={isFetching}

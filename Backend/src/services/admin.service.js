@@ -170,12 +170,13 @@ export const getDashboardStats = async () => {
     ...(guest ? { guestName: { $ne: null } } : { guestName: null }),
   });
 
-  const [instantAccepted, customerAccepted, instantPending, customerPending, acceptedRevenue] =
+  const [instantAccepted, customerAccepted, instantPending, customerPending, instantCompleted, acceptedRevenue] =
     await Promise.all([
       Booking.countDocuments(acceptedMatch(true)),
       Booking.countDocuments(acceptedMatch(false)),
       Booking.countDocuments({ guestName: { $ne: null }, bookingStatus: "Pending" }),
       Booking.countDocuments({ guestName: null, bookingStatus: "Pending" }),
+      Booking.countDocuments({ guestName: { $ne: null }, bookingStatus: "Completed" }),
       Booking.aggregate([
         {
           $match: {
@@ -252,6 +253,7 @@ export const getDashboardStats = async () => {
     customerAcceptedRevenue: revenueBySegment.customer || 0,
     instantPending,
     customerPending,
+    instantCompleted,
   };
   });
 };
