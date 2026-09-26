@@ -180,7 +180,7 @@ const AdminCustomerBookingRequests = () => {
 
   const rowActions = (b, rail = false) => {
     const btn = rail
-      ? "inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] sm:min-h-[42px] sm:w-full rounded-2xl text-xs font-semibold transition-all disabled:opacity-50"
+      ? "inline-flex items-center justify-center p-2 min-h-[44px] sm:min-h-[42px] sm:w-full rounded-2xl text-xs font-semibold transition-all disabled:opacity-50"
       : "p-2 min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-xl text-xs transition disabled:opacity-50";
     return (
       <>
@@ -202,6 +202,7 @@ const AdminCustomerBookingRequests = () => {
           label="Approve"
           icon={Check}
           tone="primary"
+          rail={rail}
         />
         <RailActionBtn
           onClick={() => setAssignDialog({ open: true, bookingId: b._id })}
@@ -210,6 +211,7 @@ const AdminCustomerBookingRequests = () => {
           label="Assign"
           icon={UserPlus}
           tone="ghost"
+          rail={rail}
         />
         <RailActionBtn
           onClick={() => setCancelDialog({ open: true, bookingId: b._id })}
@@ -218,6 +220,7 @@ const AdminCustomerBookingRequests = () => {
           label="Cancel"
           icon={XCircle}
           tone="red"
+          rail={rail}
         />
       </>
     );
@@ -228,7 +231,7 @@ const AdminCustomerBookingRequests = () => {
       header: "Booking",
       cell: (b) => (
         <div className="min-w-[130px]">
-          <p className="font-mono text-xs text-gray-400">#{b._id?.slice(-6).toUpperCase()}</p>
+          <p className="font-bold text-xs text-green-400">#{b._id?.slice(-6).toUpperCase()}</p>
           <p className="text-[11px] text-gray-500 mt-0.5 whitespace-nowrap">{formatDateTime(b.createdAt)}</p>
         </div>
       ),
@@ -368,7 +371,7 @@ const AdminCustomerBookingRequests = () => {
                 disabled={busy}
                 className="flex-1 py-2.5 min-h-[44px] bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-semibold rounded-2xl flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(34,197,94,0.5)] transition-all disabled:opacity-50"
               >
-                <Check size={16} /> <span className="lg:flex md:flex hidden">Approve</span>
+                <Check size={16} /> <span className="lg:flex md:flex ">Approve</span>
               </button>
               <button
                 onClick={() => {
@@ -378,13 +381,13 @@ const AdminCustomerBookingRequests = () => {
                 disabled={busy}
                 className="flex-1 py-2.5 min-h-[44px] bg-white/5 border border-white/10 text-white text-sm font-semibold rounded-2xl flex items-center justify-center gap-2 hover:bg-white/10 transition-all disabled:opacity-50"
               >
-                <UserPlus size={16} /> <span className="lg:flex md:flex hidden">Assign</span>
+                <UserPlus size={16} /> <span className="lg:flex md:flex ">Assign</span>
               </button>
               <button
                 onClick={() => openBooking(selectedBooking._id)}
                 className="flex-1 py-2.5 min-h-[44px] bg-white/5 border border-white/10 text-white text-sm font-medium rounded-2xl flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
               >
-                <Navigation size={16} /> <span className="lg:flex md:flex hidden">Track</span>
+                <Navigation size={16} /> <span className="lg:flex md:flex ">Track</span>
               </button>
               <button
                 onClick={() => {
@@ -394,7 +397,7 @@ const AdminCustomerBookingRequests = () => {
                 disabled={busy}
                 className="flex-1 py-2.5 min-h-[44px] bg-red-500/20 text-red-300 border border-red-500/30 text-sm font-medium rounded-2xl flex items-center justify-center gap-2 hover:bg-red-500/30 transition-all disabled:opacity-50"
               >
-                <XCircle size={16} /> <span className="lg:flex md:flex hidden">Cancel</span>
+                <XCircle size={16} /> <span className="lg:flex md:flex ">Cancel</span>
               </button>
             </div>
           )

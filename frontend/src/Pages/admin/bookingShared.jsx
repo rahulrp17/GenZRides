@@ -309,7 +309,7 @@ export const BookingFareRail = ({ b, children }) => (
         </p>
       </div>
     )}
-    <div className="flex  sm:flex-col gap-1 shrink-0 sm:shrink">
+    <div className="flex sm:flex-col gap-1 shrink-0 sm:shrink">
       {children} 
     </div>
   </div>

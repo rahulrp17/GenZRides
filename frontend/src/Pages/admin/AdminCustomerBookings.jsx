@@ -277,7 +277,7 @@ const AdminCustomerBookings = () => {
       header: "Booking",
       cell: (b) => (
         <div className="min-w-[90px]">
-          <p className="font-mono text-xs text-gray-400">#{b._id?.slice(-6).toUpperCase()}</p>
+          <p className="font-bold text-xs text-green-400">#{b._id?.slice(-6).toUpperCase()}</p>
           <p className="text-[11px] text-gray-500 mt-0.5 whitespace-nowrap">{formatBookedOn(b.createdAt)}</p>
         </div>
       ),

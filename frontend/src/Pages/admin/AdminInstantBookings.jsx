@@ -349,13 +349,13 @@ const AdminInstantBookings = () => {
       header: "Booking",
       cell: (b) => (
         <div className="min-w-[90px]">
-          <p className="font-mono text-xs text-gray-400">#{b._id?.slice(-6).toUpperCase()}</p>
+          <p className="font-bold text-xs text-green-400">#{b._id?.slice(-6).toUpperCase()}</p>
           <p className="text-[11px] text-gray-500 mt-0.5 whitespace-nowrap">{formatDateTime(b.createdAt)}</p>
         </div>
       ),
     },
     {
-      header: "Guest",
+      header: "Customer",
       cell: (b) => (
         <div className="min-w-[120px] max-w-[200px]">
           <p className="text-sm font-semibold text-white truncate">{customerName(b)}</p>
