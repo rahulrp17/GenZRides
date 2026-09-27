@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
 import { toast } from "react-hot-toast";
-import { ArrowLeft, MapPin, Navigation, CalendarDays, CarFront, Loader2, Repeat, ArrowRight, User, Mail, Phone, Home, StickyNote, Info, Receipt } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, CalendarDays, CarFront, Loader2, Repeat, ArrowRight, User, Mail, Phone, Home, StickyNote, Info, Receipt, Clock3, BadgeCheck, XCircle, Wallet } from "lucide-react";
 import SEO from "../../components/SEO";
 import { formatTripDuration } from "../../utils/formatDuration";
 import Navbar from "../../Component/Navbar/Navbar";
@@ -51,6 +51,9 @@ const ConfirmPage = () => {
   const [visitor, setVisitor] = useState(null);
   const [reserving, setReserving] = useState(false);
   const [nowTs, setNowTs] = useState(0);
+  // Terms & Conditions must be explicitly accepted before booking.
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
 
   useEffect(() => {
     if (!draft?.pickup?.lat || !draft?.drop?.lat || !draft?.vehicleType || !draft?.fareEstimate) {
@@ -193,6 +196,10 @@ const ConfirmPage = () => {
     if (booking || reserving) return;
     const validated = validateDetails();
     if (!validated) return;
+    if (!termsAccepted) {
+      toast.error("Please accept the Terms & Conditions to continue.");
+      return;
+    }
     // Logged-in users book directly on their account (unchanged flow).
     if (localStorage.getItem("accessToken")) {
       setConfirmOpen(true);
@@ -218,6 +225,11 @@ const ConfirmPage = () => {
     const validated = validateDetails();
     if (!validated) {
       setConfirmOpen(false);
+      return;
+    }
+    if (!termsAccepted) {
+      setConfirmOpen(false);
+      toast.error("Please accept the Terms & Conditions to continue.");
       return;
     }
     const { cleanName, cleanEmail, cleanPhone } = validated;
@@ -534,6 +546,31 @@ const ConfirmPage = () => {
                     placeholder="Exact Picup Address,Flight number, luggage, pet, extra stop…"
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50 transition resize-none" />
                 </div>
+                <label className="flex items-start gap-3 bg-white/[0.03] border border-white/10 rounded-xl px-3.5 py-3 cursor-pointer hover:border-green-500/30 transition select-none">
+                  <input
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    required
+                    aria-required="true"
+                    className="mt-0.5 w-5 h-5 shrink-0 accent-emerald-500 cursor-pointer"
+                  />
+                  <span className="text-[13px] leading-5 text-gray-300">
+                    I accept the{" "}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setTermsOpen(true);
+                      }}
+                      className="text-emerald-300 font-semibold underline underline-offset-2 hover:text-emerald-200 transition-colors"
+                    >
+                      Terms &amp; Conditions
+                    </button>
+                    {" "}including toll, waiting &amp; permit charges and the cancellation policy.
+                  </span>
+                </label>
                 <Motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
@@ -729,13 +766,31 @@ const ConfirmPage = () => {
             </div>
           </div>
 
-          {/* Notes — single line */}
-          <p className="text-[11px] leading-5 bg-red-700 border border-white/10 text-200 rounded-md px-2.5 py-1.5 text-gray-400">
-            <span className="text-black font-bold">Note:</span> <span className="text-white">Pay cash to the driver for Tolls &amp; permits at actuals.{""} {draft.tripType === "One Way" && " Waiting charge ₹2.5/min  will apply when driver waiting at pick up point after 30 min ."}</span> 
-            
-            <br />
-            {note.trim() && <span className="text-black font-bold">Customer note:</span>}{note.trim() && <span className="text-white"> {note.trim()}</span>}
-          </p>
+          {/* Good-to-know charges — 3-bullet premium note */}
+          <div className="bg-gradient-to-br from-amber-500/10 via-white/[0.03] to-transparent border border-amber-500/25 rounded-xl px-3.5 py-3">
+            <p className="text-[10px] uppercase tracking-widest text-amber-300/90 font-bold flex items-center gap-1.5">
+              <Info size={12} /> Good to know — extra charges
+            </p>
+            <ul className="mt-2 space-y-1.5 text-[12px] leading-5 text-gray-300">
+              <li className="flex gap-2">
+                <Receipt size={13} className="text-amber-400 shrink-0 mt-0.5" />
+                <span><span className="text-white font-semibold">Toll charges</span> on your route are extra — pay cash at actuals.</span>
+              </li>
+              <li className="flex gap-2">
+                <Clock3 size={13} className="text-amber-400 shrink-0 mt-0.5" />
+                <span><span className="text-white font-semibold">Waiting charge</span> — first 30 min free at pickup, then ₹2.5/min (one-way).</span>
+              </li>
+              <li className="flex gap-2">
+                <BadgeCheck size={13} className="text-amber-400 shrink-0 mt-0.5" />
+                <span><span className="text-white font-semibold">Permit charges</span> for interstate travel, if any, are extra at actuals.</span>
+              </li>
+            </ul>
+            {note.trim() && (
+              <p className="mt-2 pt-2 border-t border-white/10 text-[12px] leading-5 text-gray-300">
+                <span className="text-amber-300 font-semibold">Your note: </span>{note.trim()}
+              </p>
+            )}
+          </div>
 
           {/* Actions */}
           <div className="grid grid-cols-2 gap-2.5">
@@ -754,6 +809,81 @@ const ConfirmPage = () => {
               className="py-2.5 min-h-[44px] bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-sm font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {booking ? (<><Loader2 size={15} className="animate-spin" /> Booking…</>) : "Confirm Booking"}
+            </button>
+          </div>
+        </div>
+      </Modal>
+      {/* Terms & Conditions — full policy summary, premium + responsive */}
+      <Modal isOpen={termsOpen} onClose={() => setTermsOpen(false)} title="Terms & Conditions" maxWidth="max-w-lg">
+        <div className="space-y-3">
+          <div className="bg-gradient-to-br from-emerald-500/10 via-white/5 to-transparent border border-emerald-500/20 rounded-xl px-3.5 py-3 text-[13px] leading-5 text-gray-300">
+            By confirming this booking you agree to the points below. The full
+            policy lives on our{" "}
+            <Link to="/info/terms" className="text-emerald-300 font-semibold underline underline-offset-2 hover:text-emerald-200">
+              Terms page
+            </Link>
+            .
+          </div>
+          {[
+            {
+              icon: Receipt,
+              tint: "text-amber-400",
+              title: "Toll charges",
+              body: "Toll fees on your route are extra and payable in cash at actuals — the estimate never includes them.",
+            },
+            {
+              icon: Clock3,
+              tint: "text-sky-400",
+              title: "Waiting charges",
+              body: "One-way trips: first 30 minutes at pickup are free, then ₹2.5/min applies while the driver waits.",
+            },
+            {
+              icon: BadgeCheck,
+              tint: "text-violet-400",
+              title: "Permit charges",
+              body: "Interstate permits, where applicable, are extra at actuals and settled with the driver.",
+            },
+            {
+              icon: XCircle,
+              tint: "text-red-400",
+              title: "Cancellation policy",
+              body: "Free cancellation any time before the ride starts. Cancelling after the driver arrives at pickup: ₹300. Details on our Cancellation page.",
+            },
+            {
+              icon: Wallet,
+              tint: "text-emerald-400",
+              title: "Payment",
+              body: "Pay cash to the driver unless stated otherwise. Night allowance may apply between 11 PM – 5 AM and is shown upfront.",
+            },
+          ].map((s) => (
+            <div key={s.title} className="flex gap-3 bg-white/5 border border-white/10 rounded-xl px-3.5 py-3">
+              <span className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                {s.icon ? <s.icon size={15} className={s.tint} /> : null}
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-white">{s.title}</p>
+                <p className="text-[13px] leading-5 text-gray-400 mt-0.5">{s.body}</p>
+              </div>
+            </div>
+          ))}
+          <div className="grid grid-cols-2 gap-2.5 pt-1">
+            <button
+              type="button"
+              onClick={() => setTermsOpen(false)}
+              className="py-2.5 min-h-[44px] border border-white/10 text-gray-200 rounded-xl text-sm font-semibold hover:bg-white/10 transition"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTermsAccepted(true);
+                setTermsOpen(false);
+                toast.success("Terms accepted — you can book now.");
+              }}
+              className="py-2.5 min-h-[44px] bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-sm font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all"
+            >
+              Accept &amp; Continue
             </button>
           </div>
         </div>

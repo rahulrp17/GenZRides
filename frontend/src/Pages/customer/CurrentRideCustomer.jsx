@@ -665,9 +665,18 @@ const CurrentRideCustomer = () => {
             </div>
           </div>
 
-          {/* Reached Destination — payment verification in progress */}
-          {booking.bookingStatus === 'Reached' && (
+          {/* Awaiting admin approval — booking is held, not yet with drivers */}
+          {booking.approvalStatus === 'Pending Approval' && !isCancelled && (
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
+              <p className="text-sm font-semibold text-amber-300">Waiting for admin approval</p>
+              <p className="text-sm text-slate-200/80 mt-1">
+                Our team is reviewing your request — a driver is dispatched right after approval.
+              </p>
+            </div>
+          )}
+
+          {/* Reached Destination — payment verification in progress */}
+          {booking.bookingStatus === 'Reached' && (            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
               <p className="text-sm font-semibold text-amber-300">Reached Destination</p>
               <p className="text-sm text-slate-200/80 mt-1">
                 Payment status: <span className="font-semibold">{booking.paymentStatus || 'Pending'}</span>

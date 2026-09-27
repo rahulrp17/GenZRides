@@ -361,7 +361,7 @@ const BookRide = () => {
       return data;
     },
     onSuccess: (data) => {
-      toast.success("Booking created successfully. Waiting for a driver to accept.");
+      toast.success("Booking created! Waiting for admin approval.");
       setBookingFlow("waiting-for-driver");
       setBookingData(null);
       setDriverResponseTime(null);
@@ -1167,7 +1167,7 @@ const BookRide = () => {
           {/* Notes — single line */}
           <p className="text-[11px] leading-5 bg-red-700 border border-white/10 rounded-md px-2.5 py-1.5">
             <span className="text-black font-bold">Note:</span>{" "}
-            <span className="text-white">Pay cash to the driver. Tolls &amp; permits at actuals.{tripType === "One Way" && " Waiting ₹2.5/min after 30 min free."}</span>
+            <span className="text-white">Please note that tolls and permit charges are not included in your booking amount. Kindly pay cas to the driver for these expences at actuals during the journey. Thank you, and have a safe trip!  {tripType === "One Way" && " Waiting ₹2.5/min after 30 min free."}</span>
             {notes.trim() && (
               <>
                 <br />
@@ -1216,10 +1216,10 @@ const BookRide = () => {
               Your booking has been created successfully.
             </p>
             <p className="text-gray-300 mt-2 font-medium">
-              Waiting for a driver to accept.
+              Waiting for admin approval.
             </p>
             <p className="text-gray-500 mt-4 text-sm">
-              You will be notified when a driver accepts your ride.
+              Once approved, a driver is dispatched — you will be notified at each step.
             </p>
           </div>
 

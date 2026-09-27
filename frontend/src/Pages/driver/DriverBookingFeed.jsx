@@ -29,6 +29,7 @@ import useDebounce from "../../hooks/useDebounce";
 import { useSocket } from "../../Context/SocketContext";
 import { BookingStatusBadge } from "../../utils/bookingStatus";
 import { displayStatus } from "../../utils/bookingStatusMeta";
+import { useMarkFeedSeen, useFreshIds } from "../../utils/driverFeedBadges";
 import { motion as Motion } from "framer-motion";
 
 const PAY_TABS = [
@@ -284,6 +285,17 @@ const DriverBookingFeed = ({
         norm(b.tripType).includes(nq),
     );
   }, [allBookings, payTab, sort, debouncedSearch]);
+
+  // Visiting marks everything seen (clears the sidebar badge), including
+  // arrivals streaming in while open. New arrivals flash for 3s so the
+  // driver spots them instantly — same concept as admin queues.
+  useMarkFeedSeen(
+    queryKey,
+    mode === "mine" ? [] : bookings.map((b) => b._id)
+  );
+  const isFresh = useFreshIds(bookings.map((b) => b._id));
+  const freshRow = (b) =>
+    isFresh(b._id) ? "bg-emerald-500/10 animate-pulse" : "";
 
   if (isError) {
     return (
@@ -673,7 +685,11 @@ const DriverBookingFeed = ({
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: Math.min(i * 0.05, 0.3), duration: 0.32 }}
-              className="group relative overflow-hidden bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 hover:border-emerald-400/40 hover:shadow-[0_8px_40px_-12px_rgba(34,197,94,0.35)] transition-all duration-300 min-w-0"
+              className={`group relative overflow-hidden bg-white/5 backdrop-blur-lg rounded-2xl border transition-all duration-300 min-w-0 ${
+                isFresh(b._id)
+                  ? "border-emerald-400/70 shadow-[0_0_35px_rgba(34,197,94,0.45)] animate-pulse"
+                  : "border-white/10 hover:border-emerald-400/40 hover:shadow-[0_8px_40px_-12px_rgba(34,197,94,0.35)]"
+              }`}
             >
               <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent" />
               {/* rank number watermark */}
@@ -830,6 +846,7 @@ const DriverBookingFeed = ({
           rows={bookings}
           rowKey={(b) => b._id}
           density="compact"
+          rowClassName={freshRow}
         />
       )}
     </Motion.div>

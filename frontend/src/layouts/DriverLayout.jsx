@@ -13,6 +13,7 @@ import PushListener from '../components/PushListener';
 import AutoPushSync from '../components/AutoPushSync';
 import DriverLocationSharer from '../components/DriverLocationSharer';
 import SidebarNav from '../components/shared/SidebarNav';
+import { useDriverFeedBadges } from '../utils/driverFeedBadges';
 import { motion as Motion } from 'framer-motion';
 
 const navItems = [
@@ -23,8 +24,8 @@ const navItems = [
     icon: Calendar,
     children: [
       { path: '/driver/my-bookings', label: 'My Bookings' },
-      { path: '/driver/instant-bookings', label: 'Instant Bookings Request' },
-      { path: '/driver/customer-requests', label: 'Customer Booking Request' },
+      { path: '/driver/instant-bookings', label: 'Instant Bookings Request', countKey: 'driverInstantBookings' },
+      { path: '/driver/customer-requests', label: 'Customer Booking Request', countKey: 'driverCustomerRequests' },
     ],
   },
   { path: '/driver/ride', label: 'Current Ride', icon: Car },
@@ -47,6 +48,9 @@ const DriverLayout = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  // Live "new arrivals" badge counts for the two request feeds (same
+  // seen-badge concept as the admin sidebar).
+  const feedBadges = useDriverFeedBadges();
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -175,6 +179,7 @@ const DriverLayout = () => {
           <SidebarNav
             items={navItems}
             expanded={sidebarExpanded || sidebarOpen}
+            badgeCounts={feedBadges}
             onNavigate={() => setSidebarOpen(false)}
           />
 
