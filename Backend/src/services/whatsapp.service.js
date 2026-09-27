@@ -5,12 +5,16 @@ import WhatsappLog from "../models/WhatsappLog.js";
 const GRAPH_API_VERSION = "v21.0";
 const REQUEST_TIMEOUT = 10000;
 
-const getConfig = () => ({
+export const getConfig = () => ({
   token: process.env.WHATSAPP_TOKEN || "",
   phoneNumberId: (process.env.WHATSAPP_PHONE_NUMBER_ID || "").trim(),
   businessNumber: (process.env.WHATSAPP_BUSINESS_NUMBER || "").trim(),
-  templateName: (process.env.WHATSAPP_TEMPLATE_NAME || "premium_booking_invoice").trim(),
+  templateName: (process.env.WHATSAPP_TEMPLATE_NAME || "booking_alert_actions").trim(),
   templateLang: (process.env.WHATSAPP_TEMPLATE_LANG || "en").trim(),
+  // Base URL for the "View Booking" deep link (admin details page).
+  frontendUrl: (process.env.FRONTEND_URL || process.env.CLIENT_URL || "")
+    .trim()
+    .replace(/\/+$/, ""),
 });
 
 // Meta requires full international format (digits only, e.g. 91934830199).
@@ -94,12 +98,19 @@ export const sendTextMessage = async (
 
 // Approved template send for business-initiated alerts (works with no
 // open 24h window). `params` maps to {{1}}..{{n}} in template body order.
+// `buttons` appends button components after the body — used for the URL
+// button's dynamic suffix (e.g. the booking id for "View Booking"):
+// [{ type: "button", sub_type: "url", index: "2",
+//    parameters: [{ type: "text", text: "<suffix>" }] }]
+// Quick-reply buttons need no payload (defined in the template itself);
+// their taps arrive on the webhook as button/interactive messages.
 export const sendTemplateMessage = async (
   to,
   params,
   sender = null,
   config = getConfig(),
-  template = null
+  template = null,
+  buttons = null
 ) => {
   const { token, phoneNumberId } = config;
   const tpl = template || {
@@ -126,6 +137,7 @@ export const sendTemplateMessage = async (
             text: String(p ?? ""),
           })),
         },
+        ...(Array.isArray(buttons) ? buttons : []),
       ],
     },
   };
@@ -176,54 +188,58 @@ const getBookingAlertFields = async (booking) => {
 const buildBookingAlert = async (booking) => {
   const f = await getBookingAlertFields(booking);
 
-  // Invoice-style alert (mirrors the approved `premium_booking_invoice`
+  // Invoice-style alert (mirrors the approved `booking_alert_actions`
   // template below). WhatsApp renders *bold* in both template and text
-  // messages, so the fallback looks identical to the template.
+  // messages, so the fallback looks identical to the template. The trailing
+  // commands let the admin act by reply when the template buttons are
+  // unavailable (same commands the webhook understands).
   const lines = [
-    "🧾 *New Booking Alert* 🚨 ✅",
+    "🧾 *New Booking Arrived* 🚨  ",
     "_____________________________________",
-    `🔖 *Booking ID:* #${f.ref}`,
-    `👤 *Name:* ${f.name}`,
-    `📞 *Phone:* ${f.phone}`,
+    ` *Booking ID:* #${f.ref}`,
+    ` *Name:* ${f.name}`,
+    ` *Phone:* ${f.phone}`,
     "____________________________",
-    `📍 *Pickup:* ${f.pickup}`,
-    `🏁 *Drop:* ${f.drop}`,
-    `🗓️ *When:* ${f.when}`,
+    ` *Pickup:* ${f.pickup}`,
+    ` *Drop:* ${f.drop}`,
+    ` *When:* ${f.when}`,
     "____________________________",
-    `🚗 *Vehicle:* ${f.vehicle}`,
-    `💰 *Est. Fare:* ₹${f.fare} (Cash)`,
-    `⏳ *Status:* ${f.status}`,
+    ` *Vehicle:* ${f.vehicle}`,
+    ` *Est. Fare:* ₹${f.fare} (Cash)`,
+    ` *Status:* ${f.status}`,
     "_____________________________________",
-    "_Note:Tell customer to Pay Cash to your driver for Tolls & permits at actuals._",
-    
+    "",
+    `Reply *VERIFY ${f.ref}* to approve, *CANCEL ${f.ref}* to cancel.`,
   ];
 
   return lines.join("\n");
 };
 
-// Premium invoice template — create EXACTLY this in the Meta dashboard
-// (WhatsApp Manager → Message Templates → Create, category UTILITY,
-// language EN) with name `premium_booking_invoice`, then set
+// Interactive booking-alert template — create EXACTLY this in the Meta
+// dashboard (WhatsApp Manager → Message Templates → Create, category
+// UTILITY, language EN) with name `booking_alert_actions`, then set
 // WHATSAPP_TEMPLATE_NAME to match. Parameter order {{1}}..{{8}} must stay
 // in sync with buildBookingTemplateParams below.
 //
 // HEADER (static text): 🚕 New Ride Booked!
-// BODY:
-// 🧾 *New Booking Received* ✅
-//
-// 🔖 *Booking ID:* #{{1}}
-// 👤 *Name:* {{2}}
-// 📞 *Phone:* {{3}}
-//
-// 📍 *Pickup:* {{4}}
-// 🏁 *Drop:* {{5}}
-// 🗓️ *When:* {{6}}
-//
-// 🚗 *Vehicle:* {{7}}
-// 💰 *Est. Fare:* ₹{{8}} (Cash)
-//
-// _Tolls & permits at actuals. Please assign a driver._
-// FOOTER (static text): GenZRides • Instant Booking Alert
+// BODY: (same 8-param invoice layout as before — see dashboard copy in
+// .env.example)
+// FOOTER (static text): GenZRides • Tap an action below
+// BUTTONS (in this order):
+//   1. Quick reply: ✅ Verify
+//   2. Quick reply: ❌ Cancel
+//   3. URL: 🔍 View Booking → <FRONTEND_URL>/admin/bookings/{{9}}
+//      ({{9}} continues the body numbering; the API sends the full
+//      booking _id as the suffix so View opens the details page.)
+export const BOOKING_ALERT_ACTIONS_TEMPLATE = {
+  name: "booking_alert_actions",
+  category: "UTILITY",
+  language: "en",
+  header: "🚕 New Ride Booked!",
+  footer: "GenZRides • Tap an action below",
+};
+
+// Back-compat alias (old name, body-only template).
 export const PREMIUM_BOOKING_TEMPLATE = {
   name: "premium_booking_invoice",
   category: "UTILITY",
@@ -239,6 +255,15 @@ export const buildBookingTemplateParams = async (booking) => {
   const f = await getBookingAlertFields(booking);
   return [f.ref, f.name, f.phone, f.pickup, f.drop, f.when, f.vehicle, f.fare];
 };
+
+// URL-button component for the "View Booking" deep link. Buttons are
+// 0-indexed in send order: 0 = Verify, 1 = Cancel, 2 = View URL.
+export const buildViewBookingButton = (bookingId) => ({
+  type: "button",
+  sub_type: "url",
+  index: "2",
+  parameters: [{ type: "text", text: String(bookingId || "") }],
+});
 
 // Returns true when this worker won the race and recorded the send.
 // See email.service.js — delete stale `failed` first for old `unique:true` DBs.
@@ -321,15 +346,21 @@ export const notifyAdminOfBooking = async (booking, sender = null) => {
       return { sent: false, skipped: "send-failed" };
     }
 
-    const { templateName, templateLang } = getConfig();
+    const { templateName, templateLang, frontendUrl } = getConfig();
 
     // Path 1: approved template (delivers with no open 24h window).
+    // Attaches the "View Booking" URL-button suffix when a frontend URL is
+    // configured. If the approved template has no such button, Meta rejects
+    // the send and we fall through to the text fallback below.
     try {
       console.log(
         `[whatsapp] booking ${ref}: sending template '${templateName}' via ${GRAPH_API_VERSION}/${phoneNumberId} to ${maskPhone(to)}`
       );
       const params = await buildBookingTemplateParams(booking);
-      const result = await sendTemplateMessage(to, params, sender);
+      const buttons = frontendUrl
+        ? [buildViewBookingButton(booking._id)]
+        : null;
+      const result = await sendTemplateMessage(to, params, sender, undefined, undefined, buttons);
       if (result?.skipped === "whatsapp-not-configured") {
         return { sent: false, skipped: "whatsapp-not-configured" };
       }

@@ -8,7 +8,8 @@ import {
   notifyAdminOfBooking,
   normalizeRecipient,
   buildBookingTemplateParams,
-  PREMIUM_BOOKING_TEMPLATE,
+  buildViewBookingButton,
+  BOOKING_ALERT_ACTIONS_TEMPLATE,
 } from "../src/services/whatsapp.service.js";
 
 let mongoServer;
@@ -20,8 +21,13 @@ const setWaEnv = () => {
   process.env.WHATSAPP_TOKEN = "test-token";
   process.env.WHATSAPP_PHONE_NUMBER_ID = "123456789012345";
   process.env.WHATSAPP_BUSINESS_NUMBER = ADMIN_TEST_NUMBER;
-  process.env.WHATSAPP_TEMPLATE_NAME = "premium_booking_invoice";
+  process.env.WHATSAPP_TEMPLATE_NAME = "booking_alert_actions";
   process.env.WHATSAPP_TEMPLATE_LANG = "en";
+  process.env.FRONTEND_URL = "https://admin.test";
+};
+
+const restoreFrontendUrl = () => {
+  delete process.env.FRONTEND_URL;
 };
 
 beforeAll(async () => {
@@ -70,6 +76,7 @@ afterAll(async () => {
   await mongoose.connection.dropDatabase();
   await mongoose.connection.close();
   await mongoServer.stop();
+  restoreFrontendUrl();
 });
 
 beforeEach(async () => {
@@ -98,7 +105,7 @@ describe("Admin booking WhatsApp alert", () => {
     expect(result.via).toBe("template");
     expect(captured).toHaveLength(1);
     expect(captured[0].to).toBe(ADMIN_TEST_NUMBER);
-    expect(captured[0].template.name).toBe("premium_booking_invoice");
+    expect(captured[0].template.name).toBe("booking_alert_actions");
     // Invoice param order: ref, name, phone, pickup, drop, when, vehicle, fare
     const params = captured[0].template.components[0].parameters.map((p) => p.text);
     expect(params).toHaveLength(8);
@@ -106,6 +113,11 @@ describe("Admin booking WhatsApp alert", () => {
     expect(params[1]).toBe("WA Customer");
     expect(params[2]).toBe("9876543298");
     expect(params[7]).toBe("450");
+    // "View Booking" URL button carries the full booking id as suffix.
+    const buttons = captured[0].template.components.filter((c) => c.type === "button");
+    expect(buttons).toHaveLength(1);
+    expect(buttons[0]).toMatchObject({ sub_type: "url", index: "2" });
+    expect(buttons[0].parameters[0].text).toBe(String(populated._id));
 
     const log = await WhatsappLog.findOne({ booking: booking._id }).lean();
     expect(log?.status).toBe("sent");
@@ -132,7 +144,13 @@ describe("Admin booking WhatsApp alert", () => {
       "Sedan",
       "450",
     ]);
-    expect(PREMIUM_BOOKING_TEMPLATE.name).toBe("premium_booking_invoice");
+    expect(BOOKING_ALERT_ACTIONS_TEMPLATE.name).toBe("booking_alert_actions");
+    expect(buildViewBookingButton("abc123")).toEqual({
+      type: "button",
+      sub_type: "url",
+      index: "2",
+      parameters: [{ type: "text", text: "abc123" }],
+    });
   });
 
   it("falls back to the invoice-style text alert when the template send fails", async () => {
@@ -153,9 +171,10 @@ describe("Admin booking WhatsApp alert", () => {
     expect(calls).toBe(2);
     expect(result).toMatchObject({ sent: true, via: "text" });
     expect(texts).toHaveLength(1);
-    expect(texts[0]).toContain("🧾 *New Booking Alert*");
-    expect(texts[0]).toContain("💰 *Est. Fare:* ₹450 (Cash)");
-    expect(texts[0]).toContain("📍 *Pickup:* Pickup Plaza");
+    expect(texts[0]).toContain("🧾 *New Booking");
+    expect(texts[0]).toContain("Est. Fare:* ₹450 (Cash)");
+    expect(texts[0]).toContain("Pickup:* Pickup Plaza");
+    expect(texts[0]).toMatch(/VERIFY [0-9A-F]{8}.*CANCEL [0-9A-F]{8}/);
   });
 
   it("records the structured Meta error when the send fails", async () => {

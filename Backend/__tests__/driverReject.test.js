@@ -156,6 +156,13 @@ async function buildQueuedBooking() {
   expect(created.status).toBe(201);
   const bookingId = created.body.booking._id;
 
+  // Registered bookings wait for admin approval before drivers ever see
+  // them — approve first (mirrors the real flow), then dispatch.
+  const approved = await request(app)
+    .patch(`/api/admin/bookings/${bookingId}/approve`)
+    .set(auth(adminToken));
+  expect(approved.status).toBe(200);
+
   await DriverProfile.updateMany({}, { $set: { isOnline: true } });
 
   const dispatched = await request(app)

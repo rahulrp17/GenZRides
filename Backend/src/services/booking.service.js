@@ -62,10 +62,11 @@ export const createBooking = async (
     guestName = null,
     guestEmail = null,
     guestPhone = null,
-    // Admin approval gate. Instant (guest) bookings are created
-    // "Pending Approval" and stay hidden from drivers until verified.
-    // Registered customer bookings default to "Approved".
-    approvalStatus = "Approved",
+    // Admin approval gate. EVERY booking — guest and registered — is
+    // created "Pending Approval" and stays hidden from drivers until an
+    // admin verifies/approves it (same concept as instant bookings).
+    // Approval flips it to "Approved" and dispatches to drivers.
+    approvalStatus = "Pending Approval",
   } = bookingData;
 
   const guestSnapshot = allowGuestSnapshot

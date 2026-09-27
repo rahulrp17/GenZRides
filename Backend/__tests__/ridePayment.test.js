@@ -11,6 +11,7 @@ import bcrypt from "bcryptjs";
 let mongoServer;
 let customerToken;
 let driverToken;
+let adminToken;
 let testVehicle;
 
 const tripPayload = () => ({
@@ -39,6 +40,14 @@ beforeAll(async () => {
     phone: "9830000001",
     password: hashedPassword,
     role: "customer",
+  });
+
+  await User.create({
+    name: "Pay Admin",
+    email: "payadmin@test.com",
+    phone: "9830000003",
+    password: hashedPassword,
+    role: "admin",
   });
 
   const driverUser = await User.create({
@@ -87,6 +96,11 @@ beforeAll(async () => {
     .post("/api/auth/login")
     .send({ email: "paydriver@test.com", password: "Password123" });
   driverToken = driverLogin.body.accessToken;
+
+  const adminLogin = await request(app)
+    .post("/api/auth/login")
+    .send({ email: "payadmin@test.com", password: "Password123" });
+  adminToken = adminLogin.body.accessToken;
 });
 
 afterAll(async () => {
@@ -105,6 +119,17 @@ beforeEach(async () => {
 
 const authCust = (req) => req.set("Authorization", `Bearer ${customerToken}`);
 const authDriver = (req) => req.set("Authorization", `Bearer ${driverToken}`);
+const authAdmin = (req) => req.set("Authorization", `Bearer ${adminToken}`);
+
+// Registered bookings need admin approval before a driver can accept —
+// approve first, mirroring the real flow.
+async function approveBooking(id) {
+  const res = await authAdmin(
+    request(app).patch(`/api/admin/bookings/${id}/approve`)
+  );
+  expect(res.status).toBe(200);
+  return id;
+}
 
 // Drives one booking from creation to Reached and returns its id.
 async function rideToReached() {
@@ -113,6 +138,7 @@ async function rideToReached() {
   );
   expect(created.status).toBe(201);
   const id = created.body.booking._id;
+  await approveBooking(id);
 
   // Direct accept works with or without a dispatch queue, so no manual
   // dispatch is needed regardless of auto-dispatch timing.
@@ -140,6 +166,7 @@ describe("Driver cash-collection payment input", () => {
       tripPayload()
     );
     const id = created.body.booking._id;
+    await approveBooking(id);
     await authDriver(request(app).patch(`/api/bookings/${id}/accept`)).expect(200);
 
     const res = await authDriver(
