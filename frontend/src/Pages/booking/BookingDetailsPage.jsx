@@ -5,8 +5,9 @@ import { toast } from 'react-hot-toast';
 import {
   MapPin, Clock, Car, ArrowLeft, Loader2, CheckCircle, Navigation,
   User, Phone, X, CreditCard, CalendarDays, CircleDot, Wifi, WifiOff,
-  Copy, Check,
+  Copy, Check, Mail,
 } from 'lucide-react';
+import { customerEmail } from '../admin/bookingUtils';
 import { motion as Motion } from 'framer-motion';
 import { bookingAPI, driverAPI, adminAPI } from '../../services/endpoints';
 import { useCopyBooking } from '../../utils/bookingText';
@@ -218,6 +219,18 @@ const BookingDetailsPage = () => {
                 <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
               </button>
               <BookingStatusBadge status={booking.bookingStatus} />
+              {/* Instant (guest) vs registered context — the View link lands
+                  here for both queues, so the page labels which it is. */}
+              {booking.guestName && (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-violet-500/15 text-violet-300 border border-violet-500/30">
+                  Instant booking
+                </span>
+              )}
+              {booking.approvalStatus === 'Pending Approval' && (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                  Pending approval
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -330,10 +343,15 @@ const BookingDetailsPage = () => {
                   <User size={18} className="text-blue-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{booking.customer.name || 'N/A'}</p>
+                  <p className="text-sm font-medium text-white truncate">{booking.guestName || booking.customer.name || 'N/A'}</p>
                   <p className="text-xs text-gray-400 flex items-center gap-1">
                     <Phone size={11} /> {booking.customer.phone || 'N/A'}
                   </p>
+                  {customerEmail(booking) && (
+                    <p className="text-xs text-gray-400 flex items-center gap-1 truncate">
+                      <Mail size={11} /> {customerEmail(booking)}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

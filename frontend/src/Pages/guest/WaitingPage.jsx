@@ -325,13 +325,13 @@ const WaitingPage = () => {
                 {infoChips.map(
                   (c) =>
                     c.value && (
-                      <div key={c.label} className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 min-w-0 ${c.bg}`}>
-                        <span className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center shrink-0`}>
+                      <div key={c.label} className={`flex items-center gap-2 rounded-xl border px-1 py-2.5 min-w-0 ${c.bg}`}>
+                        <span className={`w-6 h-6 rounded-lg ${c.bg} flex items-center justify-center shrink-0`}>
                           <c.icon size={14} className={c.color} />
                         </span>
                         <div className="min-w-0">
                           <p className="text-[9px] uppercase tracking-widest text-gray-500 font-semibold">{c.label}</p>
-                          <p className="text-[13px] text-white font-medium truncate">{c.value}</p>
+                          <p className="text-[9px] text-white font-bold  truncate">{c.value}</p>
                         </div>
                       </div>
                     )
@@ -340,7 +340,7 @@ const WaitingPage = () => {
 
               {(booking.guestName || booking.guestPhone || booking.guestEmail) && (
                 <div className="mt-6">
-                  <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold mb-2.5">Contact for the driver</p>
+                  <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold mb-2.5">Customer Details</p>
                   <div className="flex flex-wrap gap-2.5">
                     {booking.guestName && (
                       <span className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3.5 py-1.5 text-[13px] text-gray-200">

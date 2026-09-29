@@ -450,7 +450,7 @@ const ConfirmPage = () => {
                       <span>
                         Distance fare
                         {fare.fareBreakdown.chargeableDistance > 0 && perKm != null && (
-                          <span className="block text-[11px] text-gray-500 font-normal">({(totalKm ?? 0).toFixed(1)} km - {fare.fareBreakdown.baseKm} km) x ₹{perKm}/perKm </span>
+                          <span className="block text-[11px] text-gray-500 font-normal"> {fare.fareBreakdown.chargeableDistance} km x ₹{(perKm)} /perKm</span>
                         )}
                       </span>
                       <span className="text-white tabular-nums shrink-0">{formatCurrency(fare.fareBreakdown.distanceFare)}</span>
@@ -564,7 +564,7 @@ const ConfirmPage = () => {
                         e.stopPropagation();
                         setTermsOpen(true);
                       }}
-                      className="text-emerald-300 font-semibold underline underline-offset-2 hover:text-emerald-200 transition-colors"
+                      className="text-emerald-300 font-semibold cursor-pointer underline underline-offset-2 hover:text-emerald-200 transition-colors"
                     >
                       Terms &amp; Conditions
                     </button>
@@ -672,7 +672,7 @@ const ConfirmPage = () => {
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[12px]">
               <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
                 <CalendarDays size={12} className="text-blue-400 shrink-0" />
-                <span className="truncate">{fmtWhen(draft.pickupDateTime)}</span>
+                <span className="truncate font-medium text-[11px]">{fmtWhen(draft.pickupDateTime)}</span>
               </div>
               <div className="flex items-center gap-1.5 bg-black/25 border border-white/10 rounded-lg px-2.5 py-1.5 text-gray-300 min-w-0">
                 <CarFront size={12} className="text-green-400 shrink-0" />
@@ -715,7 +715,7 @@ const ConfirmPage = () => {
                 <span className="text-gray-300">
                   Distance fare
                   {fare.fareBreakdown?.chargeableDistance > 0 && perKm != null && (
-                    <span className="block text-[11px] text-gray-500 font-normal">({(totalKm ?? 0).toFixed(1)} km - {fare.fareBreakdown.baseKm} km) x ₹{perKmLabel(perKm)}/perKm </span>
+                    <span className="block text-[11px] text-gray-500 font-normal"> ({fare.fareBreakdown.chargeableDistance} km) x ₹{perKmLabel(perKm)}/perKm </span>
                   )}
                 </span>
                 <span className="text-white font-medium tabular-nums shrink-0">{formatCurrency(fare.fareBreakdown?.distanceFare)}</span>
