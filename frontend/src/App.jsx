@@ -33,6 +33,7 @@ const AirportDetail = lazy(() => import("./Pages/AirportDetail/AirportDetail"));
 const InfoDetail = lazy(() => import("./Pages/InfoDetail/InfoDetail"));
 const Services = lazy(() => import("./Pages/Services/Services"));
 const BookingDetailsPage = lazy(() => import("./Pages/booking/BookingDetailsPage"));
+const BookingActionRedirect = lazy(() => import("./Pages/booking/BookingActionRedirect"));
 
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const AdminDashboard = lazy(() => import("./Pages/admin/AdminDashboard"));
@@ -187,6 +188,9 @@ function App() {
           <Route path="vehicles" element={<ManageVehicles />} />
           <Route path="bookings" element={<AdminCustomerBookings />} />
           <Route path="bookings/:id" element={<BookingDetailsPage />} />
+          {/* WhatsApp template landing (Meta appends the id with no
+              separator, so action rides in the path, not the query). */}
+          <Route path="booking-action/:action/:id" element={<BookingActionRedirect />} />
           <Route path="booking-requests" element={<AdminCustomerBookingRequests />} />
           <Route path="instant-bookings" element={<AdminInstantBookings />} />
           <Route path="instant-bookings/requests" element={<AdminInstantBookingRequests />} />

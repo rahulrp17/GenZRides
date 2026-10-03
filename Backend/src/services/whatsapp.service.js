@@ -262,11 +262,12 @@ export const buildBookingTemplateParams = async (booking) => {
 // own {{1}} variable in the dashboard (per-button numbering); the API
 // addresses buttons by 0-based position. Recommended dashboard order:
 //   0 = 🔍 View Booking   → <FRONTEND>/admin/bookings/{{1}}
-//   1 = ✅ Verify & Approve → <FRONTEND>/admin/bookings/{{1}}?action=verify
-//   2 = ❌ Cancel Booking   → <FRONTEND>/admin/bookings/{{1}}?action=cancel
-// The details page consumes ?action= (logged-in admin session) so these
-// work with zero webhook dependence. Omit trailing buttons when the
-// approved template has fewer URL buttons — Meta rejects extras.
+//   1 = ✅ Verify & Approve → <FRONTEND>/admin/booking-action/verify/{{1}}
+//   2 = ❌ Cancel Booking   → <FRONTEND>/admin/booking-action/cancel/{{1}}
+// NOTE: Meta appends the variable DIRECTLY with no separator and it must
+// be last — hence action-in-path (BookingActionRedirect forwards to the
+// details ?action= form). Add {{1}} via the editor's Add-variable button;
+// typed braces stay literal and break the link.
 export const buildBookingActionButtons = (bookingId) => {
   const id = String(bookingId || "");
   return [0, 1, 2].map((index) => ({
