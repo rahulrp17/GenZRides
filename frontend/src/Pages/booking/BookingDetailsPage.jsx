@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import {
@@ -43,6 +43,11 @@ const formatDateTime = (dateStr) => {
 const BookingDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Deep-link actions from the WhatsApp template URL buttons
+  // (?action=verify|cancel). Consumed once per booking.
+  const deepAction = searchParams.get('action');
+  const deepActionDoneRef = useRef(null);
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { socket } = useSocket();
@@ -137,6 +142,24 @@ const BookingDetailsPage = () => {
     onError: (err) => toast.error(err?.response?.data?.message || 'Failed to assign driver'),
   });
 
+  // Admin verify/approve (guest → verifyInstantBooking, registered →
+  // approveBooking). Same endpoints the request queues use.
+  const adminVerifyMutation = useMutation({
+    mutationFn: async (isGuest) => {
+      const { data } = isGuest
+        ? await adminAPI.verifyInstantBooking(id)
+        : await adminAPI.approveBooking(id);
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.dispatched ? 'Verified — sent to drivers!' : 'Verified! Finding drivers…');
+      invalidateDetail();
+      queryClient.invalidateQueries({ queryKey: ['adminBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['adminCounts'] });
+    },
+    onError: (err) => toast.error(err?.response?.data?.message || 'Failed to verify booking'),
+  });
+
   const adminCancelMutation = useMutation({
     mutationFn: ({ reason }) => adminAPI.cancelBooking(id, { reason }),
     onSuccess: () => {
@@ -147,6 +170,33 @@ const BookingDetailsPage = () => {
     },
     onError: (err) => toast.error(err?.response?.data?.message || 'Failed to cancel booking'),
   });
+
+  // WhatsApp deep-link actions (?action=verify|cancel): runs once per
+  // booking load, ABOVE the early returns (hooks must run every render).
+  // Verify executes immediately (explicit tap = intent); cancel opens the
+  // reason dialog (reason required).
+  useEffect(() => {
+    const b = data?.booking;
+    if (!deepAction || !b || deepActionDoneRef.current === `${id}:${deepAction}`) return;
+    const terminal = ['Completed', 'Cancelled'].includes(b.bookingStatus);
+    const verifyOk =
+      role === 'admin' && b.approvalStatus === 'Pending Approval' && !terminal;
+    const cancelOk = role === 'admin' && !terminal;
+    if (deepAction === 'verify' && verifyOk) {
+      deepActionDoneRef.current = `${id}:${deepAction}`;
+      setSearchParams({}, { replace: true });
+      adminVerifyMutation.mutate(!!b.guestName);
+    } else if (deepAction === 'cancel' && cancelOk) {
+      deepActionDoneRef.current = `${id}:${deepAction}`;
+      setSearchParams({}, { replace: true });
+      setCancelOpen(true);
+    } else if (deepAction === 'verify' || deepAction === 'cancel') {
+      deepActionDoneRef.current = `${id}:${deepAction}`;
+      setSearchParams({}, { replace: true });
+      toast('This booking no longer needs that action.');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deepAction, data?.booking?._id, data?.booking?.approvalStatus, data?.booking?.bookingStatus]);
 
   if (isError) {
     return <ErrorState message={error?.response?.data?.message || error?.message || 'Failed to load booking'} onRetry={invalidateDetail} />;
@@ -188,6 +238,10 @@ const BookingDetailsPage = () => {
     !['Completed', 'Cancelled'].includes(booking.bookingStatus);
   const canAdminCancel =
     role === 'admin' &&
+    !['Completed', 'Cancelled'].includes(booking.bookingStatus);
+  const canAdminVerify =
+    role === 'admin' &&
+    booking.approvalStatus === 'Pending Approval' &&
     !['Completed', 'Cancelled'].includes(booking.bookingStatus);
 
   return (
@@ -367,8 +421,22 @@ const BookingDetailsPage = () => {
         </div>
 
         {/* Role actions */}
-        {(canCustomerCancel || canDriverAccept || canAdminAssign || canAdminCancel) && (
+        {(canCustomerCancel || canDriverAccept || canAdminAssign || canAdminCancel || canAdminVerify) && (
           <div className="p-6 border-t border-white/10 space-y-3">
+            {canAdminVerify && (
+              <button
+                onClick={() => adminVerifyMutation.mutate(!!booking.guestName)}
+                disabled={adminVerifyMutation.isPending}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-[0_0_25px_rgba(34,197,94,0.5)] transition-all disabled:opacity-50"
+              >
+                {adminVerifyMutation.isPending ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <CheckCircle size={18} />
+                )}
+                {adminVerifyMutation.isPending ? 'Verifying…' : 'Verify & Dispatch'}
+              </button>
+            )}
             {canCustomerCancel && (
               <button
                 onClick={() => setCancelOpen(true)}

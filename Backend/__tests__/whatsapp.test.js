@@ -9,11 +9,14 @@ import {
   normalizeRecipient,
   buildBookingTemplateParams,
   buildViewBookingButton,
+  buildBookingActionButtons,
   BOOKING_ALERT_ACTIONS_TEMPLATE,
 } from "../src/services/whatsapp.service.js";
 
 let mongoServer;
 let booking;
+let vehicleId;
+let customerId;
 
 const ADMIN_TEST_NUMBER = "919876543210";
 
@@ -59,6 +62,8 @@ beforeAll(async () => {
     password: "Password123",
     role: "customer",
   });
+  vehicleId = vehicle._id;
+  customerId = customer._id;
   booking = await Booking.create({
     customer: customer._id,
     pickup: { address: "Pickup Plaza", latitude: 13.08, longitude: 80.27 },
@@ -113,11 +118,15 @@ describe("Admin booking WhatsApp alert", () => {
     expect(params[1]).toBe("WA Customer");
     expect(params[2]).toBe("9876543298");
     expect(params[7]).toBe("450");
-    // "View Booking" URL button carries the full booking id as suffix.
+    // Three action URL buttons (View idx 0, Verify idx 1, Cancel idx 2),
+    // each carrying the full booking id as its {{1}} suffix.
     const buttons = captured[0].template.components.filter((c) => c.type === "button");
-    expect(buttons).toHaveLength(1);
-    expect(buttons[0]).toMatchObject({ sub_type: "url", index: "2" });
-    expect(buttons[0].parameters[0].text).toBe(String(populated._id));
+    expect(buttons).toHaveLength(3);
+    expect(buttons.map((b) => b.index)).toEqual(["0", "1", "2"]);
+    buttons.forEach((b) => {
+      expect(b.sub_type).toBe("url");
+      expect(b.parameters[0].text).toBe(String(populated._id));
+    });
 
     const log = await WhatsappLog.findOne({ booking: booking._id }).lean();
     expect(log?.status).toBe("sent");
@@ -151,6 +160,11 @@ describe("Admin booking WhatsApp alert", () => {
       index: "2",
       parameters: [{ type: "text", text: "abc123" }],
     });
+    expect(buildBookingActionButtons("abc123")).toEqual([
+      { type: "button", sub_type: "url", index: "0", parameters: [{ type: "text", text: "abc123" }] },
+      { type: "button", sub_type: "url", index: "1", parameters: [{ type: "text", text: "abc123" }] },
+      { type: "button", sub_type: "url", index: "2", parameters: [{ type: "text", text: "abc123" }] },
+    ]);
   });
 
   it("falls back to the invoice-style text alert when the template send fails", async () => {
@@ -168,13 +182,51 @@ describe("Admin booking WhatsApp alert", () => {
 
     const result = await notifyAdminOfBooking(populated, flakySender);
 
-    expect(calls).toBe(2);
+    expect(calls).toBe(4);
     expect(result).toMatchObject({ sent: true, via: "text" });
     expect(texts).toHaveLength(1);
     expect(texts[0]).toContain("🧾 *New Booking");
     expect(texts[0]).toContain("Est. Fare:* ₹450 (Cash)");
     expect(texts[0]).toContain("Pickup:* Pickup Plaza");
     expect(texts[0]).toMatch(/VERIFY [0-9A-F]{8}.*CANCEL [0-9A-F]{8}/);
+  });
+
+  it("falls back through button layouts until the template accepts", async () => {
+    const seen = [];
+    const pickySender = async (payload) => {
+      seen.push(payload);
+      const buttons = (payload.template.components || []).filter((c) => c.type === "button");
+      // Reject the 3-URL layout (e.g. dashboard still has quick replies),
+      // accept anything with one or zero button components.
+      if (buttons.length > 1) {
+        const err = new Error("Parameter mismatch");
+        err.response = { status: 400, data: { error: { code: 132000, message: "Parameter mismatch" } } };
+        throw err;
+      }
+      return { sent: true, messageId: "test-cascade-1" };
+    };
+    // Fresh booking: the shared fixture may already carry a sent log.
+    const fresh = await Booking.create({
+      customer: customerId,
+      pickup: { address: "Pickup Plaza", latitude: 13.08, longitude: 80.27 },
+      drop: { address: "Drop Towers", latitude: 13.08, longitude: 80.27 },
+      pickupDateTime: new Date(Date.now() + 86400000),
+      tripType: "One Way",
+      vehicleType: vehicleId,
+      estimatedFare: 450,
+      paymentMethod: "Cash",
+      bookingStatus: "Pending",
+    });
+    const populatedFresh = await Booking.findById(fresh._id)
+      .populate("customer", "name phone")
+      .populate("vehicleType");
+
+    const result = await notifyAdminOfBooking(populatedFresh, pickySender);
+
+    expect(result).toMatchObject({ sent: true, via: "template" });
+    // 3-url rejected, single-view-url accepted → 2 template attempts, no text.
+    expect(seen).toHaveLength(2);
+    expect(seen.every((p) => p.type === "template")).toBe(true);
   });
 
   it("records the structured Meta error when the send fails", async () => {

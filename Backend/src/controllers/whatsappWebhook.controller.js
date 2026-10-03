@@ -48,7 +48,7 @@ export const handleWhatsappWebhook = async (req, res) => {
     try {
       payload = JSON.parse(raw);
     } catch {
-      return res.sendStatus(200);
+      return res.status(200).json({ success: true, message: "Ignored" });
     }
 
     const messages = parseIncomingMessages(payload);
@@ -58,9 +58,9 @@ export const handleWhatsappWebhook = async (req, res) => {
       await handleAdminMessage(msg);
     }
 
-    return res.sendStatus(200);
+    return res.status(200).json({ success: true, handled: messages.length });
   } catch (error) {
     console.error("[whatsapp-inbound] error:", error);
-    return res.sendStatus(200); // Always 200 so Meta doesn't retry forever
+    return res.status(200).json({ success: false });
   }
 };

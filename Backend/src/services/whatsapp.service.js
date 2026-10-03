@@ -225,12 +225,14 @@ const buildBookingAlert = async (booking) => {
 // BODY: (same 8-param invoice layout as before — see dashboard copy in
 // .env.example)
 // FOOTER (static text): GenZRides • Tap an action below
-// BUTTONS (in this order):
-//   1. Quick reply: ✅ Verify
-//   2. Quick reply: ❌ Cancel
-//   3. URL: 🔍 View Booking → <FRONTEND_URL>/admin/bookings/{{9}}
-//      ({{9}} continues the body numbering; the API sends the full
-//      booking _id as the suffix so View opens the details page.)
+// BUTTONS (URL type, Dynamic, in this order — each with its own {{1}}):
+//   1. 🔍 View Booking    → <FRONTEND_URL>/admin/bookings/{{1}}
+//   2. ✅ Verify & Approve → <FRONTEND_URL>/admin/bookings/{{1}}?action=verify
+//   3. ❌ Cancel Booking   → <FRONTEND_URL>/admin/bookings/{{1}}?action=cancel
+// (Quick replies were dropped: URL actions work through the admin login
+// session with zero webhook dependence. The ?action= deep link is consumed
+// by BookingDetailsPage — verify runs immediately, cancel opens the reason
+// dialog.)
 export const BOOKING_ALERT_ACTIONS_TEMPLATE = {
   name: "booking_alert_actions",
   category: "UTILITY",
@@ -256,8 +258,26 @@ export const buildBookingTemplateParams = async (booking) => {
   return [f.ref, f.name, f.phone, f.pickup, f.drop, f.when, f.vehicle, f.fare];
 };
 
-// URL-button component for the "View Booking" deep link. Buttons are
-// 0-indexed in send order: 0 = Verify, 1 = Cancel, 2 = View URL.
+// URL-button components for the booking alert. Each URL button carries its
+// own {{1}} variable in the dashboard (per-button numbering); the API
+// addresses buttons by 0-based position. Recommended dashboard order:
+//   0 = 🔍 View Booking   → <FRONTEND>/admin/bookings/{{1}}
+//   1 = ✅ Verify & Approve → <FRONTEND>/admin/bookings/{{1}}?action=verify
+//   2 = ❌ Cancel Booking   → <FRONTEND>/admin/bookings/{{1}}?action=cancel
+// The details page consumes ?action= (logged-in admin session) so these
+// work with zero webhook dependence. Omit trailing buttons when the
+// approved template has fewer URL buttons — Meta rejects extras.
+export const buildBookingActionButtons = (bookingId) => {
+  const id = String(bookingId || "");
+  return [0, 1, 2].map((index) => ({
+    type: "button",
+    sub_type: "url",
+    index: String(index),
+    parameters: [{ type: "text", text: id }],
+  }));
+};
+
+// Back-compat single View button (old single-URL-button templates).
 export const buildViewBookingButton = (bookingId) => ({
   type: "button",
   sub_type: "url",
@@ -349,21 +369,45 @@ export const notifyAdminOfBooking = async (booking, sender = null) => {
     const { templateName, templateLang, frontendUrl } = getConfig();
 
     // Path 1: approved template (delivers with no open 24h window).
-    // Attaches the "View Booking" URL-button suffix when a frontend URL is
-    // configured. If the approved template has no such button, Meta rejects
-    // the send and we fall through to the text fallback below.
+    // Button layouts differ across template versions (quick replies vs
+    // URL buttons, one vs three), so we cascade: full 3-URL actions →
+    // legacy single View URL → body only (the template's own static
+    // buttons still render). First success wins; anything else falls
+    // through to the text fallback below.
+    const params = await buildBookingTemplateParams(booking);
+    const attempts = frontendUrl
+      ? [
+          { label: "3-url-actions", buttons: buildBookingActionButtons(booking._id) },
+          { label: "single-view-url", buttons: [buildViewBookingButton(booking._id)] },
+          { label: "body-only", buttons: null },
+        ]
+      : [{ label: "body-only", buttons: null }];
     try {
       console.log(
         `[whatsapp] booking ${ref}: sending template '${templateName}' via ${GRAPH_API_VERSION}/${phoneNumberId} to ${maskPhone(to)}`
       );
-      const params = await buildBookingTemplateParams(booking);
-      const buttons = frontendUrl
-        ? [buildViewBookingButton(booking._id)]
-        : null;
-      const result = await sendTemplateMessage(to, params, sender, undefined, undefined, buttons);
-      if (result?.skipped === "whatsapp-not-configured") {
-        return { sent: false, skipped: "whatsapp-not-configured" };
+      let result = null;
+      let lastError = null;
+      for (const attempt of attempts) {
+        try {
+          result = await sendTemplateMessage(to, params, sender, undefined, undefined, attempt.buttons);
+          if (result?.skipped === "whatsapp-not-configured") {
+            return { sent: false, skipped: "whatsapp-not-configured" };
+          }
+          console.log(
+            `[whatsapp] booking ${ref}: template layout '${attempt.label}' accepted`
+          );
+          break;
+        } catch (attemptErr) {
+          lastError = attemptErr;
+          console.warn(
+            `[whatsapp] booking ${ref}: template layout '${attempt.label}' rejected, trying next:`,
+            JSON.stringify(sanitizeMetaError(attemptErr))
+          );
+          result = null;
+        }
       }
+      if (!result) throw lastError || new Error("template send failed");
       await markAlertSent(booking._id, to);
       console.log(
         `[whatsapp] booking ${ref}: template sent to ${maskPhone(to)} (id=${result?.messageId || "n/a"})`

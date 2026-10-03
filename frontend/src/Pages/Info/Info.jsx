@@ -230,7 +230,7 @@ const Info = () => {
                 href="tel:+91934830199"
                 className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white/5 border border-white/15 text-white text-sm font-semibold hover:border-green-500/50 hover:text-green-300 transition-all"
               >
-                <Phone size={16} /> +91 93483 0199
+                <Phone size={16} /> +91 934283 0199
               </a>
             </div>
           </Reveal>
